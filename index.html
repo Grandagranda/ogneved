@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ОГНЕВЕД — проекты в области тушения пожаров</title>
+<meta name="description" content="Расчёты и проектная документация в области пожаротушения: проезды и подъезды, планы тушения пожаров, расход воды, силы и средства. Работаем по всей России.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Manrope:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/parts.css">
+<link rel="stylesheet" href="css/home.css">
+</head>
+<body class="home">
+<header class="hdr" id="hdr"></header>
+
+<main class="frame">
+  <!-- 01 · первый экран — по макету Figma (узел 2031:1164); поверх рендера — плашка «Схема объекта» и пометки схемы (js/hero.js) -->
+  <section class="hero" id="top">
+    <div class="hero-stage">
+      <i class="fl fl--h" style="--y:40.25rem"></i>
+      <div class="hero-in">
+        <p class="badge hero-badge"><svg class="flag" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.975.5C4.725.5 1.95 2.6.925 5.5h14.15C14.025 2.6 11.25.5 7.975.5Z" fill="#EEE"/><path d="M7.975 15.5c3.275 0 6.05-2.1 7.075-5H.925c1.025 2.925 3.8 5 7.05 5Z" fill="#FE2630"/><path d="M.925 5.5A7.5 7.5 0 0 0 .5 8c0 .875.15 1.725.425 2.5h14.15c.275-.775.425-1.625.425-2.5s-.15-1.725-.425-2.5H.925Z" fill="#3C73E9"/></svg>Работаем по всей России с 2012 года</p>
+        <h1 class="hero-h"><span class="ln"><span>Экспертные решения</span></span> <span class="ln"><span>в области пожарной</span></span> <span class="ln"><span><mark class="hl"><b>безопасности</b></mark></span></span></h1>
+        <p class="hero-sub">Разрабатываем расчётные обоснования и&nbsp;документацию для зданий и&nbsp;сооружений. Профессионально, обоснованно, в&nbsp;срок.</p>
+        <button class="fb hero-cta" data-open="form"><span>Заказать проект</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></button>
+
+        <div class="hero-art" id="art">
+          <img class="art-photo" src="img/hero-photo-1600.webp" srcset="img/hero-photo-1600.webp 1600w, img/hero-photo.webp 2560w" sizes="(min-width: 1700px) 61vw, 1021px" width="2560" height="1429" alt="Здание в разрезе: спринклерная сеть, пожарные краны, резервуар и пожарная автоцистерна" fetchpriority="high">
+        </div>
+        <!-- Figma «Vector 1»: размытое пятно цвета фона гасит низ дерева у левого края рендера -->
+        <svg class="hero-blob" viewBox="0 0 262.276 264.367" aria-hidden="true"><filter id="hb-f" x="0" y="0" width="262.276" height="264.367" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="8.3"/></filter><path filter="url(#hb-f)" fill="#F9FAFE" fill-opacity=".47" d="M157.176 97.053 126.676 59.553C118.342 55.22 93.576 46.553 91.176 44.553 88.176 42.053 70.176 22.053 68.176 17.053 66.176 12.053 46.676 50.053 43.676 52.053 40.676 54.053 27.676 100.553 22.676 103.553 17.676 106.553 14.176 220.053 18.676 226.053 23.176 232.053 86.176 242.553 91.176 242.053 96.176 241.553 187.176 251.053 215.176 246.553 243.176 242.053 212.176 219.553 210.176 211.053 208.576 204.253 237.509 205.22 245.676 199.553L236.676 162.553C213.009 161.22 154.476 148.853 151.676 148.053 148.876 147.253 121.676 152.72 111.676 148.053 110.342 139.22 114.176 107.553 151.676 111.553 176.535 114.205 133.176 97.053 157.176 97.053Z"/></svg>
+        <div class="plate" id="plate"></div>
+      </div>
+      <i class="hero-fade" aria-hidden="true"></i>
+    </div>
+
+    <div class="hero-form-w">
+      <div class="hero-form">
+        <h2 class="hf-t"><em>Бесплатная консультация</em> за&nbsp;15&nbsp;минут</h2>
+        <p class="hf-s">Оставьте заявку и&nbsp;мы подберем подходящее решение под ваш объект</p>
+        <form class="form hf" novalidate>
+          <label class="fld"><input name="name" placeholder=" " autocomplete="name"><span>Ваше имя</span></label>
+          <label class="fld fld--tel"><svg class="flag" viewBox="0 0 14 11" aria-hidden="true"><path d="M14 9.036c0 .417-.164.816-.456 1.111a1.55 1.55 0 0 1-1.1.46H1.556a1.55 1.55 0 0 1-1.1-.46A1.58 1.58 0 0 1 0 9.036V7.464h14v1.572Z" fill="#CE2028"/><path d="M0 3.536h14v3.928H0z" fill="#22408C"/><path d="M12.444.393H1.556c-.413 0-.809.165-1.1.46A1.58 1.58 0 0 0 0 1.964v1.572h14V1.964c0-.417-.164-.816-.456-1.111a1.55 1.55 0 0 0-1.1-.46Z" fill="#fff"/></svg><input name="phone" type="tel" placeholder="+7 (000) 000 00 00" autocomplete="tel" required><span class="pfx">+7</span></label>
+          <label class="fld"><input name="obj" placeholder=" "><span>Ваш объект</span></label>
+          <button class="btn btn--red" type="submit">Получить консультацию</button>
+          <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="#">политикой конфиденциальности</a></p>
+          <div class="form-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><b>Заявка отправлена</b><p class="muted">Специалист перезвонит в течение 15 минут в рабочее время.</p></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- клиенты: сетка логотипов на линиях рамки -->
+  <section class="clients" aria-label="Нам доверяют">
+    <div class="wrap2 cl-head"><p class="badge badge--flat"><i></i>Нам доверяют</p><p class="cl-note">Проектные институты, девелоперы и&nbsp;промышленные предприятия</p></div>
+    <div class="cl-grid" id="clients"></div>
+  </section>
+
+  <!-- 02 · услуги: шесть карточек 3 × 2 по макету Figma (2031:1164) — картинка, срок, цена; при наведении — сцена услуги -->
+  <section class="sec sec--tint" id="services">
+    <div class="wrap2">
+      <div class="sh">
+        <p class="badge badge--flat"><i></i>Услуги</p>
+        <h2 class="h2x">Расчёты и&nbsp;документы <span class="g">для пожаротушения</span></h2>
+        <div class="sh-r"><p>Документы готовят пожарные с&nbsp;профильным образованием — поэтому решения учитывают реальную тактику тушения.</p></div>
+      </div>
+      <div class="scx" id="svc"></div>
+    </div>
+  </section>
+
+  <!-- 03 · о нас: заявление, цифры, преимущества — бенто-сетка плиток с графикой (js/pros-fx.js) -->
+  <section class="sec" id="about">
+    <div class="wrap2">
+      <div class="st">
+        <p class="badge badge--flat rv"><i></i>О нас</p>
+        <p class="st-text" id="statement">С&nbsp;2012 года узко специализируемся на&nbsp;тушении пожаров. Разрабатываем проектные обоснования, которые подтверждают: пожарные подразделения смогут подъехать к&nbsp;объекту, получить воду и&nbsp;потушить пожар.</p>
+      </div>
+      <ul class="nums" id="nums"></ul>
+      <ul class="prx" id="pros"></ul>
+    </div>
+  </section>
+
+  <!-- 04 · объекты: горизонтальная лента, едет при прокрутке -->
+  <section class="objx" id="objects">
+    <div class="objx-pin">
+      <div class="wrap2 sh">
+        <p class="badge badge--flat"><i></i>Объекты</p>
+        <h2 class="h2x">Для каких объектов<br><span class="g">мы&nbsp;проектируем</span></h2>
+        <div class="sh-r"><p>От жилого дома до&nbsp;гидроэлектростанции. Выберите тип объекта&nbsp;—<br>подготовим предложение под ваши условия.</p></div>
+      </div>
+      <div class="objx-track" id="obj"></div>
+      <div class="wrap2 objx-bar"><span class="mono" id="obj-k">01 / 08</span><i><b id="obj-p"></b></i></div>
+    </div>
+  </section>
+
+  <!-- 05 · наши работы -->
+  <section class="sec sec--tint" id="works">
+    <div class="wrap2">
+      <div class="sh">
+        <p class="badge badge--flat"><i></i>Наши работы</p>
+        <h2 class="h2x">Выполненные <span class="g">проекты</span></h2>
+        <div class="sh-r"><p>Стоимость и&nbsp;сроки указаны как «основная работа + дополнительные услуги».</p></div>
+      </div>
+      <div class="chips2" id="works-f"></div>
+      <div class="wkx" id="works-list"></div>
+      <div class="more2"><a class="fb" href="raboty.html" id="works-more"><span>Все проекты</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a></div>
+    </div>
+  </section>
+
+  <!-- 06 · стоимость -->
+  <section class="sec" id="price">
+    <div class="wrap2">
+      <div class="sh">
+        <p class="badge badge--flat"><i></i>Стоимость</p>
+        <h2 class="h2x">Сколько стоит <span class="g">проект</span></h2>
+      </div>
+      <div class="calc-wrap rv" id="calc"></div>
+    </div>
+  </section>
+
+  <!-- 07 · как мы работаем: блок закрепляется на экран; слева заголовок и кнопка, справа в кадре одна карточка шага —
+       при прокрутке следующая выезжает снизу и ложится поверх, предыдущие уходят в стопку -->
+  <section class="sec sec--tint" id="steps">
+    <div class="stk-run" id="stk-run"><div class="stk-pin">
+    <div class="wrap2 stk">
+      <div class="stk-l">
+        <p class="badge badge--flat"><i></i>Как мы работаем</p>
+        <h2 class="h2x">От&nbsp;заявки<br>до&nbsp;проекта<br><span class="g">в&nbsp;пять шагов</span></h2>
+        <p class="stk-s">Срок выполнения зависит от&nbsp;объёма работ — точную дату сдачи фиксируем в&nbsp;договоре.</p>
+        <button class="fb" data-open="form" data-q="Обсудить проект"><span>Обсудить проект</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></button>
+      </div>
+      <ol class="stk-list" id="stk"></ol>
+    </div>
+    </div></div>
+  </section>
+
+  <!-- 08 · география: контур России подложкой, маршруты из Москвы пунктиром, иллюстрация поверх карты (D.geoImg),
+       справа карточки городов с числом проектов и красная «Всего», под ними тёмная плашка -->
+  <section class="sec" id="geo">
+    <div class="wrap2">
+      <div class="geh">
+        <p class="badge badge--flat"><i></i>География</p>
+        <h2 class="h2x">Неважно, где вы&nbsp;находитесь, —<br><span class="g">работаем по&nbsp;всей России</span></h2>
+      </div>
+      <div class="gst">
+        <div class="map gst-map rv" id="map"><div class="map-tip" id="map-tip"></div></div>
+        <div class="gst-lg" aria-hidden="true"><span><i class="lg-dot"></i>Выполненные проекты</span><span><i class="lg-ring"></i>Работаем удалённо</span></div>
+        <div class="gst-art" id="geo-art"></div>
+        <div class="gst-r">
+          <ul class="gcx" id="geo-cards"></ul>
+          <div class="gbar">
+            <span class="gbar-i"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 10.4 2.6 2.6L14 7.4"/></svg></span>
+            <p>Работаем дистанционно: исходные данные получаем онлайн, документы передаём в&nbsp;электронном виде и&nbsp;курьером</p>
+            <b id="geo-total"></b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 · вопросы -->
+  <section class="sec sec--tint" id="faq">
+    <div class="wrap2 fqx">
+      <div class="fqx-l">
+        <p class="badge badge--flat"><i></i>Вопросы</p>
+        <h2 class="h2x">Ответы на&nbsp;<span class="g">частые вопросы</span></h2>
+        <div class="fqx-ask" id="faq-ask"></div>
+      </div>
+      <div class="fqx-list" id="faq-list"></div>
+    </div>
+  </section>
+
+  <!-- 10 · статьи: лента карточек листается стрелками, перетаскиванием и жестом тачпада -->
+  <section class="sec" id="blog">
+    <div class="wrap2 arh">
+      <div class="arh-l">
+        <p class="badge badge--flat"><i></i>Статьи</p>
+        <h2 class="h2x">О&nbsp;пожаротушении<br><span class="g">простым языком</span></h2>
+      </div>
+      <div class="arh-r">
+        <a class="fb fb--red" href="blog.html"><span>Все статьи</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a>
+        <div class="arn">
+          <button class="arn-b" id="ar-prev" aria-label="Предыдущая статья"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12 4.5 6.5 10l5.5 5.5"/></svg></button>
+          <button class="arn-b" id="ar-next" aria-label="Следующая статья"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m8 4.5 5.5 5.5L8 15.5"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="arv">
+      <div class="wrap2"><div class="arx" id="arts"></div></div>
+    </div>
+  </section>
+
+  <!-- 11 · библиотека -->
+  <section class="sec sec--tint" id="library">
+    <div class="wrap2">
+      <div class="sh">
+        <p class="badge badge--flat"><i></i>Библиотека</p>
+        <h2 class="h2x">Нормативы и&nbsp;книги,<br><span class="g">с&nbsp;которыми работаем</span></h2>
+        <div class="sh-r"><a class="fb fb--sm" href="biblioteka.html"><span>Открыть библиотеку</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a></div>
+      </div>
+      <div class="lib-grid lbx" id="lib"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="ftr ftr--dark" id="ftr"></footer>
+
+<script src="js/vendor/lenis.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/map-dots.js"></script>
+<script src="js/map-outline.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/calc.js"></script>
+<script src="js/hero.js"></script>
+<script src="js/svc-fx.js"></script>
+<script src="js/pros-fx.js"></script>
+<script src="js/obj-fx.js"></script>
+<script src="js/home.js"></script>
+<script src="js/motion.js"></script>
+</body>
+</html>

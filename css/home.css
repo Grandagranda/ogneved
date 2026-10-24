@@ -1,0 +1,1023 @@
+/* Главная (ПК) — по макету Figma «Огневед», кадр «home» (узел 2031:1164; первый вариант — 2004:4).
+   Размеры — пиксели макета 1920 / 16 (1rem = 16px на 1920, растёт до 2560; на 1280–1699 — 14px).
+   Язык макета: Inter Tight 400/500, чёрный #0f1012, красный #f5312a, фон первого экрана #f9fafe,
+   подписи капсом 11–13px, тонкие линии рамки rgba(0,0,0,.07), скругления 5–12px, стрелка-уголок в кнопках. */
+.home {
+  --f: 'Inter Tight', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'Geist Mono', ui-monospace, monospace;
+  --ink: #0f1012;
+  --ink-52: rgba(15, 16, 18, .52);
+  --red: #f5312a;
+  --red-2: #dc241d;
+  --tint: #f9fafe;
+  --tint-2: #f3f5fc;
+  --field: #f4f5f6;
+  --grey: #8d9198;
+  --grey-2: #abb0c5;
+  --ln: rgba(0, 0, 0, .07);
+  --ln-2: rgba(0, 0, 0, .12);
+  --acc: var(--red);
+  --hdr: 3.8125rem;
+  --cw: min(87.5rem, 100vw - 6rem);
+  --fx: max(1.5rem, (100vw - var(--cw)) / 2 - 9.375rem);
+  --e-out: cubic-bezier(.16, 1, .3, 1);
+  --e-io: cubic-bezier(.65, 0, .35, 1);
+  --sh-card: 1.125rem 2.25rem 5.5625rem rgba(168, 175, 204, .1), 4.5625rem 9rem 10.0625rem rgba(168, 175, 204, .09), 10.25rem 20.25rem 13.625rem rgba(168, 175, 204, .05), 18.25rem 35.9375rem 15.625rem rgba(168, 175, 204, .01);
+  --sh-badge: 0 .5rem .5625rem rgba(144, 158, 213, .1), 0 2rem 1rem rgba(144, 158, 213, .09), 0 4.5625rem 1.375rem rgba(144, 158, 213, .05), 0 8.0625rem 1.625rem rgba(144, 158, 213, .01);
+  font-family: var(--f);
+  letter-spacing: 0;
+  color: var(--ink);
+}
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+.home .mono { font-family: var(--f-mono); letter-spacing: 0; }
+.home ::selection { background: var(--red); color: #fff; }
+
+/* ── рамка-чертёж: вертикальные линии через всю страницу, на стыках с линиями блоков — крестики ── */
+.frame { position: relative; }
+.frame::before, .frame::after { content: ''; position: absolute; z-index: 4; top: 0; bottom: 0; width: 1px; background: var(--ln); pointer-events: none; }
+.frame::before { left: var(--fx); }
+.frame::after { right: var(--fx); }
+.wrap2 { position: relative; width: var(--cw); margin: 0 auto; }
+.sec { position: relative; padding: 9rem 0; }
+/* соседние блоки на главной разного цвета — у каждого свой верхний отступ (в base.css у внутренних страниц он обнулён) */
+.home .sec + .sec { padding-top: 9rem; }
+.sec--tint { background: var(--tint); }
+.sec::before { content: ''; position: absolute; z-index: 3; top: 0; left: var(--fx); right: var(--fx); height: 1px; background: var(--ln); }
+.sec::after { content: ''; position: absolute; z-index: 5; top: -.34375rem; left: calc(var(--fx) - .34375rem); right: calc(var(--fx) - .34375rem); height: .6875rem; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M5.5 0v11M0 5.5h11' stroke='%230f1012' stroke-opacity='.32'/%3E%3C/svg%3E") left center / .6875rem no-repeat,
+              url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M5.5 0v11M0 5.5h11' stroke='%230f1012' stroke-opacity='.32'/%3E%3C/svg%3E") right center / .6875rem no-repeat; }
+
+/* ── общие элементы макета ── */
+.badge { display: inline-flex; align-items: center; gap: .375rem; padding: .625rem 1.125rem; border: 1px solid #fff; border-radius: .5rem; background: var(--tint-2); box-shadow: var(--sh-badge); font-size: .6875rem; line-height: 1.35; font-weight: 500; text-transform: uppercase; white-space: nowrap; }
+/* в блоках ниже первого экрана тень плашки короче — длинный спад из макета на белом читается «призраком» */
+.sec .badge, .clients .badge, .objx .badge { box-shadow: 0 .375rem .875rem -.25rem rgba(144, 158, 213, .28); }
+.badge > i { width: .375rem; height: .375rem; margin-right: .1875rem; border-radius: 1px; background: var(--red); }
+.badge .flag { width: 1rem; height: 1rem; flex: none; }
+.h2x { font-size: 3.5rem; line-height: .94; font-weight: 500; letter-spacing: -.035em; }
+.h2x .g, .g { color: var(--grey-2); }
+.sh { display: grid; grid-template-columns: minmax(0, 1fr) 25rem; column-gap: 6rem; row-gap: 1.2875rem; align-items: end; margin-bottom: 4.5rem; }
+.sh .badge { grid-column: 1; justify-self: start; }
+.sh .h2x { grid-column: 1; max-width: 54rem; }
+.sh-r { grid-column: 2; display: grid; justify-items: start; gap: 1.75rem; padding-bottom: .375rem; }
+.sh-r p { font-size: 1rem; line-height: 1.5; color: var(--ink-52); }
+.shc { display: grid; justify-items: center; gap: 1.2875rem; margin-bottom: 4.5rem; text-align: center; }
+/* заголовок в «уголках» — как рамка выделения на чертеже */
+.brk { position: relative; padding: 1.75rem 2.75rem; }
+.brk::before, .brk::after { content: ''; position: absolute; width: 1rem; height: 1rem; border: 0 solid rgba(15, 16, 18, .3); }
+.brk::before { left: 0; top: 0; border-width: 1px 0 0 1px; }
+.brk::after { right: 0; bottom: 0; border-width: 0 1px 1px 0; }
+
+/* кнопка-контур с красной стрелкой в углу (Figma: Rectangle 10 + arrow-up-right); заливка поднимается снизу */
+.fb { position: relative; display: inline-flex; align-items: center; justify-content: center; height: 3.25rem; padding: 0 3.5rem; border-radius: .375rem; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .38); font-size: .8125rem; line-height: 1.35; font-weight: 500; text-transform: uppercase; white-space: nowrap; color: var(--ink); overflow: hidden; isolation: isolate; transition: color .5s var(--e-out), box-shadow .5s; }
+.fb::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--ink); transform: scaleY(0); transform-origin: 50% 100%; transition: transform .6s var(--e-out); }
+.fb:hover { color: #fff; box-shadow: inset 0 0 0 1px var(--ink); }
+.fb:hover::before { transform: none; }
+.fb-ar { position: absolute; top: .3125rem; right: .3125rem; width: 1.0625rem; height: 1.0625rem; fill: none; stroke: var(--red); stroke-width: 1.5; stroke-linejoin: round; transition: transform .5s var(--e-out), stroke .3s; }
+.fb:hover .fb-ar { transform: translate(2px, -2px); }
+.fb--sm { height: 2.75rem; padding: 0 2.75rem; font-size: .75rem; }
+.fb--dark { background: var(--ink); color: #fff; box-shadow: none; }
+.fb--dark::before { background: var(--red); }
+.fb--dark:hover { box-shadow: none; }
+.fb--dark:hover .fb-ar { stroke: #fff; }
+.home .btn { border-radius: .3125rem; letter-spacing: 0; }
+.home .btn--red { background: var(--red); color: #fff; height: 3.75rem; font-size: .9375rem; font-weight: 500; }
+.home .btn--red::before { background: var(--ink); }
+.home .btn--red:hover { color: #fff; }
+.home .btn--dark::before, .home .btn--line::before, .home .btn--white::before { background: var(--red); }
+
+/* ── шапка (Figma: 0–61px) ── */
+.home .hdr { position: fixed; left: 0; right: 0; top: 0; height: var(--hdr); background: transparent; box-shadow: none; transition: background-color .4s, transform .6s var(--e-out), backdrop-filter .4s; }
+.home .hdr::after { content: ''; position: absolute; left: var(--fx); right: var(--fx); bottom: 0; height: 1px; background: var(--ln); transition: left .5s var(--e-out), right .5s var(--e-out); }
+.home .hdr.is-scrolled { background: rgba(249, 250, 254, .84); -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); }
+.home .hdr.is-scrolled::after { left: 0; right: 0; }
+.home .hdr.is-hid { transform: translateY(-100%); }
+.hx-in { display: grid; grid-template-columns: 19.5rem minmax(0, 1fr) auto auto; column-gap: 0; align-items: start; width: var(--cw); height: 100%; margin: 0 auto; }
+.hx-logo { display: grid; justify-items: start; padding-top: .9375rem; }
+.hx-logo img { display: block; width: auto; height: 1rem; }
+.hx-logo small { margin-top: .375rem; font-size: .8125rem; line-height: 1.35; color: var(--grey); }
+.hx-nav { display: flex; gap: clamp(1.25rem, 2.2vw, 2.75rem); padding-top: 1.3125rem; }
+.hx-nav > a, .hx-nav .dd > a { position: relative; display: block; font-size: .75rem; line-height: 1.35; text-transform: uppercase; white-space: nowrap; }
+/* наведение без подчёркиваний: пункт краснеет */
+.hx-nav > a, .hx-nav .dd > a { transition: color .3s; }
+.hx-nav > a:hover, .hx-nav .dd:hover > a { color: var(--red); }
+.hx-nav .dd { position: relative; }
+.hx-nav .mega { top: calc(100% + 1.375rem); left: -1.5rem; width: 44rem; padding: .5rem; border-radius: .75rem; grid-template-columns: 1fr 1fr; gap: .25rem; box-shadow: 0 2rem 4rem -1.5rem rgba(15, 16, 18, .18), 0 0 0 1px rgba(0, 0, 0, .05); }
+.hx-nav .mega::before { top: -1.5rem; height: 1.5rem; }
+.hx-nav .mega a { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: .25rem .5rem; padding: .875rem 1rem; border-radius: .5rem; }
+.hx-nav .mega a i { grid-row: span 2; font: 500 .6875rem/1.6 var(--f-mono); font-style: normal; color: var(--red); }
+.hx-nav .mega a b { font-size: .9375rem; font-weight: 500; letter-spacing: -.01em; }
+.hx-nav .mega a span { font-size: .75rem; color: var(--grey); }
+.hx-tel { margin-left: 1.5rem; padding-top: 1.1875rem; font-size: 1rem; line-height: 1.35; font-weight: 500; white-space: nowrap; transition: color .3s; }
+.hx-tel:hover { color: var(--red); }
+.hx-btn { position: relative; width: 12.75rem; height: 2.625rem; margin: .5rem 0 0 1.25rem; border-radius: .375rem; background: var(--ink); color: #fff; font-size: .9375rem; line-height: 1.35; font-weight: 500; overflow: hidden; isolation: isolate; }
+.hx-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--red); transform: scaleY(0); transform-origin: 50% 100%; transition: transform .6s var(--e-out); }
+.hx-btn:hover::before { transform: none; }
+.hx-btn .fb-ar { top: .125rem; }
+.hx-btn:hover .fb-ar { stroke: #fff; transform: translate(2px, -2px); }
+
+/* ── 01 · первый экран (Figma 2031:1164) ── */
+.hero { --hero-bg: var(--tint); position: relative; }
+.hero-stage { position: relative; height: 52.875rem; overflow: hidden; background: var(--hero-bg); }
+.fl--h { position: absolute; z-index: 4; left: var(--fx); right: var(--fx); top: var(--y); height: 1px; background: var(--ln); }
+.hero-in { position: relative; width: var(--cw); height: 100%; margin: 0 auto; }
+.hero-badge { position: absolute; z-index: 3; left: 0; top: 10.125rem; padding: .625rem 1.5625rem; }
+.hero-h { position: absolute; z-index: 3; left: 0; top: 13.5625rem; width: 36.6875rem; display: flex; flex-direction: column; font-size: 3.875rem; line-height: .83; font-weight: 500; letter-spacing: -.03em; }
+.hero-h .ln { display: block; overflow: hidden; padding: .1em .12em .16em .12em; margin: -.1em -.12em -.16em -.12em; }
+.hero-h .ln > span { display: block; }
+.hero-h .g { color: var(--grey-2); }
+.hl { position: relative; z-index: 0; display: inline-block; vertical-align: top; background: none; color: inherit; line-height: .83; }
+/* Figma Rectangle 13: 388×53, на 6px левее слова */
+.hl::before { content: ''; position: absolute; z-index: -1; left: var(--hl-l, -.0968em); right: var(--hl-r, -.165em); top: 0; height: .855em; border-radius: .3125rem; background: var(--red); transform-origin: 0 50%; }
+.hl b { font-weight: inherit; color: #fff; }
+.hero-sub { position: absolute; z-index: 3; left: 0; top: 24.4375rem; width: 29.3125rem; font-size: 1rem; line-height: 1.35; color: var(--ink-52); }
+.hero-cta { position: absolute; z-index: 3; left: 0; top: 29.5625rem; width: 16.6875rem; padding: 0; }
+/* Figma image 23: 806, 28 · 1167×651 */
+.hero-art { position: absolute; z-index: 1; left: 34.125rem; top: 1.75rem; width: 72.9375rem; height: 40.6875rem; }
+.hero-blob { position: absolute; z-index: 2; left: 30.8988rem; top: 23.8408rem; width: 16.3923rem; height: 16.5229rem; pointer-events: none; }
+.hero-art > img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-fade { position: absolute; z-index: 2; left: calc((100vw - var(--cw)) / 2 + 21.875rem); top: 3.8125rem; width: 78.75rem; height: 3.0625rem; background: linear-gradient(rgba(249, 250, 254, .99), rgba(249, 250, 254, 0)); pointer-events: none; }
+/* крестики на углах рамки первого экрана, как на стыках блоков ниже */
+.hero-stage::after { content: ''; position: absolute; z-index: 5; left: calc(var(--fx) - .34375rem); right: calc(var(--fx) - .34375rem); top: calc(3.8125rem - .34375rem); height: calc(36.4375rem + .6875rem); pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M5.5 0v11M0 5.5h11' stroke='%230f1012' stroke-opacity='.32'/%3E%3C/svg%3E") left top / .6875rem no-repeat,
+              url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M5.5 0v11M0 5.5h11' stroke='%230f1012' stroke-opacity='.32'/%3E%3C/svg%3E") right top / .6875rem no-repeat,
+              url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M5.5 0v11M0 5.5h11' stroke='%230f1012' stroke-opacity='.32'/%3E%3C/svg%3E") left bottom / .6875rem no-repeat,
+              url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M5.5 0v11M0 5.5h11' stroke='%230f1012' stroke-opacity='.32'/%3E%3C/svg%3E") right bottom / .6875rem no-repeat; }
+
+/* вход: строки заголовка поднимаются, красная плашка проводится маркером, рендер проявляется */
+.hero-h .ln > span, .hero-badge, .hero-sub, .hero-cta, .hero-form { animation: h-rise 1.2s var(--e-out) both; }
+.hero-badge { animation-delay: .05s; }
+.hero-h .ln:nth-child(2) > span { animation-delay: .09s; }
+.hero-h .ln:nth-child(3) > span { animation-delay: .18s; }
+.hero-sub { animation-delay: .34s; }
+.hero-cta { animation-delay: .44s; }
+.hero-form { animation-delay: .6s; }
+.hero-h .ln > span { animation-name: h-line; animation-duration: 1.25s; }
+@keyframes h-line { from { transform: translateY(108%); } }
+@keyframes h-rise { from { opacity: 0; transform: translateY(1.25rem); } }
+.hl::before { animation: hl-in 1s var(--e-io) .55s both; }
+.hl b { animation: hl-c .35s ease .95s both; }
+@keyframes hl-in { from { transform: scaleX(0); } }
+@keyframes hl-c { from { color: var(--ink); } }
+.art-photo, .art-svg, .art-tags { opacity: 0; }
+.hero.is-ready .art-photo { opacity: 1; animation: art-in 1.6s var(--e-out) both; transition: opacity 1.2s ease .1s; }
+.hero.is-ready .art-svg, .hero.is-ready .art-tags { opacity: 1; transition: opacity 1s ease .6s; }
+@keyframes art-in { from { transform: translateY(.75rem) scale(.99); } }
+
+/* ── слой пометок поверх рендера ── */
+.art-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.art-tags { position: absolute; inset: 0; pointer-events: none; }
+.hero.is-off .art-svg *, .hero.is-off .art-tags *, .hero.is-off .plate * { animation-play-state: paused !important; }
+
+/* сигналы по красным трубам — всегда: короткие светлые штрихи, на ветке продолжают сигнал родителя (--o) */
+.sig path { stroke: #fff; stroke-dasharray: calc(var(--u) * 20) calc(var(--u) * 460); stroke-dashoffset: var(--o); animation: sig 5.9s linear infinite; }
+.sig-h { stroke-width: calc(var(--u) * 6.5); opacity: .26; }
+.sig-c { stroke-width: calc(var(--u) * 2); opacity: .95; }
+/* на тонких ветках к оросителям сигналов нет — иначе их слишком много */
+.sig--thin { display: none; }
+@keyframes sig { from { stroke-dashoffset: calc(var(--o) + var(--u) * 480); } to { stroke-dashoffset: var(--o); } }
+
+/* слой раздела: появляется, когда раздел выбран в плашке; линии прорисовываются, подписи проявляются */
+.ly { opacity: 0; transition: opacity .45s ease; }
+.ly.is-on { opacity: 1; transition-duration: .7s; }
+.ly *, .art-tags > * { animation-play-state: paused; }
+.ly.is-on *, .art-tags > .is-on, .art-tags > .is-on * { animation-play-state: running; }
+[pathLength] { stroke-dasharray: 1 1; stroke-dashoffset: 1; transition: stroke-dashoffset .3s; }
+.ly.is-on [pathLength] { stroke-dashoffset: 0; transition: stroke-dashoffset 1s var(--e-out) calc(.25s + var(--i, 0) * .12s); }
+
+/* выноски-подписи (моно) */
+.tg path { stroke: var(--ink); stroke-opacity: .6; stroke-width: var(--u); }
+.tg circle { fill: var(--red); stroke: #fff; stroke-width: calc(var(--u) * 1.5); transform-box: fill-box; transform-origin: center; transform: scale(0); transition: transform .3s; }
+.ly.is-on .tg circle { transform: none; transition: transform .5s cubic-bezier(.34, 1.56, .64, 1) calc(.15s + var(--i) * .12s); }
+.tg-t { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: .375rem; padding: .1875rem .4375rem; border-radius: .25rem; background: rgba(255, 255, 255, .94); box-shadow: 0 0 0 1px rgba(15, 16, 18, .08), 0 .375rem 1rem -.5rem rgba(60, 70, 110, .45); font: 500 .6875rem/1.3 var(--f-mono); letter-spacing: 0; color: var(--ink); white-space: nowrap; opacity: 0; transition: opacity .3s, transform .45s var(--e-out); }
+.tg-t--l { transform: translate(.375rem, -50%) translateX(-.375rem); }
+.tg-t--r { transform: translate(calc(-100% - .375rem), -50%) translateX(.375rem); }
+.tg-t--c { transform: translate(-50%, -50%) translateY(.375rem); }
+.tg-t--dim { padding: 0; background: none; box-shadow: none; color: var(--red); transform: translate(0, -50%) rotate(-90deg); transform-origin: 0 50%; }
+.tg-t--pipe, .tg-t--lane { padding: 0; background: none; box-shadow: none; color: var(--red); transform: translate(-50%, -100%) rotate(var(--r, 0deg)); transform-origin: 50% 100%; }
+.tg-t--lane { transform: translate(-50%, -50%) rotate(var(--r, 0deg)); transform-origin: 50% 50%; font-size: .75rem; }
+.tg-t--fire { gap: .3125rem; padding: .3125rem .5625rem .3125rem .4375rem; border-radius: .375rem; background: var(--red); color: #fff; box-shadow: 0 .625rem 1.5rem -.75rem rgba(245, 49, 42, .8); font-family: var(--f); font-size: .75rem; transform: translate(-50%, 0) translateY(.375rem); }
+.tg-t--fire svg { width: .8125rem; height: .8125rem; }
+.tg-t.is-on { opacity: 1; transition: opacity .5s ease calc(.55s + var(--i) * .12s), transform .7s var(--e-out) calc(.55s + var(--i) * .12s); }
+.tg-t--l.is-on { transform: translate(.375rem, -50%); }
+.tg-t--r.is-on { transform: translate(calc(-100% - .375rem), -50%); }
+.tg-t--c.is-on { transform: translate(-50%, -50%); }
+.tg-t--fire.is-on { transform: translate(-50%, 0); }
+.fl-ar { fill: var(--red); }
+.ping { fill: none; stroke: var(--red); stroke-width: 1.25px; vector-effect: non-scaling-stroke; opacity: 0; transform-box: fill-box; transform-origin: center; animation: ping 2.4s cubic-bezier(.2, .6, .35, 1) calc(.6s + var(--i, 0) * .3s) infinite; }
+@keyframes ping { 0% { opacity: .9; transform: scale(.3); } 60%, 100% { opacity: 0; transform: scale(2.2); } }
+
+/* выноски с расчётами */
+.call-halo { fill: url(#hx-cp); transform-box: fill-box; transform-origin: center; animation: call-pulse 2.4s ease-in-out .8s infinite; }
+.call-dot { fill: var(--red); stroke: #fff; stroke-width: calc(var(--u) * 2); transform-box: fill-box; transform-origin: center; transform: scale(0); transition: transform .3s; }
+.ly.is-on .call-dot { transform: none; transition: transform .6s cubic-bezier(.34, 1.56, .64, 1) .4s; }
+.call-ln { stroke: var(--ink); stroke-opacity: .55; stroke-width: var(--u); }
+@keyframes call-pulse { 0%, 100% { transform: scale(.5); opacity: .9; } 50% { transform: scale(1); opacity: .35; } }
+.call-t { position: absolute; z-index: 3; display: grid; gap: .1875rem; padding: .5rem .75rem .5625rem; border: 1px solid #fff; border-radius: .375rem; background: rgba(255, 255, 255, .95); box-shadow: 0 .75rem 1.75rem -1rem rgba(60, 70, 110, .45), 0 0 0 1px rgba(15, 16, 18, .05); white-space: nowrap; opacity: 0; transition: opacity .3s, transform .45s var(--e-out); }
+.call-t small { font-size: .625rem; line-height: 1.2; font-weight: 500; text-transform: uppercase; letter-spacing: .02em; color: var(--grey); }
+.call-t b { font-size: .9375rem; line-height: 1.2; font-weight: 500; letter-spacing: -.01em; }
+.call-t--r { transform: translate(0, -50%) translateX(-.5rem); }
+.call-t--l { transform: translate(-100%, -50%) translateX(.5rem); }
+.call-t.is-on { opacity: 1; transition: opacity .5s ease .9s, transform .8s var(--e-out) .9s; }
+.call-t--r.is-on { transform: translate(0, -50%); }
+.call-t--l.is-on { transform: translate(-100%, -50%); }
+
+/* размерные линии */
+.dim-ln, .dim-ext { stroke: var(--red); stroke-width: var(--u); }
+.dim-ext { stroke-opacity: .55; }
+.dim-tk { stroke: var(--red); stroke-width: calc(var(--u) * 1.5); opacity: 0; transition: opacity .3s; }
+.ly.is-on .dim-tk { opacity: 1; transition: opacity .4s ease .9s; }
+
+/* 1 · уровень воды в резервуаре поднимается (поверхность — эллипс, вода — лёгкая заливка) */
+.lvl { transform: translateY(792px); transition: transform 0s .5s; }
+.ly.is-on .lvl { transform: translateY(648px); transition: transform 2.6s cubic-bezier(.45, 0, .2, 1) .3s; }
+.lvl-fill { fill: var(--red); fill-opacity: .07; }
+.lvl-front { stroke: var(--red); stroke-width: calc(var(--u) * 1.5); }
+.lvl-back { stroke: var(--red); stroke-width: var(--u); stroke-opacity: .5; stroke-dasharray: calc(var(--u) * 4) calc(var(--u) * 4); }
+
+/* 2 · план тушения: очаг мерцает и гаснет, ороситель брызжет, рукавная линия прорисовывается */
+.fire-glow { fill: url(#hx-fire); transform-box: fill-box; transform-origin: center; animation: flick 1.4s ease-in-out infinite alternate; }
+.fire-dot { fill: #fff; stroke: var(--red); stroke-width: calc(var(--u) * 2.5); }
+.fire-ring { fill: none; stroke: var(--red); stroke-width: 1.25px; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; animation: ring 2s cubic-bezier(.2, .6, .35, 1) infinite; }
+@keyframes flick { 0% { transform: scale(.86); opacity: .7; } 35% { transform: scale(1.03); opacity: 1; } 65% { transform: scale(.93); opacity: .82; } 100% { transform: scale(1.07); opacity: .95; } }
+@keyframes ring { from { transform: scale(1); opacity: 1; } to { transform: scale(7); opacity: 0; } }
+.ly.is-on .fire { animation: fire-out 2.4s ease 3.6s forwards; }
+@keyframes fire-out { to { opacity: .15; } }
+.drop { stroke: #8fb6ff; stroke-width: calc(var(--u) * 1.25); opacity: 0; animation: drop .85s linear calc(1.2s + var(--dl)) infinite; }
+@keyframes drop { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 80% { opacity: .75; } 100% { transform: translate(var(--dx), 96px); opacity: 0; } }
+.ping--on { animation-delay: 1s; }
+.hose { stroke: var(--red); stroke-width: calc(var(--u) * 2); }
+.ly.is-on .hose { transition: stroke-dashoffset 1.6s var(--e-out) .35s; }
+.hose-run { stroke: #fff; stroke-width: calc(var(--u) * 1.25); stroke-dasharray: calc(var(--u) * 6) calc(var(--u) * 16); opacity: 0; animation: hose-run 1s linear infinite; }
+.ly.is-on .hose-run { opacity: .9; transition: opacity .5s ease 1.9s; }
+@keyframes hose-run { to { stroke-dashoffset: calc(var(--u) * -22); } }
+.hdot { fill: var(--red); stroke: #fff; stroke-width: calc(var(--u) * 2); transform-box: fill-box; transform-origin: center; transform: scale(0); transition: transform .3s; }
+.ly.is-on .hdot { transform: none; transition: transform .6s cubic-bezier(.34, 1.56, .64, 1) var(--d, .4s); }
+.beacon ellipse { fill: url(#hx-blue); opacity: 0; animation: beacon 1.8s steps(1, end) infinite; }
+@keyframes beacon { 0% { opacity: .9; } 9% { opacity: .15; } 18% { opacity: .9; } 27%, 100% { opacity: 0; } }
+
+/* 3 · проезд: полоса 4,2 м, кромки пунктиром */
+.lane { fill: var(--red); fill-opacity: .07; }
+.lane-edge { stroke: var(--red); stroke-width: calc(var(--u) * 1.25); stroke-dasharray: calc(var(--u) * 7) calc(var(--u) * 6); stroke-linecap: butt; }
+
+/* ── плашка «Схема объекта» поверх рендера (Figma Group 5: 1399, 172 · 261×226) — стекло: белый 21 % поверх запечённого блюра ── */
+.plate { position: absolute; z-index: 4; left: 71.1875rem; top: 10.75rem; width: 16.3125rem; height: 14.125rem; padding: 0 .625rem; border-radius: .3125rem; overflow: hidden; color: #fff;
+  background: linear-gradient(rgba(255, 255, 255, .21), rgba(255, 255, 255, .21)), url(../img/hero-plate.webp) center / 100% 100%;
+  opacity: 0; transform: translateY(.75rem); transition: opacity .8s ease .7s, transform 1s var(--e-out) .7s; }
+.hero.is-ready .plate { opacity: 1; transform: none; }
+.pl-hd { height: 2.3125rem; padding-top: .875rem; border-bottom: 1px solid rgba(255, 255, 255, .1); font-size: .625rem; line-height: 1.35; font-weight: 600; text-transform: uppercase; color: rgba(255, 255, 255, .47); }
+.pl-list { padding-top: .1875rem; }
+.pl-i { position: relative; display: flex; align-items: flex-start; gap: .5625rem; width: 100%; height: 2.75rem; padding-top: .8125rem; border-bottom: 1px solid rgba(255, 255, 255, .1); text-align: left; color: rgba(255, 255, 255, .41); font-size: .875rem; line-height: 1.35; transition: color .4s; }
+.pl-i b { font-weight: 400; white-space: nowrap; }
+.pl-sq { flex: none; width: .3125rem; height: .3125rem; margin-top: .4375rem; background: #fff; transition: background-color .4s; }
+.pl-i:hover, .pl-i.is-on { color: #fff; }
+.pl-i.is-on .pl-sq { background: var(--red); }
+/* время показа раздела — красная доля линии под пунктом (в макете 97 из 241) */
+.pl-bar { position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--red); transform-origin: left; transform: scaleX(0); }
+.pl-i.is-on .pl-bar { animation: pl-bar 7s linear forwards; }
+.plate:hover .pl-bar { animation-play-state: paused; }
+@keyframes pl-bar { to { transform: scaleX(1); } }
+
+/* форма: карточка на границе первого экрана (Figma «home» 2038:34 — 260, 694 · 1400×210):
+   поля 314/315/314 + кнопка 341, высота 52, зазор 9; поле #f3f3f4 с обводкой #dadee2, подпись — как плейсхолдер по центру */
+.hero-form-w { position: relative; z-index: 6; width: var(--cw); margin: -9.5rem auto 0; }
+.hero-form { position: relative; height: 13.125rem; padding: 2.1875rem 2.8125rem 0 2.75rem; border-radius: .75rem; background: #fff; box-shadow: var(--sh-card); }
+.hf-t { font-size: 1.5rem; line-height: .9; font-weight: 500; letter-spacing: -.03em; }
+.hf-t em { font-style: normal; color: var(--red); }
+.hf-s { margin-top: .525rem; font-size: .9375rem; line-height: 1.35; color: rgba(15, 16, 18, .36); }
+.home .hf { display: grid; grid-template-columns: minmax(0, 19.625fr) minmax(0, 19.6875fr) minmax(0, 19.625fr) minmax(0, 21.3125fr); column-gap: .5625rem; row-gap: .4375rem; margin-top: 1.609rem; }
+.home .hf .fld input { height: 3.25rem; padding: 0 1.5625rem; border-radius: .3125rem; background: #f3f3f4; box-shadow: inset 0 0 0 1px #dadee2; font-size: .9375rem; line-height: 1.35; color: var(--ink); transition: background-color .3s, box-shadow .3s; }
+.home .hf .fld span { left: 1.5625rem; top: 50%; font-size: .9375rem; line-height: 1.35; color: var(--grey); transform: translateY(-50%); transition: opacity .2s, transform .35s var(--e-out); }
+.home .hf .fld input:focus + span, .home .hf .fld input:not(:placeholder-shown) + span { opacity: 0; transform: translate(.375rem, -50%); }
+.home .hf .fld--tel input { padding: 0 1.5625rem 0 2.8125rem; }
+.home .hf .fld--tel input::placeholder { color: var(--grey); opacity: 1; }
+.home .hf .fld--tel .flag { position: absolute; left: 1.5625rem; top: 50%; width: .875rem; height: .6875rem; margin-top: -.34375rem; pointer-events: none; }
+.home .hf .fld--tel .pfx { position: absolute; left: 2.8125rem; top: 50%; transform: translateY(-50%); font-size: .9375rem; line-height: 1.35; color: var(--ink); pointer-events: none; transition: opacity .2s; }
+.home .hf .fld--tel input:focus ~ .pfx, .home .hf .fld--tel input:not(:placeholder-shown) ~ .pfx { opacity: 0; }
+.home .hf .fld input:hover { background: #eeeef0; box-shadow: inset 0 0 0 1px #cdd2d7; }
+.home .hf .fld input:focus { background: #fff; box-shadow: inset 0 0 0 1px var(--ink); }
+.home .hf .fld.err input { box-shadow: inset 0 0 0 1px var(--red); }
+.home .hf .btn { margin: 0; height: 3.25rem; border-radius: .3125rem; font-size: .9375rem; line-height: 1.35; font-weight: 500; text-transform: none; }
+.home .hf .consent { grid-column: 4; font-size: .6875rem; line-height: 1.17; color: rgba(0, 0, 0, .27); white-space: nowrap; }
+.home .hf .consent a { text-decoration: underline; text-underline-offset: 2px; color: inherit; transition: color .3s; }
+.home .hf .consent a:hover { color: var(--ink); }
+.home .hf .form-ok { grid-column: 1 / -1; padding: 0; display: none; }
+.home .hf.is-sent .form-ok { display: flex; align-items: center; gap: 1rem; text-align: left; }
+.home .hf .form-ok svg { margin: 0; width: 2.5rem; height: 2.5rem; color: var(--red); }
+
+/* ── клиенты: сетка логотипов на линиях рамки ── */
+.clients { position: relative; padding: 7.5rem 0 0; }
+.cl-head { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+.cl-note { font-size: .9375rem; color: var(--grey); }
+/* лента логотипов между линиями рамки: ячейки как в макете (7 на ширину рамки), едет влево без остановки */
+.cl-grid { container-type: inline-size; margin: 2.5rem var(--fx) 0; border-top: 1px solid var(--ln); border-bottom: 1px solid var(--ln); overflow: hidden; }
+.cl-track { display: flex; width: max-content; animation: cl-run 42s linear infinite; }
+.cl-grid:hover .cl-track { animation-play-state: paused; }
+@keyframes cl-run { to { transform: translate3d(-50%, 0, 0); } }
+@media (prefers-reduced-motion: reduce) { .cl-track { animation: none; } }
+.cl-i { flex: none; display: grid; place-items: center; width: calc(100cqw / 7); height: 8.75rem; padding: 0 1.5rem; border-right: 1px solid var(--ln); }
+.cl-i img { width: auto; max-width: 100%; opacity: .42; transition: opacity .5s, transform .7s var(--e-out); }
+.cl-i:hover img { opacity: .95; transform: scale(1.04); }
+
+/* ── 02 · о нас ── */
+.st { display: grid; grid-template-columns: 21.875rem minmax(0, 1fr); align-items: start; }
+.st .badge { margin-top: .3125rem; justify-self: start; }
+.st-text { font-size: 3rem; line-height: 1.1; font-weight: 500; letter-spacing: -.032em; color: var(--grey-2); }
+.st-text .sw { transition: color .25s linear; }
+.nums { display: grid; grid-template-columns: repeat(4, minmax(max-content, 1fr)); margin-top: 8rem; border-top: 1px solid var(--ln-2); }
+.nums li { position: relative; padding: 1.5rem 2rem 0 0; }
+.nums li + li { padding-left: 2rem; border-left: 1px solid var(--ln); }
+.nums-k { display: block; font-size: .75rem; color: var(--red); }
+.nums b { display: block; margin-top: 2.5rem; white-space: nowrap; font-size: 6.5rem; line-height: .9; font-weight: 300; letter-spacing: -.055em; font-variant-numeric: tabular-nums; }
+.nums p { margin-top: 1.25rem; max-width: 14rem; font-size: .9375rem; line-height: 1.4; color: var(--grey); }
+.phx { display: grid; place-items: center; background: var(--tint-2) repeating-linear-gradient(135deg, rgba(15, 16, 18, .03) 0 1px, transparent 1px 12px); }
+.phx::after { content: attr(data-ph); padding: .4375rem .75rem; border-radius: .375rem; background: rgba(255, 255, 255, .9); font: 500 .6875rem/1.3 var(--f-mono); color: var(--grey); text-align: center; }
+/* преимущества — бенто-сетка по макету (Figma «home» 2038:1110…1129): колонки 407 / 300 / 300 / 359, строки 314, зазор ~11;
+   плитки #f9fafe без обводки, скругление 7; текст прижат к низу: слева 20, снизу 32; заголовок 21/26.88, абзац 15/1.35 · 52 % */
+.prx { display: grid; grid-template-columns: 407fr 300fr 300fr 359fr; grid-template-rows: repeat(2, 19.625rem); column-gap: .7rem; row-gap: .625rem; margin-top: 5.125rem; }
+.prx-t { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; padding: 0 1.25rem 2rem; border-radius: .4375rem; background: var(--tint); overflow: hidden; transition: box-shadow .6s var(--e-out), transform .7s var(--e-out); }
+.prx-t:hover { box-shadow: 0 1.25rem 2.5rem -1.5rem rgba(144, 158, 213, .45); transform: translateY(-.25rem); }
+.prx-t--team { grid-area: 1 / 1 / 3 / 2; padding: .5rem; background: #f0f6fe; }
+.prx-t--objects { grid-area: 1 / 2 / 2 / 4; }
+.prx-t--region { grid-area: 1 / 4 / 2 / 5; }
+.prx-t--contract { grid-area: 2 / 2 / 3 / 3; }
+.prx-t--direct { grid-area: 2 / 3 / 3 / 4; }
+.prx-b { position: relative; }
+.prx-b h3 { font-size: 1.3125rem; line-height: 1.28; font-weight: 500; letter-spacing: -.045rem; }
+.prx-b p { margin-top: 1.125rem; font-size: .9375rem; line-height: 1.35; color: var(--ink-52); }
+/* иконка-сцена — в левом верхнем углу, на одной вертикали с заголовком (20px от краёв) */
+.prx-a { position: absolute; top: 1.25rem; left: 1.25rem; pointer-events: none; }
+/* фото на всю плитку (картинка собрана _tools/about-team.cjs), белая панель 8px от краёв */
+.prx-ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transition: transform 1.4s var(--e-out); }
+.prx-t--team:hover .prx-ph { transform: scale(1.03); }
+.prx-t--team .phx::after { margin-bottom: 9rem; }
+.prx-t--team .prx-b { padding: 1.875rem 1.1875rem 1.8125rem; border-radius: .4375rem; background: #fff; }
+.prx-t--team .prx-b p { margin-top: 1.25rem; }
+/* консультации: красная, тонкие линии #f7544e, заголовок 25/28, тёмная кнопка 42px на всю ширину внизу */
+.prx-t--consult { grid-area: 2 / 4 / 3 / 5; justify-content: flex-start; padding: 4.25rem 1.25rem 1.25rem; background: var(--red); color: #fff; }
+.prx-t--consult:hover { box-shadow: 0 1.5rem 2.5rem -1.25rem rgba(245, 49, 42, .55); }
+.prx-ln { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: #f7544e; pointer-events: none; }
+.prx-ln path { vector-effect: non-scaling-stroke; }
+.prx-t--consult h3 { max-width: 10.625rem; font-size: 1.5625rem; line-height: 1.12; letter-spacing: -.0612rem; }
+.prx-t--consult .prx-b p { margin-top: .875rem; color: rgba(255, 255, 255, .65); }
+.prx-go { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 2.625rem; margin-top: auto; border-radius: .375rem; background: var(--ink); color: #fff; font-size: .9375rem; line-height: 1.35; font-weight: 500; overflow: hidden; isolation: isolate; transition: color .5s var(--e-out); }
+.prx-go::before { content: ''; position: absolute; inset: 0; z-index: -1; background: #fff; transform: scaleY(0); transform-origin: 50% 100%; transition: transform .6s var(--e-out); }
+.prx-go .fb-ar { top: .125rem; right: .25rem; stroke: rgba(255, 255, 255, .66); }
+.prx-go:hover { color: var(--ink); }
+.prx-go:hover::before { transform: none; }
+.prx-go:hover .fb-ar { stroke: var(--red); transform: translate(2px, -2px); }
+
+/* графика плиток (js/pros-fx.js): линии 1–1.25px, чернила 16–34 %, один красный акцент; петля 6 с */
+.pa { display: block; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pa path, .pa circle, .pa rect { vector-effect: non-scaling-stroke; }
+.pa-l { stroke: rgba(15, 16, 18, .34); stroke-width: 1.25; }
+.pa-f { stroke: rgba(15, 16, 18, .16); stroke-width: 1; }
+.pa-g { stroke: rgba(15, 16, 18, .2); stroke-width: 1; }
+.pa-draw { stroke: var(--red); stroke-width: 1.75; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+/* объекты: этажи-плиты в разнесённой аксонометрии; полупрозрачная заливка даёт глубину — нижние линии видны сквозь верхние */
+.pa-face { fill: rgba(255, 255, 255, .7); }
+.pa-edge { stroke-width: 1; }
+.pa-slab { transform: none; }
+.is-on .pa-slab { animation: pa-breathe 6s ease-in-out infinite; }
+@keyframes pa-breathe { 0%, 100% { transform: none; } 50% { transform: translateY(var(--o)); } }
+.pa-scan { fill: rgba(245, 49, 42, .06); stroke: var(--red); stroke-width: 1.25; opacity: 0; }
+.is-on .pa-scan { animation: pa-scan 6s cubic-bezier(.45, 0, .55, 1) infinite; }
+@keyframes pa-scan { 0% { opacity: 0; transform: translateY(4px); } 10% { opacity: 1; } 42% { opacity: 1; } 52%, 100% { opacity: 0; transform: translateY(-38px); } }
+.pa-room { fill: var(--red); stroke: none; opacity: .1; }
+.is-on .pa-room { animation: pa-breathe 6s ease-in-out infinite, pa-room 6s ease-in-out infinite; }
+@keyframes pa-room { 0%, 40% { opacity: .1; } 50%, 70% { opacity: .5; } 90%, 100% { opacity: .1; } }
+/* регион: контур страны, из Москвы по очереди уходят сигналы, город отвечает кольцом */
+.pa-ru { fill: #fff; stroke: rgba(15, 16, 18, .26); stroke-width: 1; }
+.pa-arc { stroke: rgba(245, 49, 42, .22); stroke-width: 1; stroke-dasharray: .012 .016; }
+.pa-sig { stroke: var(--red); stroke-width: 1.75; filter: drop-shadow(0 0 3px rgba(245, 49, 42, .55)); }
+.pa-sig--arc { stroke-dasharray: .2 1.2; stroke-dashoffset: .2; }
+.is-on .pa-sig--arc { animation: pa-run-arc 6s var(--d) cubic-bezier(.45, 0, .4, 1) infinite both; }
+@keyframes pa-run-arc { 0% { stroke-dashoffset: .2; } 25%, 100% { stroke-dashoffset: -1; } }
+.pa-dot { fill: var(--red); stroke: #fff; stroke-width: 1.25; }
+.pa-dot--s { stroke-width: 1; }
+.pa-ring { stroke: var(--red); stroke-width: 1; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.is-on .pa-ring--hub { animation: pa-ring 3s ease-out infinite; }
+.is-on .pa-ring--hit { animation: pa-hit-ring 6s var(--d) ease-out infinite both; }
+@keyframes pa-ring { 0% { opacity: .8; transform: scale(.35); } 70%, 100% { opacity: 0; transform: scale(1.4); } }
+@keyframes pa-hit-ring { 0%, 23% { opacity: 0; transform: scale(.3); } 25% { opacity: .9; transform: scale(.35); } 45%, 100% { opacity: 0; transform: scale(1.5); } }
+/* договор: строки прорисовываются по очереди, пункты «стоимость» и «срок» отмечаются засечками, затем подпись; пауза и заново */
+.pa-sheet { fill: #fff; }
+.pa-txt { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.is-on .pa-txt { animation: pa-txt 6s var(--d) infinite both; }
+@keyframes pa-txt { 0% { stroke-dashoffset: 1; opacity: 1; animation-timing-function: var(--e-out); } 10%, 84% { stroke-dashoffset: 0; opacity: 1; } 92%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+.pa-tk { stroke: var(--red); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.is-on .pa-tk { animation: pa-tk 6s var(--d) infinite both; }
+@keyframes pa-tk { 0% { opacity: 0; transform: scaleY(0); animation-timing-function: var(--e-out); } 6%, 84% { opacity: 1; transform: none; } 92%, 100% { opacity: 0; transform: none; } }
+.pa-sg { stroke-width: 1.5; }
+.is-on .pa-sg { animation: pa-sg 6s 2s infinite both; }
+@keyframes pa-sg { 0% { stroke-dashoffset: 1; opacity: 1; animation-timing-function: ease-in-out; } 24%, 84% { stroke-dashoffset: 0; opacity: 1; } 92%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+/* напрямую: перегородки-посредники по очереди раздвигаются, прямая проходит насквозь, конечная точка отвечает кольцом */
+.pa-bar { fill: #fff; stroke: rgba(15, 16, 18, .34); stroke-width: 1.25; }
+.is-on .pa-gate--t { animation: pa-gate-t 6s var(--d) infinite; }
+.is-on .pa-gate--b { animation: pa-gate-b 6s var(--d) infinite; }
+@keyframes pa-gate-t { 0%, 8% { transform: none; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 24%, 84% { transform: translateY(-8px); animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 98%, 100% { transform: none; } }
+@keyframes pa-gate-b { 0%, 8% { transform: none; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 24%, 84% { transform: translateY(8px); animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 98%, 100% { transform: none; } }
+.pa-str { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.is-on .pa-str { animation: pa-str 6s infinite; }
+@keyframes pa-str { 0%, 24% { stroke-dashoffset: 1; opacity: 1; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 44%, 80% { stroke-dashoffset: 0; opacity: 1; } 86%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+.pa-node { fill: #fff; stroke: rgba(15, 16, 18, .5); stroke-width: 1.25; }
+.is-on .pa-ring--end { animation: pa-end 6s ease-out infinite; }
+@keyframes pa-end { 0%, 43% { opacity: 0; transform: scale(.35); } 45% { opacity: .9; transform: scale(.35); } 68%, 100% { opacity: 0; transform: scale(1.5); } }
+@media (prefers-reduced-motion: reduce) { .prx * { animation: none !important; } .pa-draw, .pa-txt, .pa-str { stroke-dashoffset: 0; } .pa-tk { opacity: 1; } }
+
+/* ── 02 · услуги (Figma 2031:1164): плашка без подложки, заголовок 600px, справа текст 431px; карточки 459×518 ── */
+#services { padding-top: 8.3125rem; }
+.badge--flat { padding: 0; border: 0; background: none; box-shadow: none !important; line-height: 14.85px; }
+.badge--flat > i { margin-right: .5625rem; }
+#services .sh { grid-template-columns: minmax(0, 1fr) 26.9375rem; row-gap: 1.2875rem; margin-bottom: 3.15rem; }
+#services .h2x { max-width: 37.5rem; }
+#services .sh-r { padding-bottom: .125rem; }
+#services .sh-r p { font-size: .9375rem; line-height: 1.35; }
+.scx { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: .71875rem; row-gap: 1.875rem; }
+.sc { position: relative; aspect-ratio: 459 / 518; border-radius: .5rem; overflow: hidden; isolation: isolate; background: var(--tint-2); }
+.sc-art { position: absolute; inset: 0; transform-origin: 62% 30%; transition: transform 1.4s var(--e-out); }
+.sc:hover .sc-art { transform: scale(1.025); }
+.sc-im { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.sc-n, .sc-d { position: absolute; z-index: 2; top: .75rem; display: inline-flex; align-items: center; height: 1.75rem; border-radius: .375rem; background: rgba(255, 255, 255, .92); font-size: .6875rem; line-height: 1; white-space: nowrap; }
+.sc-n { left: .625rem; padding: 0 .875rem 0 .9375rem; font-family: Manrope, var(--f); font-weight: 600; color: var(--grey); }
+.sc-d { right: .75rem; gap: .4375rem; padding: 0 .625rem; font-weight: 500; text-transform: uppercase; }
+.sc-d::before { content: ''; width: .375rem; height: .375rem; border-radius: 1px; background: var(--red); }
+/* панель «Фон карточки»: 5px от краёв, 449×230 — растёт вверх, если текст длиннее */
+.sc-b { position: absolute; z-index: 2; left: .3125rem; right: .3125rem; bottom: .3125rem; min-height: 14.375rem; display: flex; flex-direction: column; padding: 1.5625rem 1.3125rem 1.375rem; border-radius: .3125rem; background: rgba(255, 255, 255, .91); -webkit-backdrop-filter: blur(4.7px); backdrop-filter: blur(4.7px); }
+.sc h3 { font-size: 1.3125rem; line-height: 1.28; font-weight: 500; letter-spacing: -.0343em; }
+.sc-b > p { margin: .875rem 0 1.375rem; font-size: .9375rem; line-height: 1.35; color: var(--ink-52); }
+.sc-f { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--ln-2); }
+.sc-p { display: grid; gap: .3125rem; }
+.sc-p small { font-size: .6875rem; line-height: 1.35; font-weight: 500; text-transform: uppercase; color: var(--grey); }
+.sc-p b { font-size: 1.375rem; line-height: 1.09; font-weight: 500; letter-spacing: -.0327em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sc-go { position: relative; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--red); overflow: hidden; transition: background-color .4s; }
+.sc-go svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: #fff; stroke-width: 1.5; stroke-linejoin: round; transition: transform .5s var(--e-out); }
+.sc:hover .sc-go { background: var(--ink); }
+.sc:hover .sc-go svg { animation: go-out .7s var(--e-out); }
+@keyframes go-out { 0% { transform: none; } 45% { transform: translate(60%, -60%); } 46% { transform: translate(-60%, 60%); } 100% { transform: none; } }
+
+/* ── сцены услуг: всё скрыто, при наведении слой проявляется и элементы разыгрываются по очереди ── */
+.sc-fx { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.sc-tags { position: absolute; inset: 0; pointer-events: none; } /* только манометр у «Сил и средств» — подписей в сценах нет */
+.sc-fx, .sc-tags { opacity: 0; transition: opacity .35s ease; }
+.sc:hover .sc-fx, .sc:hover .sc-tags { opacity: 1; transition-duration: .2s; }
+:where(.sc-fx [pathLength]) { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.sc:hover :where(.sc-fx [pathLength]) { animation: fx-draw 1s var(--e-out) var(--d, .1s) forwards; }
+@keyframes fx-draw { to { stroke-dashoffset: 0; } }
+.fx-dot { fill: var(--red); stroke: #fff; stroke-width: 1.6; transform-box: fill-box; transform-origin: center; transform: scale(0); }
+.sc:hover .fx-dot { animation: fx-pop .6s cubic-bezier(.34, 1.56, .64, 1) var(--d, .3s) forwards; }
+@keyframes fx-pop { to { transform: none; } }
+.fx-ring { fill: none; stroke: var(--red); stroke-width: 1.25; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.sc:hover .fx-ring { animation: fx-ring 2s cubic-bezier(.2, .6, .35, 1) var(--d, .3s) infinite; }
+@keyframes fx-ring { 0% { opacity: .9; transform: scale(.25); } 70%, 100% { opacity: 0; transform: scale(1.6); } }
+
+/* 01 · проезды: полоса и путь прорисовываются, по пути едет метка АЦ, у машины — пульс */
+.o-band { stroke: var(--red); stroke-opacity: .13; stroke-width: 24; stroke-linecap: butt; }
+.o-route { stroke: var(--red); stroke-width: 1.6; }
+.o-turn { stroke: var(--red); stroke-width: 1.2; stroke-opacity: .75; --d: .7s; }
+.sc:hover .o-band { animation-duration: 1.6s; }
+.sc:hover .o-route { animation-duration: 1.6s; }
+.o-rad { stroke: var(--ink); stroke-opacity: .5; stroke-width: 1; --d: 1.3s; }
+.o-c { fill: var(--ink); fill-opacity: .55; }
+.o-car { offset-rotate: auto; offset-distance: 0%; opacity: 0; }
+.o-car rect { fill: var(--red); stroke: #fff; stroke-width: 1.6; }
+.o-car path { fill: #fff; }
+.sc:hover .o-car { animation: o-car 2.1s cubic-bezier(.45, .05, .25, 1) .25s forwards; }
+@keyframes o-car { 0% { opacity: 0; offset-distance: 0%; } 10% { opacity: 1; } 88% { opacity: 1; } 100% { opacity: 0; offset-distance: 100%; } }
+
+/* маячок АЦ (общий): синий и красный ореолы попеременно */
+.bcn-b, .bcn-r { opacity: 0; mix-blend-mode: screen; }
+.bcn-b { fill: #4f8cff; }
+.bcn-r { fill: var(--red); }
+.bcn ellipse { filter: blur(4px); }
+.sc:hover .bcn-b { animation: bcn .9s steps(1, end) .2s infinite; }
+.sc:hover .bcn-r { animation: bcn .9s steps(1, end) .65s infinite; }
+@keyframes bcn { 0% { opacity: .9; } 18% { opacity: .2; } 30% { opacity: .9; } 48%, 100% { opacity: 0; } }
+
+/* 02 · план тушения: схема рукавов прочерчивается, по ним идут световые импульсы (вода от гидранта); на АЦ — маячок */
+.p-plan { stroke: var(--red); stroke-width: 1.2; stroke-opacity: .9; }
+.cm { filter: drop-shadow(0 0 2.5px #fff) drop-shadow(0 0 5px rgba(255, 210, 200, .9)); opacity: 0; }
+.cm path { stroke: #fff6f0; stroke-dasharray: var(--L) calc(160 - var(--L)); stroke-dashoffset: calc(var(--o) + var(--L)); }
+.cm-t { stroke-width: 1.6; stroke-opacity: .4; }
+.cm-m { stroke-width: 2.4; stroke-opacity: .75; }
+.cm-h { stroke-width: 3.4; }
+.sc:hover .cm { animation: cm-on .5s ease .9s forwards; }
+.sc:hover .cm path { animation: cm-run 1.5s linear .9s infinite; }
+@keyframes cm-on { to { opacity: 1; } }
+@keyframes cm-run { from { stroke-dashoffset: calc(var(--o) + var(--L)); } to { stroke-dashoffset: calc(var(--o) + var(--L) - 160); } }
+
+/* 03 · расход воды: контур резервуара по силуэту, уровень поднимается ровной плоскостью; отметка идёт по шкале */
+.v-out { stroke: var(--red); stroke-width: 1.2; stroke-opacity: .8; }
+.sc:hover .v-out { animation-duration: 1.3s; }
+.v-lvl { transform: translateY(118px); }
+.sc:hover .v-wave { animation: v-wave 1.1s linear infinite; }
+@keyframes v-wave { to { transform: translateX(-30px); } }
+.sc:hover .v-lvl { animation: v-up 2.4s cubic-bezier(.45, 0, .2, 1) .45s forwards; }
+@keyframes v-up { to { transform: none; } }
+.v-fill { fill: var(--red); fill-opacity: .09; }
+.v-wave { stroke: var(--red); stroke-width: 1.4; }
+.v-sc { stroke: var(--ink); stroke-opacity: .55; stroke-width: 1; }
+.v-tk { stroke: var(--ink); stroke-opacity: .45; stroke-width: .9; opacity: 0; transition: opacity .3s; }
+.sc:hover .v-tk { opacity: 1; transition-delay: .4s; }
+.v-mk { fill: var(--red); opacity: 0; }
+.sc:hover .v-mk { animation: v-mk 2.4s cubic-bezier(.45, 0, .2, 1) .45s forwards; }
+@keyframes v-mk { 0% { opacity: 1; transform: none; } 100% { opacity: 1; transform: translateY(-70px); } }
+
+/* 05 · численность: отметки под бойцами по очереди, строй связывает их с АЦ, отсеки с ПТВ светятся */
+.c-ring { fill: none; stroke: var(--red); stroke-width: 1.5; }
+.c-fill { fill: var(--red); fill-opacity: .16; }
+.c-pt { opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(.3); }
+.sc:hover .c-pt { animation: c-pt .55s cubic-bezier(.34, 1.56, .64, 1) calc(.3s + var(--i) * .25s) forwards; }
+@keyframes c-pt { to { opacity: 1; transform: none; } }
+.sc:hover .c-pt .c-ring { animation: c-ping 1.8s ease-out calc(1.4s + var(--i) * .25s) infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes c-ping { 0% { transform: none; opacity: 1; } 70%, 100% { transform: scale(1.9); opacity: 0; } }
+.c-link { stroke: var(--red); stroke-width: 1.2; stroke-opacity: .7; --d: 1.3s; }
+.sc:hover .c-link { animation-duration: 1.2s; }
+.c-bay { fill: #ffd9d4; opacity: 0; filter: blur(3px); mix-blend-mode: screen; }
+.sc:hover .c-bay { animation: c-bay 1.6s ease-in-out calc(2s + var(--i) * .3s) infinite alternate; }
+@keyframes c-bay { from { opacity: 0; } to { opacity: .55; } }
+
+/* 06 · силы и средства: схема расстановки (связи, сектор ствола), манометр выходит на рабочее давление */
+.s-ln { stroke: var(--red); stroke-width: 1.2; stroke-dasharray: 4 4; opacity: 0; }
+.sc:hover .s-ln { animation: s-ln 1s linear var(--d, .2s) forwards; }
+@keyframes s-ln { from { opacity: 0; stroke-dashoffset: 40; } 30% { opacity: 1; } to { opacity: 1; stroke-dashoffset: 0; } }
+.s-sec-o { stroke: var(--red); stroke-width: 1.3; --d: 1s; }
+.s-arc { stroke: var(--red); stroke-width: 1; stroke-opacity: .6; --d: 1.3s; }
+.s-sec { fill: var(--red); fill-opacity: 0; }
+.sc:hover .s-sec { animation: s-sec 1.8s ease-in-out 1.6s infinite alternate; }
+@keyframes s-sec { from { fill-opacity: .06; } to { fill-opacity: .2; } }
+.s-gauge { position: absolute; display: grid; place-items: center; padding: .375rem; border-radius: 50%; background: rgba(255, 255, 255, .96); box-shadow: 0 .75rem 1.75rem -1rem rgba(60, 70, 110, .5), 0 0 0 1px rgba(15, 16, 18, .05); transform: translate(-50%, -50%) scale(.85); opacity: 0; }
+.sc:hover .s-gauge { animation: s-g-in .6s var(--e-out) .2s forwards; }
+@keyframes s-g-in { to { opacity: 1; transform: translate(-50%, -50%); } }
+.s-gauge svg { width: 2.75rem; height: 2.75rem; fill: none; stroke-linecap: round; }
+.g-bg { fill: var(--tint-2); }
+.g-tr { stroke: rgba(15, 16, 18, .12); stroke-width: 3.5; }
+.g-on { stroke: var(--red); stroke-width: 3.5; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.sc:hover .g-on { animation: g-on 1.6s cubic-bezier(.3, 1.3, .5, 1) .5s forwards; }
+@keyframes g-on { to { stroke-dashoffset: .4; } }
+.g-nd { stroke: var(--ink); stroke-width: 2; transform-origin: 30px 30px; transform: rotate(-135deg); }
+.sc:hover .g-nd { animation: g-nd 1.6s cubic-bezier(.3, 1.3, .5, 1) .5s forwards; }
+@keyframes g-nd { to { transform: rotate(27deg); } }
+.g-hub { fill: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) { .sc .sc-fx *, .sc .sc-tags * { animation-duration: .01s !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; } }
+
+/* ── 04 · объекты: лента едет вбок, пока блок закреплён ── */
+.objx { position: relative; }
+.objx::before { content: ''; position: absolute; z-index: 3; top: 0; left: var(--fx); right: var(--fx); height: 1px; background: var(--ln); }
+.objx-pin { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; overflow: hidden; padding-top: var(--hdr); }
+.objx-pin .sh { grid-template-columns: minmax(0, 1fr) auto; margin-bottom: 3rem; }
+.objx-pin .sh-r p { white-space: nowrap; }
+#price .sh { margin-bottom: 3.25rem; }
+#price .cx { min-height: 41.375rem; } /* 613 по Figma + запас под «Состав работ» самой длинной услуги, чтобы низ не прыгал */
+.objx-track { display: flex; gap: 1.25rem; width: max-content; padding: 0 calc((100vw - var(--cw)) / 2); will-change: transform; }
+.obx { position: relative; flex: none; width: 26.25rem; padding: .5rem; border-radius: .75rem; background: var(--tint); box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .04); transition: background-color .5s, box-shadow .6s var(--e-out), transform .7s var(--e-out); }
+.obx:hover { background: #fff; box-shadow: var(--sh-badge), inset 0 0 0 1px rgba(15, 16, 18, .04); transform: translateY(-.375rem); }
+.obx-m { position: relative; display: block; width: 100%; aspect-ratio: 404 / 323.2; border-radius: .5rem; overflow: hidden; background: #edf0f7; }
+.obx-m img { display: block; width: 100%; height: 100%; }
+.obx-b { display: grid; padding: 1.375rem 1rem .875rem; }
+.obx-n { font-size: .75rem; color: var(--red); }
+.obx h3 { margin-top: .625rem; min-height: 2.3em; font-size: 1.5rem; line-height: 1.15; font-weight: 500; letter-spacing: -.03em; }
+.obx-btn { position: relative; display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--ln-2); font-size: .75rem; font-weight: 500; text-transform: uppercase; text-align: left; }
+.obx-btn::after { content: ''; position: absolute; inset: 0; }
+.obx-btn .fb-ar { position: static; transition: transform .5s var(--e-out); }
+.obx:hover .obx-btn .fb-ar { transform: translate(3px, -3px); }
+/* сцены объектов (js/obj-fx.js): проигрываются при наведении */
+.ox-fx { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; opacity: 0; transition: opacity .35s ease; }
+.obx:hover .ox-fx { opacity: 1; transition-duration: .2s; }
+:where(.ox-fx [pathLength='1']) { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.obx:hover :where(.ox-fx [pathLength='1']) { animation: fx-draw 1s var(--e-out) var(--d, .1s) forwards; }
+.obx:hover .ox-fx .fx-dot { animation: fx-pop .6s cubic-bezier(.34, 1.56, .64, 1) var(--d, .3s) forwards; }
+.obx:hover .ox-fx .fx-ring { animation: fx-ring 2s cubic-bezier(.2, .6, .35, 1) var(--d, .3s) infinite; }
+.ox-ln { stroke: var(--red); stroke-width: 1.3; }
+.ox-sg { opacity: 0; filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px rgba(255, 210, 200, .9)); }
+.ox-sg path { stroke: #fff6f0; stroke-dasharray: var(--L) 200; stroke-dashoffset: var(--L); }
+.ox-sg-t { stroke-width: 1.4; stroke-opacity: .4; }
+.ox-sg-m { stroke-width: 2; stroke-opacity: .75; }
+.ox-sg-h { stroke-width: 2.8; }
+.obx:hover .ox-sg { animation: cm-on .4s ease var(--on) forwards; }
+.obx:hover .ox-sg path { animation: ox-run var(--T) linear calc(var(--on) + var(--o)) infinite; }
+@keyframes ox-run { from { stroke-dashoffset: var(--L); } to { stroke-dashoffset: -100; } }
+/* логистика: огни доков волной */
+.l-lamp { opacity: 0; }
+.l-glow { fill: var(--red); opacity: .35; filter: blur(2.5px); }
+.l-core { fill: var(--red); stroke: #fff; stroke-width: .6; }
+.obx:hover .l-lamp { animation: l-wave 2.8s ease-in-out calc(var(--i) * .13s) infinite; }
+@keyframes l-wave { 0%, 4% { opacity: 0; } 14%, 58% { opacity: 1; } 72%, 100% { opacity: 0; } }
+/* производство: отсеки-пролёты по очереди подсвечиваются */
+.p-tri { fill: var(--red); opacity: 0; }
+.obx:hover .p-tri { animation: p-bay 3.6s ease-in-out calc(1.2s + var(--i) * 1.2s) infinite; }
+@keyframes p-bay { 0%, 100% { opacity: 0; } 18%, 34% { opacity: .16; } 52% { opacity: 0; } }
+.ox-ln--t { stroke-width: 1.1; stroke-opacity: .8; }
+/* административное: путь эвакуации наружу */
+.a-way { stroke: var(--red); stroke-width: 4; stroke-opacity: .12; }
+.a-run { stroke: var(--red); stroke-width: 1.4; stroke-dasharray: 3 3.5; opacity: 0; }
+.obx:hover .a-run { animation: cm-on .3s ease .5s forwards, a-flow .8s linear .5s infinite; }
+@keyframes a-flow { to { stroke-dashoffset: -6.5; } }
+.a-ar { stroke: var(--red); stroke-width: 1.4; }
+.obx:hover .a-ar { animation-delay: .8s; }
+/* жилое: высотная отметка */
+.v-ext { stroke: var(--red); stroke-width: .8; stroke-opacity: .55; }
+.v-dim { stroke: var(--red); stroke-width: 1.1; }
+.obx:hover .v-dim { animation: fx-draw 1.1s cubic-bezier(.45, 0, .55, 1) .25s forwards; }
+.v-tk { stroke: var(--red); stroke-width: 1.1; opacity: 0; transform-box: fill-box; transform-origin: center; transform: scaleX(0); }
+.obx:hover .v-tk { animation: v-tk .45s var(--e-out) var(--d) forwards; }
+@keyframes v-tk { to { opacity: 1; transform: none; } }
+.v-sl { stroke: var(--red); stroke-width: 1.1; opacity: 0; }
+.obx:hover .v-sl { animation: cm-on .3s ease 1.3s forwards; }
+/* торговое: круги у входа */
+.t-ring { stroke: var(--red); stroke-width: 1.1; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.obx:hover .t-ring { animation: fx-ring 2.4s cubic-bezier(.2, .6, .35, 1) calc(.2s + var(--i) * .8s) infinite; }
+/* социальное: маршрут по пандусу */
+.s-way { stroke-width: 1.5; }
+/* другие: контур кровли */
+.o-roof { stroke-width: 1.2; }
+.obx:hover .o-roof { animation-duration: 1.4s; }
+@media (prefers-reduced-motion: reduce) { .obx .ox-fx * { animation-duration: .01s !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; } }
+.objx-bar { display: flex; align-items: center; gap: 1.5rem; margin-top: 2.5rem; font-size: .75rem; color: var(--grey); }
+.objx-bar i { flex: 1; height: 1px; background: rgba(15, 16, 18, .12); }
+.objx-bar b { display: block; height: 100%; background: var(--red); transform: scaleX(0); transform-origin: left; }
+
+/* ── 05 · наши работы ── */
+.chips2 { display: flex; flex-wrap: wrap; gap: .5rem; margin: -1.5rem 0 2.5rem; }
+.chip2 { height: 2.5rem; padding: 0 1.125rem; border-radius: .375rem; box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .12); font-size: .75rem; font-weight: 500; text-transform: uppercase; color: var(--ink); transition: background .35s, color .35s, box-shadow .35s; }
+.chip2:hover { box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .4); }
+.chip2.is-on { background: var(--ink); color: #fff; box-shadow: none; }
+.wkx { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.25rem; transition: opacity .3s, transform .4s var(--e-out); }
+.wkx.is-swap { opacity: 0; transform: translateY(.75rem); }
+.wkc { position: relative; padding: .5rem; border-radius: .75rem; background: #fff; transition: box-shadow .6s var(--e-out), transform .7s var(--e-out); }
+.wkc:hover { box-shadow: var(--sh-card); transform: translateY(-.25rem); }
+.wkc--0 { grid-column: 1 / span 7; } .wkc--1 { grid-column: 8 / span 5; }
+.wkc--2 { grid-column: 1 / span 5; } .wkc--3 { grid-column: 6 / span 7; }
+.wkc-img { position: relative; display: block; height: 26rem; border-radius: .5rem; overflow: hidden; background: var(--tint-2); }
+@property --sc { syntax: '<number>'; inherits: false; initial-value: 1.12; }
+.wkc-img img { width: 100%; height: 100%; object-fit: cover; transform: translate3d(0, var(--py, 0%), 0) scale(var(--sc)); transition: --sc 1.2s var(--e-out); }
+.wkc:hover .wkc-img img { --sc: 1.17; }
+.wkc-b { display: grid; padding: 1.5rem 1.25rem 1.25rem; }
+.wkc-m { display: flex; gap: 1.25rem; font-size: .6875rem; font-weight: 500; text-transform: uppercase; color: var(--grey); }
+.wkc-m span:first-child { color: var(--red); }
+.wkc h3 { margin-top: .875rem; font-size: 1.625rem; line-height: 1.12; font-weight: 500; letter-spacing: -.03em; }
+.wkc-dl { display: flex; gap: 3rem; margin-top: 1.5rem; padding-top: 1.125rem; border-top: 1px solid var(--ln-2); }
+.wkc-dl dt { font-size: .6875rem; font-weight: 500; text-transform: uppercase; color: var(--grey); }
+.wkc-dl dd { margin-top: .375rem; font-size: 1.0625rem; font-weight: 500; letter-spacing: -.015em; }
+.wkc-x { display: flex; gap: .5rem; margin-top: 1.125rem; font-size: .875rem; line-height: 1.45; color: var(--ink-52); }
+.wkc-x b { color: var(--red); font-weight: 500; }
+.more2 { display: flex; justify-content: center; margin-top: 3.5rem; }
+
+/* ── 07 · как мы работаем: блок закрепляется на экран, как лента «Объектов»: слева заголовок, шкала дней и кнопка,
+   справа в кадре одна карточка шага. По прокрутке следующая выезжает снизу и ложится поверх (--p), предыдущие уменьшаются,
+   темнеют и уходят в стопку кромкой сверху (--k — сколько карточек легло сверху). Высоту прокрутки .stk-run задаёт home.js ── */
+.home #steps { padding: 0; }
+.stk-run { position: relative; }
+.stk-pin { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; overflow: hidden; padding-top: var(--hdr); }
+.stk { display: grid; grid-template-columns: 27rem minmax(0, 55.5rem); justify-content: space-between; align-items: center; }
+.stk-l { display: grid; justify-items: start; }
+.stk-l .h2x { margin-top: 1.2875rem; }
+.stk-s { max-width: 24rem; margin-top: 1.75rem; font-size: .9375rem; line-height: 1.35; color: var(--ink-52); }
+.stk-l .fb { margin-top: 2.5rem; }
+
+/* карточки лежат в одной ячейке, сцена увеличена (zoom 1.1 — карточка 807×342 из Figma крупнее, пропорции те же);
+   сверху место под две кромки стопки (по 1.5rem) */
+.stk-list { position: relative; width: 50.4375rem; height: 24.375rem; justify-self: end; zoom: 1.1; }
+/* карточка по Figma (Page 1, Rectangle 26…30): 807×342, скругление 7, поля 5; справа панель 398×332 (Group 20…24) */
+.stk-c { position: absolute; left: 0; right: 0; top: 3rem; display: grid; grid-template-columns: minmax(0, 1fr) 24.875rem; height: 21.375rem; padding: .3125rem; border-radius: .4375rem; background: #fff;
+  box-shadow: 0 -1rem 2.5rem -2rem rgba(60, 70, 110, .35);
+  transform: translateY(calc((1 - var(--p, 1)) * 100vh - min(var(--k, 0), 2) * 1.5rem)) scale(calc(1 - min(var(--k, 0), 2) * .04)); transform-origin: 50% 0; will-change: transform; }
+/* карточка под стопкой темнеет */
+.stk-c::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: var(--ink); opacity: min(calc(var(--k, 0) * .05), .15); pointer-events: none; }
+/* текст: плашка срока (25, 15), под ней линия через всю левую часть (y 57), заголовок и описание прижаты к низу (низ описания — 316) */
+.stk-b { position: relative; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: .625rem 1.25rem 1.3125rem; }
+.stk-b::before { content: ''; position: absolute; left: -.3125rem; right: 0; top: 3.25rem; height: 1px; background: rgba(0, 0, 0, .05); }
+.stk-chip { display: inline-flex; align-items: center; justify-content: center; gap: .4375rem; min-width: 8.75rem; height: 1.6875rem; padding: 0 .625rem; border-radius: .3125rem; background: var(--tint-2); font-size: .6875rem; line-height: 14.85px; font-weight: 500; text-transform: uppercase; white-space: nowrap; }
+.stk-chip::before { content: ''; flex: none; width: .375rem; height: .375rem; border-radius: 1px; background: var(--red); }
+.stk-c h3 { margin-top: auto; font-size: 1.5rem; line-height: 1; font-weight: 500; letter-spacing: -.03125rem; }
+.stk-c p { max-width: 20.25rem; margin-top: 1.3125rem; font-size: .9375rem; line-height: 1.5; color: var(--grey); }
+/* панель-иллюстрация: экспорт группы из Figma (скругление и растушёвка краёв уже в картинке), номер шага — 18px от угла */
+.stk-m { position: relative; width: 24.875rem; height: 20.75rem; border-radius: .25rem; overflow: hidden; }
+.stk-im { display: block; width: 100%; height: 100%; }
+img.stk-im { transition: transform 1.4s var(--e-out); }
+.stk-c:hover img.stk-im { transform: scale(1.03); }
+.stk-k { position: absolute; top: 1.125rem; left: 1.125rem; font-size: .6875rem; line-height: 1; font-weight: 500; text-transform: uppercase; color: var(--red); }
+/* сдача — тёмная (Rectangle 30: #0f1012), заголовок белый, описание #888c94, плашка #515153 */
+.stk-c--fin { background: var(--ink); color: #fff; box-shadow: 0 -1rem 2.5rem -2rem rgba(15, 16, 18, .6); }
+.stk-c--fin .stk-b::before { background: rgba(255, 255, 255, .06); }
+.stk-c--fin .stk-chip { background: #515153; color: #fff; }
+.stk-c--fin p { color: #888c94; }
+
+/* ── 06 · стоимость: калькулятор по шагам (js/calc.js) — вопрос слева, «лист расчёта» справа ── */
+.cx-wrap { border-radius: .75rem; }
+.cx { display: grid; grid-template-columns: minmax(0, 1fr) 27rem; border-radius: .75rem; background: #fff; box-shadow: var(--sh-card), 0 0 0 1px rgba(15, 16, 18, .04); overflow: hidden; }
+.cx-main { display: flex; flex-direction: column; min-width: 0; padding: 3.75rem 3rem 1.75rem; }
+/* шаги: тонкая шкала из шести отрезков */
+/* вопросы лежат в одной ячейке: высота блока не прыгает между шагами */
+.cx-stage { display: grid; flex: 1; }
+.cx-q { grid-area: 1 / 1; min-width: 0; opacity: 0; visibility: hidden; transform: translateX(2.5rem); transition: opacity .35s ease, transform .55s var(--e-out), visibility 0s .55s; }
+.cx-q.is-left { transform: translateX(-2.5rem); }
+.cx-q.is-on { opacity: 1; visibility: visible; transform: none; transition: opacity .5s ease .12s, transform .7s var(--e-out) .08s, visibility 0s; }
+/* visibility потомка не наследует скрытие закрытого окна — без этого шаг калькулятора из окна #m-calc ловил курсор посреди страницы */
+.modal:not(.is-open) .cx-q.is-on { visibility: hidden; }
+.cx-k { font: 500 .6875rem/1 var(--f-mono); text-transform: uppercase; color: var(--red); }
+.cx-t { margin-top: .875rem; font-size: 2rem; line-height: 1.05; font-weight: 500; letter-spacing: -.035em; }
+.cx-h { margin-top: .625rem; font-size: .9375rem; line-height: 1.45; color: var(--grey); }
+.cx-opts { display: grid; grid-template-columns: repeat(var(--c, 2), minmax(0, 1fr)); gap: .5rem; margin-top: 1.75rem; }
+/* вариант ответа: нажатие — сразу дальше */
+.cx-o { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: .875rem; min-height: 5rem; padding: 1rem 2.75rem 1rem 1.875rem; border-radius: .5rem; background: var(--tint); box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .06); text-align: left; transition: background-color .35s, box-shadow .35s, transform .5s var(--e-out); }
+.cx-o:hover { background: #fff; box-shadow: inset 0 0 0 1px rgba(15, 16, 18, 0), 0 .875rem 1.75rem -1.25rem rgba(60, 70, 110, .45); transform: translateY(-2px); }
+.cx-o:active { transform: scale(.985); }
+.cx-o.is-sel { background: rgba(245, 49, 42, .045); box-shadow: inset 0 0 0 1.5px var(--red); }
+.cx-ot { display: grid; gap: .3125rem; min-width: 0; }
+.cx-ot b { font-size: 1rem; line-height: 1.25; font-weight: 500; letter-spacing: -.015em; }
+.cx-ot small { font-size: .8125rem; line-height: 1.35; color: var(--grey); }
+.cx-ck { position: absolute; right: .875rem; top: 50%; width: 1.125rem; height: 1.125rem; margin-top: -.5625rem; border-radius: 50%; background: var(--red); transform: scale(0); transition: transform .45s cubic-bezier(.34, 1.56, .64, 1); }
+.cx-ck::after { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5.6 9.3 7.9 11.5 12.4 6.6' fill='none' stroke='%23fff' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat; }
+.cx-o.is-sel .cx-ck { transform: none; }
+/* значки объектов, план площади, кубики зданий */
+.cx-oi { width: 2.5rem; height: 2.5rem; display: grid; place-items: center; border-radius: .5rem; background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .06); transition: background .35s, color .35s; }
+.cx-oi svg { width: 1.375rem; height: 1.375rem; }
+.cx-o.is-sel .cx-oi { background: var(--red); color: #fff; box-shadow: none; }
+.cx-o--ico { grid-template-columns: 2.5rem minmax(0, 1fr); padding-left: 1.125rem; }
+.cx-opts[style*="--c:4"] .cx-o { grid-template-columns: 1fr; align-content: start; gap: 1.25rem; min-height: 8.5rem; padding: 1.125rem; }
+.cx-opts[style*="--c:4"] .cx-ot b { font-size: .9375rem; }
+.cx-o--plan { grid-template-columns: 1fr; justify-items: start; align-content: space-between; gap: 1.5rem; min-height: 9.5rem; padding: 1.125rem; }
+.cx-pl { position: relative; width: 3.25rem; height: 3.25rem; }
+.cx-pl::before { content: ''; position: absolute; inset: 0; border: 1px dashed rgba(15, 16, 18, .18); border-radius: .125rem; }
+.cx-pl i { position: absolute; left: 0; bottom: 0; width: calc(var(--s) * 100%); height: calc(var(--s) * 100%); border-radius: .125rem; background: rgba(15, 16, 18, .12); transition: background .35s; }
+.cx-o--plan .cx-ot b { font-size: 1.375rem; letter-spacing: -.03em; }
+.cx-o.is-sel .cx-pl i { background: var(--red); }
+.cx-o--blk { grid-template-columns: 1fr; justify-items: start; align-content: space-between; gap: 1.5rem; min-height: 9rem; padding: 1.125rem; }
+.cx-bl { display: flex; align-items: flex-end; gap: .25rem; height: 2.25rem; }
+.cx-bl i { width: .875rem; height: 1.5rem; border-radius: .125rem; background: rgba(15, 16, 18, .14); transition: background .35s; }
+.cx-bl i:nth-child(2n) { height: 2.25rem; }
+.cx-bl i:nth-child(3n) { height: 1.125rem; }
+.cx-o.is-sel .cx-bl i { background: var(--red); }
+/* у карточек с картинкой отметка — в правом верхнем углу, на одной линии с картинкой */
+.cx-o--plan .cx-ck, .cx-o--blk .cx-ck, .cx-opts[style*="--c:4"] .cx-ck { top: 1.125rem; right: 1.125rem; margin-top: 0; }
+/* экран результата */
+.cx-next { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin-top: 1.75rem; }
+.cx-next li { display: grid; gap: .5rem; padding: .875rem 1rem; border-radius: .5rem; background: var(--tint); font-size: .9375rem; line-height: 1.35; }
+.cx-next b { font: 500 .6875rem/1 var(--f-mono); color: var(--red); }
+.home .cx-form { grid-template-columns: 1fr 1fr 1.15fr; gap: .5rem; margin-top: 1.25rem; }
+.home .cx-form .fld input { height: 3.75rem; border-radius: .3125rem; background: var(--field); box-shadow: inset 0 0 0 1px var(--field); font-size: .9375rem; }
+.home .cx-form .fld input:focus { background: #fff; box-shadow: inset 0 0 0 1px var(--ink); }
+.home .cx-form .btn { margin: 0; }
+.home .cx-form .consent { grid-column: 1 / -1; font-size: .6875rem; color: rgba(0, 0, 0, .3); }
+.home .cx-form .form-ok { grid-column: 1 / -1; display: none; padding: 0; }
+.home .cx-form.is-sent .form-ok { display: flex; align-items: center; gap: 1rem; text-align: left; }
+.home .cx-form .form-ok svg { margin: 0; width: 2.75rem; height: 2.75rem; color: var(--red); }
+/* низ: назад, подсказка, сброс */
+.cx-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.75rem; padding-top: 1.125rem; border-top: 1px solid var(--ln-2); }
+.cx-back, .cx-reset { display: inline-flex; align-items: center; gap: .5rem; height: 2.5rem; padding: 0 1rem 0 .75rem; border-radius: .375rem; font-size: .75rem; font-weight: 500; text-transform: uppercase; transition: background .3s, color .3s, opacity .3s; }
+.cx-back svg { width: 1rem; height: 1rem; transition: transform .45s var(--e-out); }
+.cx-back:hover { background: var(--tint-2); }
+.cx-back:hover svg { transform: translateX(-3px); }
+.cx-back:disabled { opacity: .3; pointer-events: none; }
+.cx-reset { padding: 0 .75rem; color: var(--grey); }
+.cx-reset:hover { color: var(--red); }
+/* «лист расчёта»: рамка и штамп как на чертеже, значения заполняются по ходу ответов */
+.cx-sheet { position: relative; display: flex; flex-direction: column; gap: 1.375rem; padding: 4.125rem 2.25rem 1.5rem; background: var(--tint); }
+.cx-sheet::before { content: ''; position: absolute; inset: .75rem; border: 1px solid rgba(15, 16, 18, .08); border-radius: .375rem; pointer-events: none; }
+.cs-price small, .cs-time small, .cs-inc small { display: block; font-size: .6875rem; font-weight: 500; text-transform: uppercase; color: var(--grey); }
+.cs-price b { display: flex; align-items: baseline; gap: 0 .3125rem; margin-top: .625rem; white-space: nowrap; font-size: 2.25rem; line-height: 1.05; font-weight: 400; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.cs-dash { font-style: normal; font-weight: 300; color: var(--grey-2); }
+.cs-dash[hidden] { display: none; }
+.cs-time { margin-top: 1.5625rem; } /* Figma: от цены до срока 47px */
+.cs-trow { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.cs-trow b { font-size: 1rem; font-weight: 500; letter-spacing: -.015em; }
+.cs-spec { border-top: 1px solid var(--ln-2); }
+.cs-spec > div { position: relative; display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 1rem; align-items: baseline; padding: .5rem 0; border-bottom: 1px solid var(--ln-2); }
+.cs-spec dt { font: 500 .625rem/1.6 var(--f-mono); letter-spacing: .02em; text-transform: uppercase; color: var(--grey); }
+.cs-spec dd { overflow: hidden; font-size: .875rem; line-height: 1.35; font-weight: 500; letter-spacing: -.01em; color: var(--grey-2); text-overflow: ellipsis; white-space: nowrap; }
+.cs-spec .is-set dd { color: var(--ink); }
+.cs-spec .is-cur::before { content: ''; position: absolute; left: -.875rem; top: 50%; width: .375rem; height: .375rem; margin-top: -.1875rem; border-radius: 1px; background: var(--red); }
+.cs-spec dd.is-new { animation: dd-in .55s var(--e-out); }
+@keyframes dd-in { from { opacity: 0; transform: translateY(.5rem); } }
+.cs-inc ul { display: grid; gap: .4375rem; margin-top: .75rem; }
+.cs-inc li { position: relative; padding-left: 1.25rem; font-size: .8125rem; line-height: 1.4; color: var(--ink-52); animation: dd-in .6s var(--e-out) both; animation-delay: calc(var(--i) * 90ms); }
+.cs-inc li::before { content: ''; position: absolute; left: .125rem; top: .3em; width: .5rem; height: .3125rem; border: solid var(--red); border-width: 0 0 1.5px 1.5px; transform: rotate(-45deg); }
+.cs-inc ul:empty::before { content: 'Появится после выбора документа'; font-size: .8125rem; color: var(--grey-2); }
+.cs-st { color: var(--grey); }
+.cs-st.is-done { color: var(--red); }
+/* калькулятор в окне на главной — светлый */
+.home .modal--wide .modal-box { width: min(100%, 76rem); background: #fff; border-radius: .75rem; }
+.home .modal--wide .modal-x { background: var(--tint-2); color: var(--ink); }
+.home .modal--wide .modal-x:hover { background: var(--ink); color: #fff; }
+.home .modal .cx { box-shadow: none; }
+
+/* ── 07 · статьи: заголовок со стрелками, под линией — лента широких карточек; выходит за колонку и тает к краям экрана ── */
+.arh { display: flex; justify-content: space-between; align-items: flex-end; gap: 4rem; padding-bottom: 3rem; margin-bottom: 2.75rem; border-bottom: 1px solid var(--ln-2); }
+.arh-l { display: grid; justify-items: start; gap: 2.25rem; }
+.arh-l .h2x { max-width: 46rem; }
+.arh-r { display: flex; align-items: center; gap: 2.5rem; padding-bottom: .25rem; }
+.fb--red { background: var(--red); color: #fff; box-shadow: none; }
+.fb--red .fb-ar { stroke: #fff; }
+.fb--red:hover { box-shadow: none; }
+.arn { display: flex; gap: .625rem; }
+.arn-b { position: relative; width: 3.25rem; height: 3.25rem; display: grid; place-items: center; border-radius: .375rem; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .14); color: var(--ink); overflow: hidden; isolation: isolate; transition: color .5s var(--e-out), box-shadow .5s, opacity .4s; }
+.arn-b::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--ink); transform: scaleY(0); transform-origin: 50% 100%; transition: transform .6s var(--e-out); }
+.arn-b svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform .5s var(--e-out); }
+.arn-b:not(:disabled):hover { color: #fff; box-shadow: inset 0 0 0 1px var(--ink); }
+.arn-b:not(:disabled):hover::before { transform: none; }
+#ar-prev:not(:disabled):hover svg { transform: translateX(-2px); }
+#ar-next:not(:disabled):hover svg { transform: translateX(2px); }
+.arn-b:disabled { cursor: default; opacity: .3; }
+
+.arv { position: relative; overflow: hidden; padding: .75rem 0 2.5rem; margin-bottom: -2.5rem; }
+.arx { display: flex; gap: 1.25rem; width: max-content; cursor: grab; touch-action: pan-y; user-select: none; transition: transform 1.1s var(--e-out); }
+.arx.is-drag { cursor: grabbing; transition: none; }
+.arc { position: relative; flex: none; display: flex; flex-direction: column; width: 35rem; height: 37.5rem; border-radius: .75rem; background: #fff; box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .07); transition: box-shadow .6s var(--e-out), transform .7s var(--e-out); }
+.arc:hover { box-shadow: var(--sh-badge), inset 0 0 0 1px rgba(15, 16, 18, .07); transform: translateY(-.375rem); }
+.arc-img { display: block; height: 18.5rem; margin: .5rem .5rem 0; border-radius: .5rem .5rem 0 0; overflow: hidden; background: var(--tint-2); }
+.arc-img img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.02); transition: transform 1.4s var(--e-out); }
+.arc:hover .arc-img img { transform: scale(1.07); }
+.arc-tag { position: absolute; left: 1.375rem; top: 1.375rem; padding: .4375rem .75rem; border-radius: .375rem; background: rgba(255, 255, 255, .92); box-shadow: 0 .375rem 1rem -.5rem rgba(60, 70, 110, .45); font-size: .6875rem; line-height: 1.3; font-weight: 500; text-transform: uppercase; pointer-events: none; }
+/* белая панель наплывает на фото скруглённым верхом — в углах видно фото */
+.arc-b { position: relative; flex: 1; display: flex; flex-direction: column; margin: -1rem .5rem .5rem; padding: 1.875rem 1.75rem 1.25rem; border-radius: .75rem .75rem .5rem .5rem; background: #fff; }
+.arc h3 { font-size: 1.875rem; line-height: 1.1; font-weight: 500; letter-spacing: -.035em; }
+.arc h3 a { transition: color .35s; }
+.arc:hover h3 a { color: var(--red); }
+.arc-d { margin-top: 1.25rem; max-width: 27rem; font-size: 1rem; line-height: 1.5; color: var(--ink-52); }
+.arc-f { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-top: auto; }
+.arc-f p { display: grid; gap: .375rem; font-size: 1rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.arc-f p span { font-size: .6875rem; font-weight: 500; text-transform: uppercase; color: var(--grey); }
+.arc-btn { padding: 0 3rem; pointer-events: none; }
+.arc:hover .arc-btn { color: #fff; box-shadow: inset 0 0 0 1px var(--ink); }
+.arc:hover .arc-btn::before { transform: none; }
+.arc:hover .arc-btn .fb-ar { transform: translate(2px, -2px); }
+
+/* ── 08 · библиотека: папки в языке макета ── */
+.home .lbx { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3.5rem 1.25rem; }
+.home .lbx .f-back, .home .lbx .f-back::before { background: #e8ebf5; }
+.home .lbx .f-back { border-radius: .75rem; }
+.home .lbx .f-front { border-radius: .75rem; background: var(--tint-2); box-shadow: 0 -.75rem 1.5rem -1.25rem rgba(60, 70, 110, .35); }
+.home .lbx .folder:hover .f-front { background: #fff; box-shadow: var(--sh-badge); }
+.home .lbx .f-k, .home .lbx .f-d { font-family: var(--f); font-size: .6875rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0; }
+.home .lbx .f-d em { color: var(--red); }
+.home .lbx .f-t { font-size: 1rem; font-weight: 500; letter-spacing: -.02em; }
+
+/* ── 09 · вопросы ── */
+.fqx { display: grid; grid-template-columns: 31.25rem minmax(0, 1fr); gap: 6rem; align-items: start; }
+.fqx-l { position: sticky; top: calc(var(--hdr) + 3rem); display: grid; justify-items: start; gap: 2.25rem; }
+/* «Не нашли ответа?» — без подложки: заголовок, строка, кнопка */
+.fqx-ask { width: 100%; max-width: 27rem; margin-top: 2rem; }
+.fqx-ask-t { font-size: 1.5rem; line-height: 1.2; font-weight: 500; letter-spacing: -.03em; }
+.fqx-ask-b { margin-top: 1.75rem; }
+.fqx-ask-s { margin-top: .625rem; font-size: 1rem; line-height: 1.5; color: var(--ink-52); }
+.fqx-list { border-top: 1px solid var(--ln-2); }
+.fq-i { border-bottom: 1px solid var(--ln-2); }
+.fq-q { width: 100%; display: grid; grid-template-columns: 4rem minmax(0, 1fr) 2rem; align-items: center; gap: 1rem; padding: 1.75rem 0; text-align: left; }
+.fq-q .mono { font-size: .75rem; color: var(--grey); transition: color .3s; }
+.fq-q b { font-size: 1.375rem; line-height: 1.25; font-weight: 500; letter-spacing: -.025em; transition: transform .6s var(--e-out); }
+.fq-q:hover b { transform: translateX(.375rem); }
+.fq-q i { position: relative; width: 2rem; height: 2rem; border-radius: .3125rem; background: var(--ink); transition: background .4s, transform .6s var(--e-out); }
+.fq-q i::before, .fq-q i::after { content: ''; position: absolute; left: 50%; top: 50%; width: .75rem; height: 1.5px; margin: -.75px 0 0 -.375rem; background: #fff; }
+.fq-q i::after { transform: rotate(90deg); }
+.fq-i.is-open .fq-q i { background: var(--red); transform: rotate(135deg); }
+.fq-i.is-open .fq-q .mono { color: var(--red); }
+.fq-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .7s var(--e-out); }
+.fq-i.is-open .fq-a { grid-template-rows: 1fr; }
+.fq-a > div { overflow: hidden; }
+.fq-a p { padding: 0 4rem 2rem 5rem; font-size: 1.0625rem; line-height: 1.6; color: var(--ink-52); opacity: 0; transform: translateY(-.5rem); transition: opacity .35s, transform .6s var(--e-out); }
+.fq-i.is-open .fq-a p { opacity: 1; transform: none; transition-delay: .12s; }
+
+/* ── 10 · география: заголовок со смещением, как в «О нас»; ниже сцена — контур России подложкой во всю колонку,
+   маршруты из Москвы пунктиром, иллюстрация поверх карты (D.geoImg), справа карточки городов и тёмная плашка ── */
+.geh { position: relative; z-index: 2; display: grid; grid-template-columns: 21.875rem minmax(0, 1fr); align-items: start; }
+.geh .badge { margin-top: .875rem; justify-self: start; }
+.gst { position: relative; height: 41rem; margin-top: 1rem; }
+/* карта по Figma («09 · География» → «Контур России» 1388×750 в точке 239, 223): тот же контур, крупнее в 1,4 раза, сплошной #eff0f4 */
+.gst-map { position: absolute; z-index: 0; left: -2.406rem; top: -4.106rem; width: 89.55rem; }
+.map-svg { width: 100%; height: auto; overflow: visible; }
+.map-land { fill: #eff0f4; }
+.map-rt path { fill: none; }
+/* сеть: тонкие дуги из Москвы ко всем городам прорисовываются волной, когда блок входит в экран */
+.rt-n { stroke: var(--red); stroke-opacity: .14; stroke-width: .6; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.gst-map.is-lit .rt-n { stroke-dashoffset: 0; transition: stroke-dashoffset 1.4s cubic-bezier(.65, 0, .35, 1) var(--w); }
+.rt-on { stroke: var(--red); stroke-width: 1.4; stroke-dasharray: 1 1; stroke-dashoffset: 1; transition: stroke-dashoffset .3s ease; }
+.rt-on.is-on { stroke-dashoffset: 0; transition: stroke-dashoffset .9s var(--e-out); }
+/* города: мягкое свечение дышит, ядро с белым ободком; Москва — тёмное ядро, красный центр, двойной пульс */
+.city { cursor: pointer; outline: none; }
+.city :is(.c-dot, .c-hub, .c-core, .c-glow, .c-rip, .c-ping) { transform-box: fill-box; transform-origin: center; }
+.city .c-glow { pointer-events: none; }
+#geo.is-live .gst-map.is-lit .c-glow { animation: c-breathe 3.2s ease-in-out calc(var(--w) + var(--b)) infinite alternate; }
+@keyframes c-breathe { from { transform: scale(.75); opacity: .7; } to { transform: scale(1.12); opacity: 1; } }
+.city .c-dot { fill: var(--red); stroke: #fff; stroke-width: 1.4; vector-effect: non-scaling-stroke; transition: transform .5s var(--e-out); }
+.city .c-hub { fill: var(--ink); stroke: #fff; stroke-width: 2; vector-effect: non-scaling-stroke; transition: transform .5s var(--e-out); }
+.city .c-core { fill: var(--red); pointer-events: none; }
+.city .c-hit { fill: transparent; }
+.city.is-on .c-dot { transform: scale(1.35); }
+.city.is-on .c-hub { transform: scale(1.15); }
+.city .c-ping { fill: none; stroke: var(--red); stroke-width: 1.2; vector-effect: non-scaling-stroke; opacity: 0; }
+#geo.is-live .c-ping { animation: pa-ring 3s ease-out infinite; }
+#geo.is-live .c-ping--2 { animation-delay: 1.5s; }
+.c-rip { fill: none; stroke: var(--red); stroke-width: 1.2; vector-effect: non-scaling-stroke; opacity: 0; transform-box: fill-box; transform-origin: center; pointer-events: none; }
+/* волна: всё зажигается из Москвы наружу (--w — задержка по расстоянию), каждый город — с кольцом */
+.js-rv .gst-map:not(.is-lit) :is(.c-dot, .c-hub, .c-core, .c-glow, .cv-dot) { transform: scale(0); }
+.gst-map.is-lit :is(.c-dot, .c-hub, .c-core, .cv-dot) { transition: transform .7s cubic-bezier(.34, 1.56, .64, 1) var(--w); }
+.gst-map.is-lit .city .c-rip { animation: c-rip 1.3s ease-out var(--w) both; }
+@keyframes c-rip { 0% { opacity: .85; transform: scale(.3); } 100% { opacity: 0; transform: scale(1.6); } }
+/* редкие вспышки (home.js) — тем же кольцом; у городов покрытия точка на миг краснеет */
+.gst-map.is-lit .is-ping .c-rip { animation: c-rip 1.6s ease-out both; }
+.cov .cv-dot { fill: #b8bfcd; transform-box: fill-box; transform-origin: center; }
+.cov.is-ping .cv-dot { animation: cv-flash 1.6s ease-out; }
+@keyframes cv-flash { 0% { fill: #b8bfcd; transform: scale(1); } 15% { fill: var(--red); transform: scale(1.8); } 60% { fill: var(--red); transform: scale(1.2); } 100% { fill: #b8bfcd; transform: scale(1); } }
+/* легенда под картой */
+.gst-lg { position: absolute; z-index: 2; left: 0; bottom: 3.5rem; display: flex; gap: 1.75rem; font-size: .75rem; line-height: 1; font-weight: 500; text-transform: uppercase; color: var(--grey); }
+.gst-lg span { display: inline-flex; align-items: center; gap: .5rem; }
+.lg-dot, .lg-ring { width: .5rem; height: .5rem; border-radius: 50%; }
+.lg-dot { background: var(--red); box-shadow: 0 0 0 2px #fff, 0 0 0 6px rgba(245, 49, 42, .16); }
+.lg-ring { width: .375rem; height: .375rem; background: #b8bfcd; }
+@media (prefers-reduced-motion: reduce) { .gst-map *, .gst-map .rt-n { transition: none !important; animation: none !important; } .gst-map .rt-n { stroke-dashoffset: 0; } }
+.map-tip { position: absolute; z-index: 5; min-width: 12rem; max-width: 17rem; padding: 1rem 1.125rem; border-radius: .5rem; background: var(--ink); color: #fff; transform: translate(-50%, calc(-100% - .5rem)); opacity: 0; pointer-events: none; transition: opacity .25s, transform .4s var(--e-out); }
+.map-tip.is-on { opacity: 1; transform: translate(-50%, calc(-100% - 1rem)); }
+.map-tip::after { content: ''; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; margin-left: -5px; background: var(--ink); transform: rotate(45deg); }
+.map-tip b { display: block; font-weight: 500; letter-spacing: -.015em; }
+.map-tip p { margin-top: .25rem; font-size: .875rem; color: rgba(255, 255, 255, .65); }
+.map-tip strong { font-size: 1.25rem; font-weight: 500; color: #fff; }
+.map-tip small { display: block; margin-top: .375rem; font-size: .75rem; color: rgba(255, 255, 255, .5); }
+/* иллюстрация поверх карты (D.geoImg); пока её нет — места не видно */
+.gst-art { position: absolute; z-index: 1; left: 22rem; bottom: 0; width: 20rem; height: 34rem; display: grid; align-items: end; justify-items: center; pointer-events: none; }
+.gst-art img { max-width: 100%; max-height: 100%; object-fit: contain; }
+/* карточки городов 3 × 2: название, виды работ, число проектов; последняя — красная «Всего» */
+.gst-r { position: absolute; z-index: 2; right: 0; top: 7.5rem; width: 41.25rem; }
+.gcx { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.gc { position: relative; display: flex; flex-direction: column; min-height: 9.5rem; padding: 1.25rem 1.375rem 1.125rem; border-radius: .5rem; background: #fff; box-shadow: 0 1.25rem 2.5rem -1.25rem rgba(144, 158, 213, .42); cursor: default; transition: transform .6s var(--e-out), box-shadow .6s var(--e-out); }
+.gc:hover, .gc.is-on { transform: translateY(-.25rem); box-shadow: 0 1.5rem 3rem -1.25rem rgba(144, 158, 213, .6); }
+.gc-t { font-size: 1rem; line-height: 1.3; font-weight: 500; letter-spacing: -.015em; }
+.gc-s { margin-top: .25rem; font-size: .75rem; line-height: 1.35; color: var(--grey); }
+.gc-v { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; margin-top: auto; padding-top: 1rem; }
+.gc-v strong { font-size: 2.75rem; line-height: .9; font-weight: 400; letter-spacing: -.045em; font-variant-numeric: tabular-nums; transition: color .4s; }
+.gc-v span { font-size: .8125rem; color: var(--grey); }
+.gc:hover .gc-v strong, .gc.is-on .gc-v strong { color: var(--red); }
+.gc--acc { background: var(--red); color: #fff; box-shadow: 0 1.25rem 2.5rem -1.25rem rgba(245, 49, 42, .55); }
+.gc--acc:hover { box-shadow: 0 1.5rem 3rem -1.25rem rgba(245, 49, 42, .7); }
+.gc--acc .gc-s, .gc--acc .gc-v span { color: rgba(255, 255, 255, .72); }
+.gc--acc:hover .gc-v strong { color: #fff; }
+/* тёмная плашка: как работаем с регионами + общее число проектов */
+.gbar { display: flex; align-items: center; gap: 1rem; min-height: 4.75rem; margin-top: 1.25rem; padding: 1rem 1.75rem 1rem 1.375rem; border-radius: .5rem; background: var(--ink); color: #fff; }
+.gbar-i { flex: none; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--red); }
+.gbar-i svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.gbar p { flex: 1; font-size: .875rem; line-height: 1.4; color: rgba(255, 255, 255, .82); }
+.gbar b { display: grid; justify-items: end; gap: .3125rem; white-space: nowrap; }
+.gbar b strong { font-size: 1.75rem; line-height: 1; font-weight: 500; letter-spacing: -.035em; color: var(--red); }
+.gbar b span { font-size: .6875rem; line-height: 1; font-weight: 500; text-transform: uppercase; color: rgba(255, 255, 255, .5); }
+
+/* ── подвал главной: тёмный, в формате «Зелёного патруля» под наш язык —
+   сверху логотип со строкой о компании и контакты крупно, посередине призыв с кнопкой и колонки ссылок,
+   снизу линия во всю ширину и служебная строка; линии рамки страницы продолжаются белыми 8 % ── */
+.home .ftr--dark { position: relative; padding: 0; background: var(--ink); color: #fff; }
+.ftr--dark::before { content: ''; position: absolute; top: 0; bottom: 0; left: var(--fx); width: 1px; background: rgba(255, 255, 255, .08); box-shadow: calc(100vw - 2 * var(--fx) - 1px) 0 0 rgba(255, 255, 255, .08); pointer-events: none; }
+.fd-top, .fd-mid { display: grid; grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(0, 1fr)); column-gap: 3rem; }
+.fd-top { padding: 5rem 0 4rem; }
+.fd-mid { position: relative; padding: 3.5rem 0 4.5rem; }
+.fd-mid::before, .fd-bot::before { content: ''; position: absolute; left: 50%; top: 0; width: 100vw; height: 1px; background: rgba(255, 255, 255, .12); transform: translateX(-50%); }
+.fd-brand { display: inline-grid; justify-items: start; }
+.fd-brand img { display: block; width: auto; height: 1.75rem; }
+.fd-brand small { margin-top: .625rem; font-size: .9375rem; line-height: 1.35; color: rgba(255, 255, 255, .45); }
+.fd-claim { max-width: 25rem; margin-top: 2.25rem; font-size: 1.1875rem; line-height: 1.4; letter-spacing: -.01em; color: var(--red); }
+.fd-l { font-size: .8125rem; line-height: 1.3; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .43); }
+.fd-l--gap { margin-top: 2rem; }
+.fd-v { display: block; margin-top: .8125rem; font-size: 1.6875rem; line-height: 1.19; font-weight: 500; letter-spacing: -.02em; color: #fff; white-space: nowrap; transition: color .25s; }
+a.fd-v:hover { color: var(--red); }
+.fd-s { margin-top: .5rem; font-size: .875rem; line-height: 1.4; color: rgba(255, 255, 255, .45); }
+.fd-t { margin-top: .75rem; font-size: 1.125rem; line-height: 1.3; font-weight: 500; color: #fff; }
+.fd-socs { display: flex; gap: .4375rem; margin-top: .8125rem; }
+.fd-socs a { display: grid; place-items: center; width: 3.625rem; height: 3.625rem; border-radius: 50%; background: rgba(255, 255, 255, .06); color: #fff; transition: background-color .3s; }
+.fd-socs a:hover { background: var(--red); }
+.fd-socs svg { width: 1.375rem; height: 1.375rem; }
+/* призыв: крупная фраза с серым хвостом, под ней красная кнопка (заливка белым при наведении) */
+.fd-h { max-width: 25rem; font-size: 2rem; line-height: 1.08; font-weight: 500; letter-spacing: -.035em; }
+.fd-h span { color: rgba(255, 255, 255, .4); }
+.fd-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; height: 3.25rem; margin-top: 2.25rem; padding: 0 3.5rem; border-radius: .375rem; background: var(--red); color: #fff; font-size: .8125rem; font-weight: 500; text-transform: uppercase; overflow: hidden; isolation: isolate; transition: color .5s var(--e-out); }
+.fd-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; background: #fff; transform: scaleY(0); transform-origin: 50% 100%; transition: transform .6s var(--e-out); }
+.fd-btn .fb-ar { stroke: #fff; }
+.fd-btn:hover { color: var(--ink); }
+.fd-btn:hover::before { transform: none; }
+.fd-btn:hover .fb-ar { stroke: var(--red); transform: translate(2px, -2px); }
+.fd-ul { margin-top: 1.125rem; }
+.fd-ul li + li { margin-top: .625rem; }
+.fd-ul a { font-size: .9375rem; line-height: 1.4; color: rgba(255, 255, 255, .78); transition: color .25s; }
+.fd-ul a:hover { color: var(--red); }
+.fd-bot { position: relative; display: flex; gap: 1rem 2.5rem; padding: 1.375rem 0 1.5rem; font-size: .9375rem; font-weight: 500; line-height: 1.35; color: rgba(255, 255, 255, .45); }
+.fd-bot span { margin-right: auto; }
+.fd-bot a { transition: color .25s; }
+.fd-bot a:hover { color: rgba(255, 255, 255, .85); }
+
+/* «блуждающие» кнопки в языке макета */
+.home .dock button { border-radius: .5rem; }
+.home .dock .d-main { background: var(--ink); }
+.home .modal-box { border-radius: .75rem; }
+.home .modal .h3 { font-weight: 500; letter-spacing: -.03em; }
+.home .modal-x { border-radius: .375rem; }
+
+/* появления: мягкий ease-out для сдвига */
+.js-rv .home .rv, .home .rv { transition-timing-function: ease, var(--e-out); }
+/* заголовки: слова поднимаются из маски; после появления клип снимается (is-done) */
+.h2x.is-split .wm { display: inline-block; overflow: hidden; vertical-align: top; padding: .1em .08em .16em; margin: -.1em -.08em -.16em; }
+.h2x.is-split .wi { display: inline-block; transform: translateY(112%); transition: transform 1.15s var(--e-out) calc(var(--w) * 45ms); }
+.h2x.is-in .wi { transform: none; }
+.h2x.is-done .wm { overflow: visible; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-h .ln > span, .hero-badge, .hero-sub, .hero-cta, .hero-form, .hl::before, .hl b, .hero.is-ready .art-photo { animation: none; }
+}
