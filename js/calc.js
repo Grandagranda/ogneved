@@ -210,4 +210,7 @@
     return el;
   }
   window.OG_CALC = calc;
+  // окно «Рассчитать стоимость» на всех страницах — тот же калькулятор
+  const mc = $('#m-calc [data-calc]');
+  if (mc) calc(mc);
 })();

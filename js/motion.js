@@ -15,7 +15,7 @@
       const a = e.target.closest('a[href^="#"], a[href^="index.html#"]'); if (!a) return;
       const id = a.getAttribute('href').replace('index.html', ''), t = id.length > 1 && document.querySelector(id);
       if (!t && id !== '#top') return;
-      e.preventDefault(); lenis.scrollTo(id === '#top' ? 0 : t, { offset: -24, duration: 1.4 });
+      e.preventDefault(); lenis.scrollTo(id === '#top' ? 0 : t, { offset: -(+a.dataset.off || 24), duration: 1.4 });
     });
   }
   // эффекты прокрутки считаем только когда страница сдвинулась (или изменился размер/догрузились картинки) —
@@ -53,13 +53,15 @@
   };
 
   // ── появления ──
-  const GROUPS = '.nums, .prx, .scx, .wkx, .arx, .lbx, .fqx-list, .gcx, .fx-cols';
-  const ONE = '.sh .badge, .shc .badge, .fqx-l .badge, .stk-l .badge, .stk-s, .sh-r, .chips2, .more2, .cl-head, .fx-btns, .gbar, .st .badge, .cl-grid';
+  // группы: дети появляются по очереди; одиночные — сами по себе (главная и внутренние страницы)
+  const GROUPS = '.nums, .prx, .scx, .wkx, .arx, .lbx, .fqx-list, .gcx, .fx-cols, .pgf, .pgd, .rmt, .fls, .pk-list, .io, .arg, .cnt-l, .wpb-main, .ath, .bkh-r';
+  const ONE = '.sh .badge, .shc .badge, .fqx-l .badge, .stk-l .badge, .stk-s, .sh-r, .chips2, .more2, .cl-head, .fx-btns, .gbar, .st .badge, .cl-grid, ' +
+    '.crb, .pgh-h .badge, .pgh-r, .svh-l > :not(h1), .svh-art, .gnt,.pk-l > :not(h2),  .ctx-l .badge, .ctx-r, .ctx-f, .wph, .wpb-side, .atc, .toc2, .prose2, .ats, .bkh-v, .cnt-f, .arf';
   if (!reduce && 'IntersectionObserver' in window) {
     document.documentElement.classList.add('js-rv');
-    $$(GROUPS).forEach(g => [...g.children].forEach((c, i) => { c.classList.add('rv'); if (!c.style.getPropertyValue('--i')) c.style.setProperty('--i', Math.min(i, 7)); }));
+    $$(GROUPS).forEach(g => [...g.children].forEach((c, i) => { if (c.matches('h1')) return; c.classList.add('rv'); if (!c.style.getPropertyValue('--i')) c.style.setProperty('--i', Math.min(i, 7)); }));
     $$(ONE).forEach(el => el.classList.add('rv'));
-    const heads = $$('.h2x, .fx-cta .h2x');
+    const heads = $$('.h2x, .h1x');
     heads.forEach(split);
     const io = new IntersectionObserver(es => es.forEach(e => {
       if (!e.isIntersecting) return;
@@ -73,17 +75,48 @@
     }), { rootMargin: '0px 0px -8% 0px', threshold: .12 });
     $$('.rv').forEach(el => io.observe(el));
     heads.forEach(el => io.observe(el));
-    // работы и статьи перерисовываются фильтром — новые карточки показываем сразу с появлением
-    new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1 && n.matches('.wkc')) { n.classList.add('rv'); requestAnimationFrame(() => requestAnimationFrame(() => n.classList.add('is-in'))); setTimeout(() => n.classList.remove('rv', 'is-in'), 1500); } })))
-      .observe(document.getElementById('works-list'), { childList: true });
+    // списки перерисовываются фильтром — новые карточки показываем сразу с появлением, по очереди
+    const pop = (n, i) => { n.classList.add('rv'); n.style.setProperty('--i', Math.min(i, 7)); requestAnimationFrame(() => requestAnimationFrame(() => n.classList.add('is-in'))); setTimeout(() => n.classList.remove('rv', 'is-in'), 1500 + i * 70); };
+    const mo = new MutationObserver(ms => ms.forEach(m => [...m.addedNodes].filter(n => n.nodeType === 1).forEach((n, i) => {
+      if (n.matches('.arg')) [...n.children].forEach((c, k) => pop(c, k + 1)); else pop(n, i);
+    })));
+    $$('#works-list, [data-swap]').forEach(el => mo.observe(el, { childList: true }));
   }
 
   // ── счётчики ──
+  // крупные цифры: тире диапазона и плюс — отдельными знаками поменьше и с воздухом (стили — home.css)
+  $$('.nums b, .pgf b, .rmt-sum strong, .gbar strong').forEach(el => {
+    el.innerHTML = el.innerHTML.replace(/(\d)\s*[–—-]\s*(\d)/g, (s, a, b) => a + '<i class="n-dash">–</i>' + b).replace(/(\d)\+/g, (s, a) => a + '<i class="n-plus">+</i>');
+  });
+  // тире ровно посередине: у цифр разные боковые поля (у «1» широкое слева), поэтому равные поля тире дают разные просветы —
+  // меряем контуры знаков на canvas и делим воздух (те же .4em тире) так, чтобы от цифры до цифры было поровну;
+  // контуры canvas округляет до пикселя — меряем в кегле ×10
+  const dashFit = () => {
+    const cx = document.createElement('canvas').getContext('2d');
+    $$('.n-dash').forEach(t => {
+      const a = t.previousSibling, c = t.nextSibling;
+      if (!a || !c || a.nodeType !== 3 || c.nodeType !== 3) return;
+      const ps = getComputedStyle(t.parentNode), ts = getComputedStyle(t), fs = parseFloat(ts.fontSize);
+      const m = (s, ch) => {
+        cx.font = `${s.fontWeight} ${parseFloat(s.fontSize) * 10}px ${s.fontFamily}`;
+        const r = cx.measureText(ch);
+        return { width: r.width / 10, actualBoundingBoxLeft: r.actualBoundingBoxLeft / 10, actualBoundingBoxRight: r.actualBoundingBoxRight / 10 };
+      };
+      const A = m(ps, a.nodeValue.slice(-1)), T = m(ts, '–'), C = m(ps, c.nodeValue[0]);
+      const gl = A.width - A.actualBoundingBoxRight + (parseFloat(ps.letterSpacing) || 0) - T.actualBoundingBoxLeft;
+      const gr = T.width - T.actualBoundingBoxRight - C.actualBoundingBoxLeft;
+      const g = (gl + gr) / 2 + .2 * fs;
+      t.style.margin = `0 ${((g - gr) / fs).toFixed(3)}em 0 ${((g - gl) / fs).toFixed(3)}em`;
+    });
+  };
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(dashFit);
+  // счётчик меняет только число — первый текстовый узел с цифрами, знаки рядом остаются
   const countUp = el => {
-    const m = el.textContent.match(/^(\D*)(\d+)(.*)$/); if (!m) return;
+    const n = [...el.childNodes].find(c => c.nodeType === 3 && /\d/.test(c.nodeValue)); if (!n) return;
+    const m = n.nodeValue.match(/^(\D*)(\d+)(.*)$/); if (!m) return;
     const to = +m[2], t0 = performance.now(), dur = 1600;
-    const step = now => { const k = Math.min(1, (now - t0) / dur); el.textContent = m[1] + Math.round(to * (1 - Math.pow(1 - k, 4))) + m[3]; if (k < 1) requestAnimationFrame(step); };
-    el.textContent = m[1] + 0 + m[3]; requestAnimationFrame(step);
+    const step = now => { const k = Math.min(1, (now - t0) / dur); n.nodeValue = m[1] + Math.round(to * (1 - Math.pow(1 - k, 4))) + m[3]; if (k < 1) requestAnimationFrame(step); };
+    n.nodeValue = m[1] + 0 + m[3]; requestAnimationFrame(step);
   };
   if (!reduce) {
     const cio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { cio.unobserve(e.target); countUp(e.target); } }), { threshold: .6 });

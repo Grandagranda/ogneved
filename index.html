@@ -8,7 +8,7 @@
 <meta name="description" content="Расчёты и проектная документация в области пожаротушения: проезды и подъезды, планы тушения пожаров, расход воды, силы и средства. Работаем по всей России.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Manrope:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Manrope:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/parts.css">
 <link rel="stylesheet" href="css/home.css">
@@ -17,24 +17,25 @@
 <header class="hdr" id="hdr"></header>
 
 <main class="frame">
-  <!-- 01 · первый экран — по макету Figma (узел 2031:1164); поверх рендера — плашка «Схема объекта» и пометки схемы (js/hero.js) -->
+  <!-- 01 · первый экран — по макету Figma «home» 2059:6: ролик тушения, поверх — карточка услуг и пометки к ним (js/hero.js) -->
   <section class="hero" id="top">
     <div class="hero-stage">
       <i class="fl fl--h" style="--y:40.25rem"></i>
       <div class="hero-in">
         <p class="badge hero-badge"><svg class="flag" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.975.5C4.725.5 1.95 2.6.925 5.5h14.15C14.025 2.6 11.25.5 7.975.5Z" fill="#EEE"/><path d="M7.975 15.5c3.275 0 6.05-2.1 7.075-5H.925c1.025 2.925 3.8 5 7.05 5Z" fill="#FE2630"/><path d="M.925 5.5A7.5 7.5 0 0 0 .5 8c0 .875.15 1.725.425 2.5h14.15c.275-.775.425-1.625.425-2.5s-.15-1.725-.425-2.5H.925Z" fill="#3C73E9"/></svg>Работаем по всей России с 2012 года</p>
-        <h1 class="hero-h"><span class="ln"><span>Экспертные решения</span></span> <span class="ln"><span>в области пожарной</span></span> <span class="ln"><span><mark class="hl"><b>безопасности</b></mark></span></span></h1>
+        <h1 class="hero-h"><span class="ln"><span>Экспертные решения</span></span> <span class="ln"><span>при проектировании</span></span> <span class="ln"><span>в области</span></span> <span class="ln"><span><mark class="hl"><b>пожаротушения</b></mark></span></span></h1>
         <p class="hero-sub">Разрабатываем расчётные обоснования и&nbsp;документацию для зданий и&nbsp;сооружений. Профессионально, обоснованно, в&nbsp;срок.</p>
         <button class="fb hero-cta" data-open="form"><span>Заказать проект</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></button>
 
+        <!-- Figma «home» 2059:1044: ролик 687, −16 · 1073×791 — петля img/hero.mp4 (_tools/hero-video.cjs); поверх — пометки услуг (js/hero.js) -->
         <div class="hero-art" id="art">
-          <img class="art-photo" src="img/hero-photo-1600.webp" srcset="img/hero-photo-1600.webp 1600w, img/hero-photo.webp 2560w" sizes="(min-width: 1700px) 61vw, 1021px" width="2560" height="1429" alt="Здание в разрезе: спринклерная сеть, пожарные краны, резервуар и пожарная автоцистерна" fetchpriority="high">
+          <video class="art-video" src="img/hero.mp4" poster="img/hero-poster.webp" width="1676" height="1236" muted loop playsinline autoplay preload="auto" aria-label="Пожарные расчёты тушат пожар в офисном здании: автоцистерна, автолестница, рукавная линия от гидранта"></video>
         </div>
-        <!-- Figma «Vector 1»: размытое пятно цвета фона гасит низ дерева у левого края рендера -->
-        <svg class="hero-blob" viewBox="0 0 262.276 264.367" aria-hidden="true"><filter id="hb-f" x="0" y="0" width="262.276" height="264.367" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="8.3"/></filter><path filter="url(#hb-f)" fill="#F9FAFE" fill-opacity=".47" d="M157.176 97.053 126.676 59.553C118.342 55.22 93.576 46.553 91.176 44.553 88.176 42.053 70.176 22.053 68.176 17.053 66.176 12.053 46.676 50.053 43.676 52.053 40.676 54.053 27.676 100.553 22.676 103.553 17.676 106.553 14.176 220.053 18.676 226.053 23.176 232.053 86.176 242.553 91.176 242.053 96.176 241.553 187.176 251.053 215.176 246.553 243.176 242.053 212.176 219.553 210.176 211.053 208.576 204.253 237.509 205.22 245.676 199.553L236.676 162.553C213.009 161.22 154.476 148.853 151.676 148.053 148.876 147.253 121.676 152.72 111.676 148.053 110.342 139.22 114.176 107.553 151.676 111.553 176.535 114.205 133.176 97.053 157.176 97.053Z"/></svg>
+        <!-- Figma Rectangle 34 и Ellipse 2: растушёвка левого края ролика и пятно цвета фона справа -->
+        <i class="hero-vfade" aria-hidden="true"></i>
+        <img class="hero-glow" src="img/hero-glow.webp" width="705" height="504" alt="" aria-hidden="true">
         <div class="plate" id="plate"></div>
       </div>
-      <i class="hero-fade" aria-hidden="true"></i>
     </div>
 
     <div class="hero-form-w">
@@ -92,7 +93,7 @@
         <div class="sh-r"><p>От жилого дома до&nbsp;гидроэлектростанции. Выберите тип объекта&nbsp;—<br>подготовим предложение под ваши условия.</p></div>
       </div>
       <div class="objx-track" id="obj"></div>
-      <div class="wrap2 objx-bar"><span class="mono" id="obj-k">01 / 08</span><i><b id="obj-p"></b></i></div>
+      <div class="wrap2 objx-bar"><span class="num" id="obj-k">01 / 08</span><i><b id="obj-p"></b></i></div>
     </div>
   </section>
 

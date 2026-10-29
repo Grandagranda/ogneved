@@ -1,16 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 926 118" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 976 214" fill="none">
   <title>ОГНЕВЕД</title>
-  <!-- буквы: высота 100, штрих 22, просвет 14; осевые линии обводкой, углы острые -->
-  <g stroke="#ffffff" stroke-width="22" stroke-miterlimit="10">
-    <rect x="11" y="11" width="108" height="78" rx="35"/>
-    <path d="M155 100V11H236"/>
-    <path d="M261 0V100M347 0V100M261 50H347"/>
-    <path d="M464 11H383V89H464M383 50H456"/>
-    <path d="M489 100V11H548A16 16 0 0 1 564 27V34A16 16 0 0 1 548 50H489M489 50H556A19.5 19.5 0 0 1 556 89H478"/>
-    <path d="M693 11H612V89H693M612 50H685"/>
-    <path d="M737 89V11H803V89M707 89H825"/>
+  <defs><mask id="og-mw" maskUnits="userSpaceOnUse" x="0" y="0" width="104" height="122"><path d="M52 8L96 22V64C96 92 82 107 52 114C22 107 8 92 8 64V22Z" fill="#fff" stroke="#000" stroke-width="29" stroke-linejoin="miter"/></mask></defs>
+  <g transform="scale(1.75)">
+    <path d="M52 8L96 22V64C96 92 82 107 52 114C22 107 8 92 8 64V22Z" stroke="#ffffff" stroke-width="16" stroke-linejoin="miter" stroke-miterlimit="10"/>
+    <g mask="url(#og-mw)"><path fill="#ffffff" d="M25 62L79 18.8V40.8L25 84Z"/><path fill="#f5312a" d="M25 91L79 47.8V69.8L25 113Z"/></g>
   </g>
-  <path fill="#ffffff" d="M707 100H725V118H707ZM807 100H825V118H807Z"/>
-  <!-- знак: пламя с боковым языком -->
-  <path fill="#f5312a" d="M893 0C899 22 925 36 925 64C925 85 910 100 890 100C870 100 855 85 855 64C855 48 864 37 872 30C872 42 877 50 884 53C881 34 885 14 893 0Z"/>
+  <g transform="translate(0 57)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="10">
+    <g transform="translate(218 0)" stroke="#ffffff" color="#ffffff"><rect x="10" y="10" width="110" height="80" rx="30"/></g>
+    <g transform="translate(363 0)" stroke="#ffffff" color="#ffffff"><path d="M10 100V10H76"/></g>
+    <g transform="translate(454 0)" stroke="#ffffff" color="#ffffff"><path d="M10 0V100M84 0V100M20 50H74"/></g>
+    <g transform="translate(563 0)" stroke="#ffffff" color="#ffffff"><path stroke="none" fill="currentColor" d="M0 0H80V20H20V32H0ZM0 68H20V80H80V100H0Z"/><g fill="#f5312a"><path stroke="none" d="M0 40H72V60H0Z"/></g></g>
+    <g transform="translate(658 0)" stroke="#ffffff" color="#ffffff"><path d="M10 100V10H64A20 20 0 0 1 64 50H10M10 50H68A20 20 0 0 1 68 90H10"/></g>
+    <g transform="translate(771 0)" stroke="#ffffff" color="#ffffff"><path stroke="none" fill="currentColor" d="M0 0H80V20H20V32H0ZM0 68H20V80H80V100H0Z"/><path stroke="none" fill="currentColor" d="M0 40H72V60H0Z"/></g>
+    <g transform="translate(866 0)" stroke="#ffffff" color="#ffffff"><path d="M10 120V90H100V120M30 90V10H80V90"/><path d="M0 90H110"/></g>
+  </g>
 </svg>
