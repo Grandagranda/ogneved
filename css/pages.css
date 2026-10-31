@@ -41,6 +41,7 @@
 .pgf .num { display: block; font-size: .8125rem; color: var(--red); }
 .pgf b small { margin-right: .25em; font-size: .4em; font-weight: 400; letter-spacing: 0; color: var(--grey); vertical-align: .9em; }
 .pgf b { display: block; margin-top: 1.75rem; font-size: 3.5rem; line-height: .9; font-weight: 300; letter-spacing: -.05em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pgf .pgf-w { font-size: 2.75rem; line-height: 3.15rem; }
 .pgf p { max-width: 15.5rem; margin-top: 1rem; font-size: .875rem; line-height: 1.4; color: var(--grey); }
 /* пары «подпись — значение» (проект, документ) */
 .pgd { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); margin-top: 3.75rem; border-top: 1px solid var(--ln-2); }
@@ -253,6 +254,108 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 .pg .wkc[style*="span 12"] .wkc-img { height: 32rem; }
 .pg .sec--tint .scx .sc { box-shadow: none; }
 
+/* ── графическая часть проекта: две схемы на одной панели (js/schemes.js) ──
+   слева площадка на мозаике, справа сухотруб на тёмном; знаки — в единицах панели 1400×700 */
+.sxw { display: grid; gap: .625rem; }
+.sx { position: relative; aspect-ratio: 2 / 1; border-radius: .75rem; overflow: hidden; background: #fff; box-shadow: var(--sh-card), 0 0 0 1px rgba(15, 16, 18, .04); isolation: isolate; }
+.sx-dark { position: absolute; top: 0; bottom: 0; right: 0; left: calc(936 / 1400 * 100%); background: var(--ink); }
+.sx > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sx-veil path { fill: #dadeee; }
+.sx-road { fill: var(--tint-2); }
+.sx-room { fill: #fff; }
+.sx-wall { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.sx-curb { fill: none; stroke: rgba(15, 16, 18, .14); }
+.sx-t { font: 500 12px/1 var(--f); letter-spacing: 0; fill: var(--ink); }
+.sx-c { text-anchor: middle; }
+.sx-t--r { fill: var(--red); }
+.sx-halo { stroke: #fff; stroke-width: 4; stroke-linejoin: round; }
+.sx-tl { stroke: var(--ink); stroke-width: 1; }
+.sx-h { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; }
+.sx-hd { fill: none; stroke: #fff; stroke-width: 1.6; }
+.sx-comb { stroke-width: 2.4; }
+.sx-dash { stroke-dasharray: 8 6; }
+.sx-p { fill: none; stroke: var(--red); stroke-width: 3.4; stroke-linejoin: round; }
+.sx-p--t { stroke-width: 2.4; }
+.sx-f { fill: var(--ink); }
+.sx-r { fill: var(--red); stroke: var(--red); }
+.sx-ac path, .sx-ac ellipse { fill: #fff; stroke: var(--red); stroke-width: 1.6; }
+.sx-ac-t { font: 500 10px/1 var(--f); fill: var(--ink); text-anchor: middle; }
+.sx-pg circle { fill: #fff; stroke: var(--ink); stroke-width: 1.6; }
+.sx-pg path { fill: var(--ink); }
+.sx-rs circle { fill: #fff; stroke: var(--ink); stroke-width: 1.6; }
+.sx-rs path, .sx-st path:not(.sx-f) { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+.sx-dr path { fill: #fff; stroke: var(--ink); stroke-width: 1.4; }
+.sx-dr circle { fill: #fff; stroke: var(--ink); stroke-width: 1.4; }
+.sx-fl path:first-child { fill: none; stroke: var(--red); stroke-width: 2; }
+.sx-pb circle, .sx-sh path { fill: #fff; stroke: var(--red); stroke-width: 1.6; }
+.sx-pb-t { font: 500 13px/1 var(--f); fill: var(--red); text-anchor: middle; }
+.sx-pb-n { font: 500 12px/1 var(--f); fill: var(--red); }
+.sx-hang path { fill: none; stroke: rgba(255, 255, 255, .55); stroke-width: 1.2; }
+.sx-valve path { fill: none; stroke: #fff; stroke-width: 1.2; }
+.sx-valve .sx-fw { fill: #fff; }
+.sx-w .sx-t { fill: rgba(255, 255, 255, .72); }
+.sx-t--g { fill: var(--grey); text-transform: uppercase; font-size: 11px; }
+/* появление: сначала техника, затем рукава, стояки и стволы, последней — труба на тёмной половине */
+.sx-dw { stroke-dasharray: 1 1; stroke-dashoffset: 1; stroke-linecap: butt; }
+.sx.is-on .sx-dw { animation: sx-draw var(--z) cubic-bezier(.45, 0, .55, 1) var(--a) forwards; }
+.sx-pop { opacity: 0; transform: scale(.82); transform-box: fill-box; transform-origin: center; }
+.sx.is-on .sx-pop { animation: sx-pop .7s var(--e-out) var(--a) forwards; }
+.sx-fade { opacity: 0; }
+.sx.is-on .sx-fade { animation: sx-fade .7s ease var(--a) forwards; }
+.sx-veil, .sx-road, .sx-spec { transition: opacity .8s; }
+.sx:not(.is-on) .sx-veil, .sx:not(.is-on) .sx-road, .sx:not(.is-on) .sx-spec, .sx:not(.is-on) .sx-sg { opacity: 0; }
+.sx.is-on .sx-spec { transition-delay: 2.7s; }
+@keyframes sx-draw { to { stroke-dashoffset: 0; } }
+@keyframes sx-pop { to { opacity: 1; transform: none; } }
+@keyframes sx-fade { to { opacity: 1; } }
+/* сигналы: штрих с шагом --P, сдвиг на один шаг — бесшовный круг; бегут, только пока панель на экране */
+.sx-run { will-change: transform; }
+.sx.is-on .sx-sg { animation: sx-sg .8s ease 3s backwards; }
+.sx-sg path { --P: 300px; fill: none; stroke-linecap: round; stroke-dasharray: var(--L) calc(var(--P) - var(--L)); stroke-dashoffset: var(--o); animation: sx-run 2.8s linear infinite paused; }
+.sx.is-run .sx-sg path { animation-play-state: running; }
+.sx-sg-t { --L: 44px; --o: 0px; stroke-opacity: .42; }
+.sx-sg-h { --L: 13px; --o: -31px; }
+.sx-sg--r path { stroke: var(--red); stroke-width: 3; }
+.sx-sg--w path { stroke: #fff; stroke-width: 1.8; }
+@keyframes sx-sg { from { opacity: 0; } }
+@keyframes sx-run { to { stroke-dashoffset: calc(var(--o) - var(--P)); } }
+/* кольцо срабатывания: сигнал дошёл до оросителя — расходится у него и у его пары в помещении */
+.sx-ring { fill: none; stroke: var(--red); stroke-width: 1.4; vector-effect: non-scaling-stroke; opacity: 0; transform-box: fill-box; transform-origin: center; animation: sx-ring 2.8s linear var(--a) infinite paused; }
+.sx-ring--w { stroke: #fff; }
+.sx.is-run .sx-ring { animation-play-state: running; }
+@keyframes sx-ring { 0% { opacity: 0; transform: scale(.42); } 4% { opacity: .75; } 46%, 100% { opacity: 0; transform: scale(1.3); } }
+/* наведение на карточку: яркими остаются только её слои */
+.sx [data-l] { transition: opacity .35s; }
+.sx [data-l].is-dim { opacity: .14; }
+.sx.is-dim .sx-veil { opacity: .45; }
+@media (prefers-reduced-motion: reduce) {
+  .sx-dw { stroke-dashoffset: 0; }
+  .sx-pop, .sx-fade { opacity: 1; transform: none; }
+  .sx .sx-veil, .sx .sx-road, .sx .sx-spec { opacity: 1; transition: none; }
+  .sx * { animation: none !important; }
+  .sx-sg { display: none; }
+}
+.sxh { position: absolute; top: 1.75rem; }
+.sxh--l { left: 2.25rem; }
+.sxh--r { left: calc(936 / 1400 * 100% + 2.25rem); color: #fff; }
+.sxh h3 { margin-top: .75rem; font-size: 1.375rem; line-height: 1.15; font-weight: 500; letter-spacing: -.025em; }
+.sxh-s { margin-top: .25rem; font-size: .8125rem; line-height: 1.35; color: var(--grey); }
+.sx-spec { position: absolute; right: 2.25rem; bottom: 2rem; width: 12.5rem; color: #fff; }
+.sx-spec div { display: flex; justify-content: space-between; gap: 1rem; padding: .4375rem 0; border-top: 1px solid rgba(255, 255, 255, .12); font-size: .75rem; line-height: 1.2; }
+.sx-spec dt { color: rgba(255, 255, 255, .55); }
+.sx-tag { position: absolute; left: 2.25rem; top: 7.625rem; display: inline-flex; align-items: center; gap: .4375rem; height: 1.625rem; padding: 0 .625rem; border-radius: .3125rem; background: #fff; box-shadow: 0 0 0 1px var(--ln-2); font-size: .625rem; line-height: 1; font-weight: 500; text-transform: uppercase; color: var(--ink); }
+.sx-tag i { width: .4375rem; height: .4375rem; border-radius: 1px; background: var(--grey-2); }
+.sxk-ls { position: relative; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: .625rem; }
+.sxk { position: relative; display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; min-height: 12.5rem; padding: 1.25rem 1.25rem 1.25rem; border-radius: .375rem; background: #fff; text-align: left; box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .08); transition: box-shadow .4s; }
+.sxk-ic { display: block; height: 1.75rem; margin-bottom: auto; }
+.sxk-ic svg { display: block; width: auto; height: 100%; overflow: visible; }
+.sxk-ic .sx-ic-h path { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+.sxk b { padding-top: 1.5rem; font: 300 2.5rem/1 var(--f-num); letter-spacing: -.05em; white-space: nowrap; }
+.sxk small { font-size: .35em; font-weight: 400; letter-spacing: 0; color: var(--grey); }
+.sxk span { margin-top: .625rem; min-height: 3.375rem; font-size: .8125rem; line-height: 1.38; color: var(--ink-52); }
+.sxk-ls .fl--add { min-height: 12.5rem; padding: 1.25rem; }
+.sxk:hover, .sxk:focus-visible { outline: 0; box-shadow: inset 0 0 0 1px var(--red); }
+
 /* ── проект: фото на всю колонку, ниже текст тремя пунктами и липкая карточка услуги ── */
 .wph { height: 38rem; border-radius: .75rem; overflow: hidden; background: var(--tint-2); }
 .wph img, .atc img, .arf-img img { width: 100%; height: 100%; object-fit: cover; transform: translate3d(0, var(--py, 0%), 0) scale(1.12); }
@@ -337,8 +440,13 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 .ats .fb { justify-self: start; margin-top: 1rem; }
 
 /* ── библиотека: папки главной по пять в ряд; последняя ячейка — вопрос о документе пунктиром ── */
-.pg .lbx { min-height: 20rem; padding-top: 2.5rem; transition: opacity .3s, transform .4s var(--e-out); }
-.pg .lbx.is-swap { opacity: 0; transform: translateY(.75rem); }
+.pg .lbw { min-height: 20rem; transition: opacity .3s, transform .4s var(--e-out); }
+.pg .lbw.is-swap { opacity: 0; transform: translateY(.75rem); }
+.pg .lbx { padding-top: 2.5rem; }
+.lb-cat + .lb-cat { margin-top: 4.5rem; }
+.lb-h { display: flex; align-items: center; gap: .75rem; font-size: 1.5rem; line-height: 1.2; font-weight: 500; letter-spacing: -.02em; }
+.lb-h i { flex: none; width: .625rem; height: .625rem; border-radius: .125rem; }
+.lb-h span { color: var(--grey); }
 .lb-ask { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: .5rem; aspect-ratio: 1 / .98; padding: 1.5rem 1.375rem 1.25rem; border-radius: .75rem; border: 1px dashed rgba(15, 16, 18, .16); text-align: left; transition: border-color .4s, background-color .4s; }
 .lb-ask b { font-size: 1rem; line-height: 1.3; font-weight: 500; letter-spacing: -.02em; }
 .lb-ask > span:last-child { font-size: .8125rem; line-height: 1.4; color: var(--grey); }
@@ -403,7 +511,9 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 .cnt-row .side-k { align-self: start; padding-top: .5rem; }
 .cnt-row--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .cnt-row--3 .side-k { padding-top: 0; }
-.cnt-big { display: inline-block; font-size: 3.75rem; line-height: 1; font-weight: 500; letter-spacing: -.045em; white-space: nowrap; transition: color .3s; }
+.cnt-tel { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.cnt-tel .msg-q { width: 6rem; height: 6rem; box-shadow: inset 0 0 0 1px var(--ln-2); }
+.cnt-big { display: inline-block; font-size: 3.5rem; line-height: 1; font-weight: 500; letter-spacing: -.045em; white-space: nowrap; transition: color .3s; }
 .cnt-mid { display: inline-block; font-size: 2.25rem; line-height: 1.05; font-weight: 500; letter-spacing: -.035em; transition: color .3s; }
 .cnt-big:hover, .cnt-mid:hover { color: var(--red); }
 .cnt-s { margin-top: .75rem; font-size: .9375rem; line-height: 1.45; color: var(--grey); }
@@ -460,3 +570,25 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 .ctx-f .hf-t { font-size: 1.5rem; line-height: 1; }
 .ctx-f .hf { margin-top: 1.609rem; }
 .ctx-f .form-ok { min-height: 3.25rem; }
+
+/* ── политика и согласие: как статья, текст плотнее; номер у каждого раздела; метка — реквизит, которого пока нет ── */
+.lg h2 { display: grid; grid-template-columns: 3rem minmax(0, 1fr); align-items: baseline; font-size: 1.75rem; line-height: 1.15; scroll-margin-top: 7rem; }
+.lg h2 .num { font-size: .8125rem; letter-spacing: 0; color: var(--red); }
+.lg > :not(h2) { margin-left: 3rem; }
+.lg p, .lg li { font-size: 1.0625rem; line-height: 1.6; color: rgba(15, 16, 18, .72); }
+.lg ul { display: grid; gap: .5rem; margin-top: .75rem; }
+.lg p + ul, .lg ul + p { margin-top: 1rem; }
+.lg li { position: relative; padding-left: 1.25rem; }
+.lg li::before { content: ''; position: absolute; left: 0; top: .6em; width: .375rem; height: .375rem; border-radius: 1px; background: var(--red); }
+.lg a { text-decoration: underline; text-underline-offset: 2px; transition: color .3s; }
+.lg a:hover { color: var(--red); }
+.lg-dl { margin-top: 1rem; border-top: 1px solid var(--ln-2); }
+.lg-dl div { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 1rem; padding: .8125rem 0; border-bottom: 1px solid var(--ln-2); }
+.lg-dl dt { font-size: .6875rem; line-height: 1.6rem; font-weight: 500; text-transform: uppercase; color: var(--grey); }
+.lg-dl dd { font-size: 1.0625rem; line-height: 1.5; color: var(--ink); }
+.lg-f { padding: .0625rem .375rem; border-radius: .1875rem; background: rgba(245, 49, 42, .1); color: var(--red); }
+.lg-as .side-k + * { margin-top: 0; }
+.lg-as-p { font-size: .9375rem; line-height: 1.45; color: var(--ink-52); }
+.lg-as-m { display: block; margin: .75rem 0 2.5rem; font-size: 1.25rem; font-weight: 500; letter-spacing: -.02em; transition: color .3s; }
+.lg-as-m:hover { color: var(--red); }
+.lg-as .fb { width: 100%; }

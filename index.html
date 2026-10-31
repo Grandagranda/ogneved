@@ -7,8 +7,7 @@
 <title>ОГНЕВЕД — проекты в области тушения пожаров</title>
 <meta name="description" content="Расчёты и проектная документация в области пожаротушения: проезды и подъезды, планы тушения пожаров, расход воды, силы и средства. Работаем по всей России.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Manrope:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/parts.css">
 <link rel="stylesheet" href="css/home.css">
@@ -47,7 +46,7 @@
           <label class="fld fld--tel"><svg class="flag" viewBox="0 0 14 11" aria-hidden="true"><path d="M14 9.036c0 .417-.164.816-.456 1.111a1.55 1.55 0 0 1-1.1.46H1.556a1.55 1.55 0 0 1-1.1-.46A1.58 1.58 0 0 1 0 9.036V7.464h14v1.572Z" fill="#CE2028"/><path d="M0 3.536h14v3.928H0z" fill="#22408C"/><path d="M12.444.393H1.556c-.413 0-.809.165-1.1.46A1.58 1.58 0 0 0 0 1.964v1.572h14V1.964c0-.417-.164-.816-.456-1.111a1.55 1.55 0 0 0-1.1-.46Z" fill="#fff"/></svg><input name="phone" type="tel" placeholder="+7 (000) 000 00 00" autocomplete="tel" required><span class="pfx">+7</span></label>
           <label class="fld"><input name="obj" placeholder=" "><span>Ваш объект</span></label>
           <button class="btn btn--red" type="submit">Получить консультацию</button>
-          <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="#">политикой конфиденциальности</a></p>
+          <label class="consent agr"><input type="checkbox" name="agree" required><i></i><span>Даю <a href="soglasie.html" target="_blank">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="politika.html" target="_blank">политику конфиденциальности</a></span></label>
           <div class="form-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><b>Заявка отправлена</b><p class="muted">Специалист перезвонит в течение 15 минут в рабочее время.</p></div>
         </form>
       </div>
@@ -77,7 +76,10 @@
     <div class="wrap2">
       <div class="st">
         <p class="badge badge--flat rv"><i></i>О нас</p>
-        <p class="st-text" id="statement">С&nbsp;2012 года узко специализируемся на&nbsp;тушении пожаров. Разрабатываем проектные обоснования, которые подтверждают: пожарные подразделения смогут подъехать к&nbsp;объекту, получить воду и&nbsp;потушить пожар.</p>
+        <div class="st-text" id="statement">
+          <p>С&nbsp;2012 года узко специализируемся на&nbsp;проектировании и&nbsp;расчётных обоснованиях соответствия объектов защиты требованиям пожарной безопасности в&nbsp;области пожаротушения:</p>
+          <ul><li>разрабатываем обоснования проектных решений для строящихся объектов;</li><li>подтверждаем соответствие требованиям норм эксплуатируемых объектов.</li></ul>
+        </div>
       </div>
       <ul class="nums" id="nums"></ul>
       <ul class="prx" id="pros"></ul>
@@ -210,6 +212,7 @@
 <footer class="ftr ftr--dark" id="ftr"></footer>
 
 <script src="js/vendor/lenis.min.js"></script>
+<script src="js/vendor/qrcode.js"></script>
 <script src="js/data.js"></script>
 <script src="js/map-dots.js"></script>
 <script src="js/map-outline.js"></script>

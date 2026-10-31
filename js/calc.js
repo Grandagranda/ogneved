@@ -36,8 +36,8 @@
   const BLD_T = ['Одно здание', '2–3 здания', '4 и более'], BLD_N = [1, 3, 5];
 
   const STEPS = [
-    { k: 'doc', t: 'Документ', q: 'Какой документ нужен?', h: 'Не уверены — выберите ближайший, уточним на консультации', c: 2,
-      opts: () => D.services.map(s => ({ v: s.id, t: s.short, m: `от ${D.rub(s.price)} · ${s.days} дней` })) },
+    { k: 'doc', t: 'Документ', q: 'Какой документ нужен?', h: 'Не уверены — выберите ближайший. Дислокацию и численность пожарной охраны считаем индивидуально', c: 2,
+      opts: () => D.services.filter(s => s.price).map(s => ({ v: s.id, t: s.short, m: `от ${D.rub(s.price)} · ${s.days} дней` })) },
     { k: 'obj', t: 'Объект', q: 'Какой у вас объект?', h: 'Тип здания влияет на нормы и объём расчётов', c: 4,
       opts: () => D.objects.map(o => ({ v: o.id, t: o.t, i: OBJ_I[o.id] })) },
     { k: 'area', t: 'Площадь', q: 'Какая площадь объекта?', h: 'Суммарная по всем этажам, достаточно примерно', c: 5,
@@ -76,7 +76,7 @@
               <label class="fld"><input name="name" placeholder=" " autocomplete="name"><span>Ваше имя</span></label>
               <label class="fld"><input name="phone" type="tel" placeholder=" " autocomplete="tel" required><span>Телефон</span></label>
               <button class="btn btn--red" type="submit">Получить точный расчёт</button>
-              <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="#">политикой конфиденциальности</a></p>
+              <label class="consent agr"><input type="checkbox" name="agree" required><i></i><span>Даю <a href="soglasie.html" target="_blank">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="politika.html" target="_blank">политику конфиденциальности</a></span></label>
               <div class="form-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><div><b>Заявка отправлена</b><p class="muted">Инженер перезвонит в течение 15 минут в рабочее время.</p></div></div>
             </form>
           </div>
@@ -91,6 +91,7 @@
         <div class="cs-time"><div class="cs-trow"><small>Срок разработки</small><b class="cs-days">—</b></div></div>
         <dl class="cs-spec">${STEPS.map(s => `<div data-k="${s.k}"><dt>${s.t}</dt><dd>—</dd></div>`).join('')}</dl>
         <div class="cs-inc"><small>Состав работ</small><ul></ul></div>
+        <a class="cs-pdf" href="${D.priceList}" download="ОГНЕВЕД — прайс-лист.pdf"><span class="cs-pdf-i">PDF</span><span class="cs-pdf-t"><b>Прайс-лист</b><small>Типовые цены в&nbsp;диапазонах</small></span>${U.ICO.dl}</a>
       </aside>
     </div>`;
 

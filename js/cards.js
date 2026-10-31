@@ -12,6 +12,8 @@
 
   const C = {
     dn, pad, AR,
+    // случайный порядок (Фишер — Йейтс): проекты меняются местами при каждом обновлении страницы
+    shuffle: list => { const a = [...list]; for (let i = a.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [a[i], a[k]] = [a[k], a[i]]; } return a; },
     // порядок услуг — как в макете главной (по рядам слева направо)
     order: D.svcOrder,
 
@@ -23,7 +25,7 @@
       <div class="sc-b">
         <h3><a class="cover-link" href="usluga.html?id=${s.id}">${s.cardT}</a></h3>
         <p>${s.cardD}</p>
-        <div class="sc-f"><p class="sc-p"><small>Стоимость</small><b>от ${D.rub(s.price)}</b></p><span class="sc-go">${GO}</span></div>
+        <div class="sc-f"><p class="sc-p"><small>Стоимость</small><b>${D.cost(s)}</b></p><span class="sc-go">${GO}</span></div>
       </div>
     </article>`; },
 
@@ -49,8 +51,8 @@
       </div>
     </article>`,
 
-    cover: b => b.img ? `<img src="img/${b.img}.webp" alt="" loading="lazy">`
-      : `<div class="cv cv--${b.cover.c}"><div class="cv-h">${b.cover.h}</div><div class="cv-n">${b.num}</div><div class="cv-t">${b.t}</div><div class="cv-l"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>`,
+    // вкладыш: у всех один вид, цвет полоски — по разделу библиотеки
+    cover: (b, lines = 6) => `<div class="cv cv--${b.cat}"><div class="cv-h">${b.head}</div><div class="cv-n">${b.num}</div><div class="cv-t">${b.t}</div><div class="cv-l">${'<i></i>'.repeat(lines)}</div>${lines > 6 ? `<p class="cv-f"><span>${b.date}</span><span>${b.kind}</span></p>` : ''}</div>`,
 
     // документ библиотеки: папка, документ выезжает вверх при наведении
     book: b => `<a class="folder" href="kniga.html?id=${b.id}">
@@ -62,6 +64,22 @@
         <span class="f-d">${b.news ? `<em>${b.news}</em>` : ''}<time>${b.date}</time></span>
       </span>
     </a>`,
+
+    // раздел библиотеки на главной: та же папка, во вкладыше — первый документ раздела
+    bookCat: (c, i) => {
+      const list = D.books.filter(b => b.cat === c.id), n = list.length;
+      return `<a class="folder" href="biblioteka.html?cat=${c.id}">
+      <span class="f-back"></span>
+      <span class="f-doc">${C.cover({ cat: c.id, head: c.short, num: '', t: '', ...(list[0] && { num: list[0].num, t: list[0].t }) })}</span>
+      <span class="f-front">
+        <span class="f-k">${String(i + 1).padStart(2, '0')} / ${String(D.bookCats.length).padStart(2, '0')}</span>
+        <span class="f-t">${c.t}</span>
+        <span class="f-d">${n ? `${n} ${C.docs(n)}` : 'Наполняется'}</span>
+      </span>
+    </a>`;
+    },
+
+    docs: n => (n % 10 === 1 && n % 100 !== 11 ? 'документ' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'документа' : 'документов'),
   };
 
   // белые панели карточек услуг — одной высоты, по самой высокой: иначе в ряду они «пляшут»

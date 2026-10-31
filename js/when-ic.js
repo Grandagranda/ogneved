@@ -26,7 +26,7 @@
       ic('<rect x="3.5" y="4" width="4" height="4" rx=".8"/><path d="M10.5 6h10"/><path d="M10.5 12h10"/><rect x="3.5" y="16" width="4" height="4" rx=".8"/><path d="M10.5 18h7"/><path d="M3.5 12.2 5.3 14l3.2-3.6" class="r a-draw" pathLength="1"/>'),
       // действующий план устарел: у документа красная стрелка обновления делает оборот
       ic(`${sheet(11)}<path d="M8 10h6M8 13.5h2.5"/><g class="r a-spin" style="transform-origin:16.9px 16.7px"><path class="rr" d="M20.6 15.4a4 4 0 1 0 .3 2.4"/><path class="rr" d="M21 12.6v2.9h-2.9"/></g>`),
-      // пожарная часть запросила план: на документе возникает красная отметка согласования
+      // предписание надзора: на документе возникает красная отметка согласования
       ic(`${sheet(12)}<path d="M8 10h6M8 13.5h4"/><g class="r a-pop" style="transform-origin:16.5px 16.5px"><circle class="rr" cx="16.5" cy="16.5" r="4" fill="#fff"/><path class="rr" d="m14.7 16.6 1.3 1.3 2.4-2.6"/></g>`),
     ],
     voda: [

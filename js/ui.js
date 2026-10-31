@@ -16,6 +16,8 @@
     max: fl('<path d="M350.4,9.6C141.8,20.5,4.1,184.1,12.8,390.4c3.8,90.3,40.1,168,48.7,253.7,2.2,22.2-4.2,49.6,21.4,59.3,31.5,11.9,79.8-8.1,106.2-26.4,9-6.1,17.6-13.2,24.2-22,27.3,18.1,53.2,35.6,85.7,43.4,143.1,34.3,299.9-44.2,369.6-170.3C799.6,291.2,622.5-4.6,350.4,9.6h0ZM269.4,504c-11.3,8.8-22.2,20.8-34.7,27.7-18.1,9.7-23.7-.4-30.5-16.4-21.4-50.9-24-137.6-11.5-190.9,16.8-72.5,72.9-136.3,150-143.1,78-6.9,150.4,32.7,183.1,104.2,72.4,159.1-112.9,316.2-256.4,218.6h0Z"/>', 720),
     mail: fl('<path d="M4 4.5h16A2.5 2.5 0 0 1 22.5 7v.3l-10.5 6.6L1.5 7.3V7A2.5 2.5 0 0 1 4 4.5Zm-2.5 5.2 9.97 6.27c.32.2.74.2 1.06 0L22.5 9.7V17a2.5 2.5 0 0 1-2.5 2.5H4A2.5 2.5 0 0 1 1.5 17V9.7Z"/>'),
     calc: sv('<rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 6.5h7"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01" stroke-width="2.2"/>'),
+    // значок окна связи: QR-код — там и коды для телефона, и звонок, и мессенджеры
+    qr: sv('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h.01M21 17.5V21h-3.5"/>'),
     chat: sv('<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="M8 10h8M8 14h5"/>'),
     ok: sv('<circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/>'),
     dl: sv('<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>'),
@@ -32,7 +34,7 @@
   const PANELS = {
     'uslugi.html': () => `<ul class="mx-sv">${D.svcOrder.map(D.svc).map((s, i) => `<li class="mx-a" style="--i:${Math.floor(i / 3)}"><a href="usluga.html?id=${s.id}">
           <span class="mx-im"><img data-src="img/s-${s.id}.webp" alt=""></span>
-          <span class="mx-tx"><b>${s.cardT}</b><small>от&nbsp;${D.rub(s.price)} · ${s.days} дней</small></span></a></li>`).join('')}</ul>`,
+          <span class="mx-tx"><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} дней</small></span></a></li>`).join('')}</ul>`,
   };
 
   // ── шапка: логотип-слово, меню капсом, телефон, чёрная кнопка с красной стрелкой; у «Услуг» — панель при наведении ──
@@ -125,7 +127,7 @@
         <div><p class="fd-l">География</p><p class="fd-t">${D.city.split(',')[0]}</p><p class="fd-s">${D.city.split(',').slice(1).join(',').trim()}</p>
           <p class="fd-l fd-l--gap">Режим работы</p><p class="fd-t">${D.hours.replace(/,.*/, '')}</p><p class="fd-s">${(D.hours.split(',')[1] || '').trim()}</p></div>
       </div>
-      <div class="fd-bot"><span>© 2012–2026 ОГНЕВЕД</span><a href="#">Политика конфиденциальности</a><a href="#">Согласие на&nbsp;обработку персональных данных</a><a href="#top">Наверх ↑</a></div>
+      <div class="fd-bot"><span>© 2012–2026 ОГНЕВЕД</span><a href="politika.html">Политика конфиденциальности</a><a href="soglasie.html">Согласие на&nbsp;обработку персональных данных</a><a href="#top">Наверх ↑</a></div>
     </div>`;
   }
 
@@ -136,7 +138,7 @@
     ${telField()}
     ${o.q === false ? '' : `<label class="fld fld--ta"><textarea name="q" placeholder=" " rows="3"></textarea><span>${o.ql || 'Объект или вопрос'}</span></label>`}
     <button class="btn btn--red" type="submit">${o.btn || 'Оставить заявку'}</button>
-    <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="#">политикой конфиденциальности</a></p>
+    <label class="consent agr"><input type="checkbox" name="agree" required><i></i><span>Даю <a href="soglasie.html" target="_blank">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="politika.html" target="_blank">политику конфиденциальности</a></span></label>
     <div class="form-ok">${ICO.ok}<div><b>Заявка отправлена</b><p class="muted">Специалист перезвонит в течение 15 минут в рабочее время.</p></div></div>
   </form>`;
   // строка формы как на первом экране: имя, телефон, объект и красная кнопка в один ряд
@@ -145,7 +147,7 @@
     ${telField()}
     <label class="fld"><input name="obj" placeholder=" "><span>${o.ql || 'Ваш объект'}</span></label>
     <button class="btn btn--red" type="submit">${o.btn || 'Получить консультацию'}</button>
-    <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="#">политикой конфиденциальности</a></p>
+    <label class="consent agr"><input type="checkbox" name="agree" required><i></i><span>Даю <a href="soglasie.html" target="_blank">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="politika.html" target="_blank">политику конфиденциальности</a></span></label>
     <div class="form-ok">${ICO.ok}<div><b>Заявка отправлена</b><p class="muted">Специалист перезвонит в течение 15 минут в рабочее время.</p></div></div>
   </form>`;
   function bindForms(root = document) {
@@ -159,9 +161,12 @@
         tel.value = '+7' + (p[0] ? ' (' + p[0] : '') + (p[0].length === 3 ? ') ' : '') + p[1] + (p[2] ? '-' + p[2] : '') + (p[3] ? '-' + p[3] : '');
         tel.closest('.fld').classList.remove('err');
       });
+      f.addEventListener('change', e => { if (e.target.name === 'agree') e.target.closest('.agr').classList.remove('err'); });
       f.addEventListener('submit', e => {
         e.preventDefault();
         if (tel.value.replace(/\D/g, '').length < 11) { tel.closest('.fld').classList.add('err'); tel.focus(); return; }
+        const agr = f.elements.agree;
+        if (agr && !agr.checked) { agr.closest('.agr').classList.add('err'); agr.focus(); return; }
         f.classList.add('is-sent');
       });
     });
@@ -169,9 +174,11 @@
 
   // ── связаться: звонок и мессенджеры кнопками — значок в квадрате, подпись капсом и действие, стрелка-уголок.
   //    msgBlock(['max', 'tg']) — только мессенджеры ──
-  const MSG = [['tel', 'Позвонить', D.phone, D.phoneHref], ['max', 'Мессенджер', 'Написать в&nbsp;MAX', D.max], ['tg', 'Мессенджер', 'Написать в&nbsp;Telegram', D.tg]];
-  const msgBlock = only => `<div class="msg">${MSG.filter(m => !only || only.includes(m[0])).map(([k, t, v, h]) =>
-    `<a class="msg-b"${k === 'tel' ? ` href="${h}"` : ext(h)}><span class="msg-i">${ICO[k]}</span><span class="msg-t"><small>${t}</small><b>${v}</b></span>${AR_UP}</a>`).join('')}</div>`;
+  const MSG = [['tel', 'Позвонить', D.phone, D.phoneHref], ['max', `Мессенджер · по&nbsp;номеру ${D.phone}`, 'Написать в&nbsp;MAX', D.max], ['tg', 'Мессенджер', 'Написать в&nbsp;Telegram', D.tg]];
+  // qr: код для телефона; строится из той же ссылки, что и кнопка (у звонка — tel:, камера предложит набрать номер)
+  const qr = h => { qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8']; const q = qrcode(0, 'M'); q.addData(h, 'Byte'); q.make(); const n = q.getModuleCount(); let d = ''; for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`; return `<svg class="msg-q" viewBox="-2 -2 ${n + 4} ${n + 4}" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}"/></svg>`; };
+  const msgBlock = (only, withQr) => `<div class="msg${withQr ? ' msg--qr' : ''}">${MSG.filter(m => !only || only.includes(m[0])).map(([k, t, v, h]) =>
+    `<a class="msg-b"${k === 'tel' ? ` href="${h}"` : ext(h)}><span class="msg-i">${ICO[k]}</span><span class="msg-t"><small>${t}</small><b>${v}</b></span>${withQr ? qr(k === 'max' ? D.maxQr : h) : ''}${AR_UP}</a>`).join('')}</div>`;
 
   // ── коэффициенты калькулятора стоимости (js/calc.js) ──
   const calc = { data: {
@@ -190,16 +197,16 @@
           <p class="badge badge--flat"><i></i>Бесплатная консультация</p>
           <h3 class="mdl-h">Расскажите об&nbsp;объекте&nbsp;— <span class="g">подскажем, какой документ нужен</span></h3>
           <ul class="mdl-ul"><li>Перезвоним в&nbsp;течение 15&nbsp;минут в&nbsp;рабочее время</li><li>Подскажем, какие расчёты нужны вашему объекту</li><li>Назовём стоимость и&nbsp;срок ещё до&nbsp;договора</li></ul>
-          <div class="mdl-c"><p class="mdl-k">Или позвоните</p><a href="${D.phoneHref}">${D.phone}</a><small>${D.hours}</small></div>
+          <div class="mdl-c"><div class="mdl-ct"><p class="mdl-k">Или позвоните</p><a href="${D.phoneHref}">${D.phone}</a><small>${D.hours}</small></div>${qr(D.phoneHref)}</div>
         </aside>
         <div class="mdl-r"><p class="mdl-t">Заявка на&nbsp;консультацию</p><p class="mdl-s">Оставьте контакты — специалист перезвонит и&nbsp;уточнит задачу</p>${formHTML()}</div></div></div>
       <div class="modal modal--wide" id="m-calc" role="dialog" aria-modal="true" aria-label="Калькулятор стоимости"><div class="modal-box"><button class="modal-x" data-close aria-label="Закрыть">${ICO.x}</button><div data-calc></div></div></div>
       <div class="modal mdl mdl--cnt" id="m-cnt" role="dialog" aria-modal="true" aria-label="Контакты"><div class="modal-box"><button class="modal-x" data-close aria-label="Закрыть">${ICO.x}</button>
         <p class="badge badge--flat"><i></i>Контакты</p>
-        <h3 class="mdl-h">Свяжитесь с&nbsp;нами <span class="g">удобным способом</span></h3><p class="mdl-s">Позвоните или напишите в&nbsp;мессенджер — ответим в&nbsp;течение 15&nbsp;минут в&nbsp;рабочее время.</p>${msgBlock()}
+        <h3 class="mdl-h">Свяжитесь с&nbsp;нами <span class="g">удобным способом</span></h3><p class="mdl-s">Позвоните или напишите в&nbsp;мессенджер — ответим в&nbsp;течение 15&nbsp;минут в&nbsp;рабочее время.</p>${msgBlock(null, true)}
         <dl class="mdl-dl"><div><dt>Почта</dt><dd><a href="mailto:${D.email}">${D.email}</a></dd></div><div><dt>Режим работы</dt><dd>${D.hours}</dd></div></dl></div></div>
       <div class="dock" aria-label="Быстрые действия">
-        <button data-open="cnt" aria-label="Позвонить или написать">${ICO.tel}<span class="d-tip">Позвонить или написать</span></button>
+        <button data-open="cnt" aria-label="Позвонить, написать или открыть QR-код">${ICO.qr}<span class="d-tip">Позвонить, написать, QR-код</span></button>
         <button data-open="form" aria-label="Задать вопрос">${ICO.chat}<span class="d-tip">Задать вопрос</span></button>
         <button class="d-main" data-open="calc" aria-label="Рассчитать стоимость">${ICO.calc}<span>Рассчитать стоимость</span></button>
       </div>`;
@@ -224,6 +231,6 @@
     window.OG_UI.open = open;
   }
 
-  window.OG_UI = { $, $$, ICO, AR_UP, formHTML, formRow, bindForms, calc, msgBlock };
+  window.OG_UI = { $, $$, ICO, AR_UP, formHTML, formRow, bindForms, calc, msgBlock, qr };
   header(); footer(); modals();
 })();

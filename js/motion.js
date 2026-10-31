@@ -54,9 +54,9 @@
 
   // ── появления ──
   // группы: дети появляются по очереди; одиночные — сами по себе (главная и внутренние страницы)
-  const GROUPS = '.nums, .prx, .scx, .wkx, .arx, .lbx, .fqx-list, .gcx, .fx-cols, .pgf, .pgd, .rmt, .fls, .pk-list, .io, .arg, .cnt-l, .wpb-main, .ath, .bkh-r';
+  const GROUPS = '.nums, .prx, .scx, .wkx, .arx, .lbx, .fqx-list, .gcx, .fx-cols, .pgf, .pgd, .rmt, .fls, .pk-list, .io, .arg, .cnt-l, .wpb-main, .ath, .bkh-r, .sxk-ls';
   const ONE = '.sh .badge, .shc .badge, .fqx-l .badge, .stk-l .badge, .stk-s, .sh-r, .chips2, .more2, .cl-head, .fx-btns, .gbar, .st .badge, .cl-grid, ' +
-    '.crb, .pgh-h .badge, .pgh-r, .svh-l > :not(h1), .svh-art, .gnt,.pk-l > :not(h2),  .ctx-l .badge, .ctx-r, .ctx-f, .wph, .wpb-side, .atc, .toc2, .prose2, .ats, .bkh-v, .cnt-f, .arf';
+    '.crb, .pgh-h .badge, .pgh-r, .svh-l > :not(h1), .svh-art, .gnt,.pk-l > :not(h2),  .ctx-l .badge, .ctx-r, .ctx-f, .wph, .sx, .wpb-side, .atc, .toc2, .prose2, .ats, .bkh-v, .cnt-f, .arf';
   if (!reduce && 'IntersectionObserver' in window) {
     document.documentElement.classList.add('js-rv');
     $$(GROUPS).forEach(g => [...g.children].forEach((c, i) => { if (c.matches('h1')) return; c.classList.add('rv'); if (!c.style.getPropertyValue('--i')) c.style.setProperty('--i', Math.min(i, 7)); }));
@@ -127,7 +127,13 @@
   const stx = document.getElementById('statement');
   if (stx) {
     const words = [];
-    stx.innerHTML = stx.innerHTML.split(/(\s+)/).map(w => /^\s+$/.test(w) || !w ? w : `<span class="sw">${w}</span>`).join('');
+    const walk = document.createTreeWalker(stx, NodeFilter.SHOW_TEXT), nodes = [];
+    while (walk.nextNode()) nodes.push(walk.currentNode);
+    nodes.filter(n => n.data.trim()).forEach(n => {
+      const t = document.createElement('template');
+      t.innerHTML = n.data.split(/([ \n\t]+)/).map(w => !w.trim() ? w : `<span class="sw">${w}</span>`).join('');
+      n.replaceWith(t.content);
+    });
     stx.querySelectorAll('.sw').forEach(w => words.push(w));
     const A = [171, 176, 197], B = [15, 16, 18];
     let lastN = -1;

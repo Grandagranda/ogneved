@@ -9,6 +9,8 @@
 
   // ── общие детали ──
   const crumbs = list => `<nav class="crb" aria-label="Хлебные крошки"><a href="index.html">Главная</a>${list.map(([t, h]) => h ? `<a href="${h}">${t}</a>` : `<span aria-current="page">${t}</span>`).join('')}</nav>`;
+  // услуга без цены в калькуляторе: вместо расчёта — запрос стоимости
+  const costBtn = (s, t = 'Рассчитать стоимость', cls) => s.price ? fb(t, { cls, open: 'calc', svc: s.id }) : fb('Узнать стоимость', { cls, open: 'form', q: 'Стоимость: ' + s.short });
   const badge = t => `<p class="badge badge--flat"><i></i>${t}</p>`;
   const fb = (t, o = {}) => {
     const cls = `fb${o.cls ? ' ' + o.cls : ''}`, inner = `<span>${t}</span>${AR}`;
@@ -18,7 +20,7 @@
   // шапка блока, как на главной: плашка, заголовок с серым хвостом, справа — пояснение или кнопка
   const sh = (b, h, r = '', cls = '') => `<div class="sh${cls ? ' ' + cls : ''}">${badge(b)}<h2 class="h2x">${h}</h2>${r ? `<div class="sh-r">${r}</div>` : ''}</div>`;
   // цифры шапки страницы — как ряд цифр «О нас» на главной, только мельче
-  const facts = list => `<ul class="pgf">${list.map(([n, t], i) => `<li><span class="num">${pad(i + 1)}</span><b>${String(n).replace(/^от(&nbsp;|\s)/, '<small>от</small>')}</b><p>${t}</p></li>`).join('')}</ul>`;
+  const facts = list => `<ul class="pgf">${list.map(([n, t], i) => `<li><span class="num">${pad(i + 1)}</span><b${n === 'Индивидуально' ? ' class="pgf-w"' : ''}>${String(n).replace(/^от(&nbsp;|\s)/, '<small>от</small>')}</b><p>${t}</p></li>`).join('')}</ul>`;
   const dl = (list, cls = '') => `<dl class="pgd${cls ? ' ' + cls : ''}">${list.map(([t, v]) => `<div><dt>${t}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
   // шапка страницы: крошки, слева заголовок, справа — пояснение и кнопки, ниже — цифры или фильтр
   const head = o => `<section class="pgh"><div class="wrap2">
@@ -50,7 +52,7 @@
   const PICK = [
     ['Проезды на&nbsp;участке не&nbsp;совпадают с&nbsp;требованиями свода правил', 'opp'],
     ['Экспертиза запросила обоснование доступа пожарной техники', 'opp'],
-    ['Гарнизон требует план тушения пожара для объекта', 'ptp'],
+    ['Надзор требует план тушения пожара для объекта', 'ptp'],
     ['Нужно обосновать меньший объём пожарного резервуара', 'voda'],
     ['На&nbsp;участке нет централизованного водопровода', 'voda'],
     ['Пожарные части не&nbsp;успевают к&nbsp;объекту за&nbsp;нормативное время', 'dislokaciya'],
@@ -98,7 +100,7 @@
         <div class="gnt-tl" aria-hidden="true"><i class="gnt-band"></i><i class="gnt-now"></i></div>
         <div class="gnt-r gnt-hd"><p class="side-k">Этап работ</p><ol class="gnt-days" aria-hidden="true">${[...Array(B)].map((_, d) => `<li style="--x:${d}">${pad(d + 1)}</li>`).join('')}</ol><p class="gnt-end">Сдача</p></div>
         <ol class="gnt-ls">${s.includes.map((t, k) => `<li class="gnt-r" style="--a:${sp[k][0]};--b:${sp[k][1]}"><p class="gnt-t"><span class="num">${pad(k + 1)}</span><b>${t}</b></p><span class="gnt-c"><i class="gnt-bar"><em>${dur(sp[k][1] - sp[k][0])}</em></i></span></li>`).join('')}</ol>
-        <div class="gnt-r gnt-ft">${fb('Рассчитать для своего объекта', { cls: 'fb--sm', open: 'calc', svc: s.id })}<p class="gnt-pdf"><i></i>${/бумажн/i.test(s.result) ? 'Бумага и&nbsp;PDF' : 'PDF с&nbsp;подписью'}</p></div>
+        <div class="gnt-r gnt-ft">${costBtn(s, 'Рассчитать для своего объекта', 'fb--sm')}<p class="gnt-pdf"><i></i>${/бумажн/i.test(s.result) ? 'Бумага и&nbsp;PDF' : 'PDF с&nbsp;подписью'}</p></div>
       </div>`;
   };
   // исходные данные — карточками файлов: чертежи присылают в .dwg/.pdf, сведения — в .pdf/.doc
@@ -107,7 +109,9 @@
     const s = D.svc(qs.get('id')) || S[0], i = S.indexOf(s), FX = window.OG_FX || {};
     document.title = s.cardT + ' — ОГНЕВЕД';
     const wk = D.works.filter(w => w.s === s.id);
-    const others = [1, 2, 3].map(k => S[(i + k) % S.length]);
+    // «Другие документы»: у этих услуг порядок задан заказчиком, у остальных — следующие по кругу
+    const MORE = { sily: ['ptp', 'opp', 'dislokaciya'], ptp: ['opp', 'sily', 'voda'] };
+    const others = MORE[s.id] ? MORE[s.id].map(D.svc) : [1, 2, 3].map(k => S[(i + k) % S.length]);
     after.push(() => {
       setTimeout(() => $('.svh-art').classList.add('is-play'), 900); $('#svc') && C.eqSc($('#svc'));
       // календарный план: когда блок на экране, линия «сегодня» проходит шкалу и отрезки заливаются за ней;
@@ -125,17 +129,17 @@
         <div class="svh-g">
           <div class="svh-l">
             ${badge(`Услуга ${pad(i + 1)} / ${pad(S.length)}`)}
-            <h1 class="h1x">${s.cardT.replace(/\s*(\([^)]+\))$/, (m, a) => ` <span class="g">${a}</span>`)}</h1>
+            <h1 class="h1x">${s.cardT.replace(/ и (\S+)/g, (m, a) => ` <span style="white-space:nowrap">и ${a}</span>`).replace(/\s*(\([^)]+\))$/, (m, a) => ` <span class="g">${a}</span>`)}</h1>
             <p class="svh-doc">${s.cardD}</p>
             <p class="svh-p">${s.lead}</p>
-            <div class="pgh-act">${fb('Заказать документ', { cls: 'fb--red', open: 'form', q: 'Услуга: ' + s.short })}${fb('Рассчитать стоимость', { open: 'calc', svc: s.id })}</div>
+            <div class="pgh-act">${fb('Заказать документ', { cls: 'fb--red', open: 'form', q: 'Услуга: ' + s.short })}</div>
           </div>
           <div class="svh-art sc" data-fx="${s.id}">
             <div class="sc-art"><img class="sc-im" src="img/s-${s.id}.webp" alt="${s.cardT}">${FX[s.id] ? `<svg class="sc-fx" viewBox="0 0 ${FX.W} ${FX.H}" aria-hidden="true">${FX[s.id]}</svg>` : ''}</div>
             <span class="sc-n">${pad(i + 1)} / ${pad(S.length)}</span><span class="sc-d">${s.days} раб. дней</span>
           </div>
         </div>
-        ${facts([['от&nbsp;' + D.rub(s.price), 'стоимость — фиксируем в&nbsp;договоре до&nbsp;начала работ'], [s.days, 'рабочих дней с&nbsp;момента получения исходных данных'], ['PDF', 'с&nbsp;подписью исполнителя — прикладывают к&nbsp;проекту'], [String(s.norms.length), 'нормативных документа в&nbsp;основе расчёта']])}
+        ${facts([[D.cost(s), s.price ? 'стоимость — фиксируем в&nbsp;договоре до&nbsp;начала работ' : 'стоимость — зависит от&nbsp;параметров защищаемой территории'], [s.days, 'рабочих дней с&nbsp;момента получения исходных данных'], ['PDF', 'с&nbsp;подписью исполнителя — прикладывают к&nbsp;проекту'], [String(s.norms.length), 'нормативных документа в&nbsp;основе расчёта']])}
       </div></section>` +
       sec(whenCards(s), { cls: 'sec--first' }) +
       sec(sh('Состав работ', 'Что входит <span class="g">в&nbsp;работу</span>', `<p>${planNote(s)}</p>`, 'sh--line') + plan(s)) +
@@ -156,11 +160,12 @@
   R.raboty = () => {
     const used = S.filter(s => D.works.some(w => w.s === s.id));
     after.push(() => {
-      const grid = $('#wgrid'), show = v => swap(grid, works(D.works.filter(w => v === 'all' || w.s === v)));
+      // порядок карточек свой при каждой загрузке
+      const WK = C.shuffle(D.works), grid = $('#wgrid'), show = v => swap(grid, works(WK.filter(w => v === 'all' || w.s === v)));
       onChip($('#wf'), show); show('all');
     });
     return head({ cr: [['Наши работы']], h: 'Наши работы<br><span class="g">по&nbsp;всей России</span>',
-        lead: 'Проекты для жилых домов, складов, производств, мостов и&nbsp;гидроэлектростанций. Стоимость и&nbsp;сроки указаны как «основная работа + дополнительные услуги».',
+        lead: 'Проекты для жилых домов, складов, производств и&nbsp;энергообъектов. Стоимость и&nbsp;сроки указаны как «основная работа + дополнительные услуги».',
         act: fb('Обсудить проект', { cls: 'fb--red', open: 'form', q: 'Обсудить проект' }),
         facts: [[D.about.facts[0].n, 'выполненных проектов с&nbsp;2012 года'], [String(D.cities.length), 'городов и&nbsp;регионов на&nbsp;карте работ'], [D.about.facts[1].n, D.about.facts[1].t], [D.about.facts[2].n, D.about.facts[2].t]] }) +
       sec(chips('wf', [['all', `Все проекты · ${D.works.length}`], ...used.map(s => [s.id, s.short])]) + '<div class="wkx" id="wgrid" data-swap></div>', { cls: 'sec--first' }) +
@@ -168,6 +173,36 @@
   };
 
   // ── Страница проекта ──
+  // графическая часть: две схемы на одной панели (js/schemes.js), под панелью — карточки условных обозначений;
+  // наведение на карточку оставляет яркими только её слои
+  const schemes = w => {
+    const B = window.OG_SCH, x = B && B[w.id]; if (!x) return '';
+    const vb = `viewBox="0 0 ${B.W} ${B.H}"`;
+    const top = (s, cls) => `<div class="sxh ${cls}"><p class="side-k">${s.l}</p><h3>${s.t}</h3><p class="sxh-s">${s.s}</p></div>`;
+    after.push(() => {
+      const el = $('#sx'), box = el.closest('.sxw');
+      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { el.classList.add('is-on'); o.disconnect(); } }, { threshold: .35 }).observe(el);
+      // сигналы бегут, только пока панель на экране
+      new IntersectionObserver(([e]) => el.classList.toggle('is-run', e.isIntersecting)).observe(el);
+      const layers = $$('[data-l]', el), dim = k => { layers.forEach(g => g.classList.toggle('is-dim', !!k && !g.dataset.l.split(' ').includes(k))); el.classList.toggle('is-dim', !!k); };
+      $$('.sxk', box).forEach(b => { b.addEventListener('mouseenter', () => dim(b.dataset.k)); b.addEventListener('focus', () => dim(b.dataset.k)); b.addEventListener('blur', () => dim()); });
+      $('.sxk-ls', box).addEventListener('mouseleave', () => dim());
+    });
+    return sec(sh('Графическая часть', 'Рабочие схемы <span class="g">проекта</span>', `<p>${x.note}</p>`, 'sh--line') + `
+      <div class="sxw">
+        <div class="sx" id="sx" role="img" aria-label="${x.sheets.map(s => s.t + ': ' + s.s).join('. ').replace(/&nbsp;/g, ' ')}">
+          <i class="sx-dark"></i>
+          <svg class="sx-veil" ${vb} aria-hidden="true">${B.veil(x.veil)}</svg>
+          <svg class="sx-art" ${vb} aria-hidden="true"><defs><pattern id="sx-hatch" width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V26M0 0H26" fill="none" stroke="#f5312a" stroke-opacity=".34"/></pattern></defs>${x.art}</svg>
+          <svg class="sx-run" ${vb} aria-hidden="true">${x.run}</svg>
+          ${top(x.sheets[0], 'sxh--l')}${top(x.sheets[1], 'sxh--r')}
+          <dl class="sx-spec">${x.spec.map(([t, v]) => `<div><dt>${t}</dt><dd class="num">${v}</dd></div>`).join('')}</dl>
+          <p class="sx-tag"><i></i>Планировка скрыта, расположение условное</p>
+        </div>
+        <ul class="sxk-ls" style="--n:${x.keys.length + 1}">${x.keys.map(c => `<li><button class="sxk" data-k="${c.k}"><i class="sxk-ic">${B.ICON[c.i]}</i><b>${c.b}${c.u ? ` <small>${c.u}</small>` : ''}</b><span>${c.t}</span></button></li>`).join('')}
+          <li><button class="fl fl--add" data-open="form" data-q="Похожий проект: ${w.obj}"><span class="fl-plus"></span><b>Нужны такие&nbsp;же схемы?</b><small>Разработаем графическую часть для вашего объекта</small></button></li></ul>
+      </div>`);
+  };
   R.rabota = () => {
     const w = D.works.find(x => x.id === qs.get('id')) || D.works[0], s = D.svc(w.s), tx = T.work[w.s] || T.work.opp;
     document.title = w.obj + ' — ОГНЕВЕД';
@@ -180,10 +215,11 @@
           <div class="wpb-main">${text.map(([t, p], k) => `<div class="wpb-i"><p class="wpb-k"><span class="num">${pad(k + 1)}</span>${t}</p><div class="wpb-t"><p>${p}</p>${k === 1 && w.extra ? `<p class="wpb-x"><b>+</b>Дополнительно: ${w.extra.toLowerCase()}</p>` : ''}</div></div>`).join('')}</div>
           <aside class="wpb-side">
             <p class="side-k">Услуга</p>
-            <a class="sv-link" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/s-${s.id}.webp" alt=""></span><span class="mx-tx"><i>${pad(S.indexOf(s) + 1)}</i><b>${s.cardT}</b><small>от&nbsp;${D.rub(s.price)} · ${s.days} дней</small></span>${AR}</a>
-            <div class="side-btns">${fb('Заказать похожий проект', { cls: 'fb--red', open: 'form', q: 'Похожий проект: ' + w.obj })}${fb('Рассчитать стоимость', { open: 'calc', svc: s.id })}</div>
+            <a class="sv-link" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/s-${s.id}.webp" alt=""></span><span class="mx-tx"><i>${pad(S.indexOf(s) + 1)}</i><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} дней</small></span>${AR}</a>
+            <div class="side-btns">${fb('Заказать похожий проект', { cls: 'fb--red', open: 'form', q: 'Похожий проект: ' + w.obj })}${costBtn(s)}</div>
           </aside>
         </div>`, { cls: 'sec--first' }) +
+      schemes(w) +
       sec(sh('Наши работы', 'Другие <span class="g">проекты</span>', fb('Все проекты', { href: 'raboty.html', cls: 'fb--sm' })) + `<div class="wkx">${works(others)}</div>`) +
       cta('Нужен похожий<br><span class="g">проект?</span>');
   };
@@ -238,24 +274,54 @@
           <div class="prose2">${tx.body.map(([h, p], k) => `<h2 id="p${k}">${h}</h2><p>${p}</p>`).join('')}
             <div class="prose2-cta"><div><b>Нужен расчёт для вашего объекта?</b><p>Бесплатно подскажем, какой документ потребуется, и&nbsp;назовём стоимость.</p></div>${fb('Задать вопрос', { cls: 'fb--dark', open: 'form', q: 'Вопрос по статье: ' + a.t })}</div>
           </div>
-          <aside class="ats"><p class="side-k">Услуги</p>${S.slice(0, 4).map((s, k) => `<a class="sv-link sv-link--sm" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/s-${s.id}.webp" alt="" loading="lazy"></span><span class="mx-tx"><i>${pad(k + 1)}</i><b>${s.cardT}</b><small>от&nbsp;${D.rub(s.price)}</small></span>${AR}</a>`).join('')}
+          <aside class="ats"><p class="side-k">Услуги</p>${S.slice(0, 4).map((s, k) => `<a class="sv-link sv-link--sm" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/s-${s.id}.webp" alt="" loading="lazy"></span><span class="mx-tx"><i>${pad(k + 1)}</i><b>${s.cardT}</b><small>${D.cost(s)}</small></span>${AR}</a>`).join('')}
             ${fb('Все услуги', { href: 'uslugi.html', cls: 'fb--sm' })}</aside>
         </div>`, { cls: 'sec--first' }) +
       sec(sh('Читать дальше', 'Другие <span class="g">статьи</span>', fb('Все статьи', { href: 'blog.html', cls: 'fb--sm' })) + `<div class="arg">${more.map(x => C.arc(x)).join('')}</div>`) +
       cta();
   };
 
-  // ── Библиотека: папки, как на главной; последняя ячейка — «Не нашли документ?» ──
-  const ask = `<button class="lb-ask" data-open="form" data-q="Ищу документ: "><span class="lb-ask-i"><i></i></span><b>Не&nbsp;нашли документ?</b><span>Спросите — пришлём ссылку на&nbsp;актуальную редакцию</span></button>`;
-  R.biblioteka = () => {
-    const kinds = [...new Set(D.books.map(b => b.kind))];
+  // ── Политика и согласие: содержание слева (как у статьи), текст, справа — вопросы и второй документ ──
+  const legal = id => {
+    const L = window.OG_LEGAL(D)[id], other = id === 'politika' ? ['Согласие на&nbsp;обработку данных', 'soglasie.html'] : ['Политика конфиденциальности', 'politika.html'];
+    document.title = L.crumb + ' — ОГНЕВЕД';
     after.push(() => {
-      const grid = $('#bgrid'), show = v => swap(grid, D.books.filter(b => v === 'all' || b.kind === v).map(C.book).join('') + ask);
-      onChip($('#bf'), show); show('all');
+      const links = $$('.toc2 a'), hs = links.map(l => $(l.getAttribute('href')));
+      const spy = () => { let k = 0; hs.forEach((h, i) => { if (h.getBoundingClientRect().top < innerHeight * .4) k = i; }); links.forEach((l, i) => l.classList.toggle('is-on', i === k)); };
+      addEventListener('scroll', spy, { passive: true }); spy();
+    });
+    return `<section class="pgh"><div class="wrap2">${crumbs([[L.crumb]])}
+        <div class="ath">
+          <div class="ath-m">${badge('Документы')}<time>Редакция от&nbsp;${D.legal.date}</time></div>
+          <h1 class="h1x">${L.h}</h1>
+          <p class="ath-p">${L.lead}</p>
+        </div></div></section>` +
+      sec(`<div class="atb lgb">
+          <aside class="toc2"><p class="side-k">Содержание</p><ol>${L.secs.map(([h], k) => `<li><a href="#p${k}" data-off="110"><span class="num">${pad(k + 1)}</span>${h}</a></li>`).join('')}</ol></aside>
+          <div class="prose2 lg">${L.secs.map(([h, b], k) => `<h2 id="p${k}"><span class="num">${pad(k + 1)}</span>${h}</h2>${b}`).join('')}</div>
+          <aside class="ats lg-as"><p class="side-k">Вопросы по&nbsp;данным</p><p class="lg-as-p">Напишите нам — ответим в&nbsp;течение 10&nbsp;рабочих дней</p><a class="lg-as-m" href="mailto:${D.email}">${D.email}</a>
+            <p class="side-k">Второй документ</p>${fb(other[0], { href: other[1], cls: 'fb--sm' })}</aside>
+        </div>`, { cls: 'sec--first' });
+  };
+  R.politika = () => legal('politika');
+  R.soglasie = () => legal('soglasie');
+
+  // ── Библиотека: папки, как на главной; последняя ячейка — «Не нашли документ?» ──
+  const ask = (t = 'Не&nbsp;нашли документ?', d = 'Спросите — пришлём ссылку на&nbsp;актуальную редакцию') => `<button class="lb-ask" data-open="form" data-q="Ищу документ: "><span class="lb-ask-i"><i></i></span><b>${t}</b><span>${d}</span></button>`;
+  R.biblioteka = () => {
+    const part = (c, last) => {
+      const list = D.books.filter(b => b.cat === c.id);
+      return `<div class="lb-cat lb-cat--${c.id}"><h2 class="lb-h"><i></i>${c.t}<span class="num">${list.length || ''}</span></h2><div class="lib-grid lbx">${list.map(C.book).join('')}${list.length ? (last ? ask() : '') : ask('Раздел наполняется', 'Спросите — пришлём нужный документ')}</div></div>`;
+    };
+    const start = D.bookCat(qs.get('cat')) ? qs.get('cat') : 'all';
+    after.push(() => {
+      const grid = $('#bgrid'), show = v => swap(grid, (v === 'all' ? D.bookCats : [D.bookCat(v)]).map((c, i, a) => part(c, c === a.filter(x => D.books.some(b => b.cat === x.id)).pop())).join(''));
+      onChip($('#bf'), show); show(start);
+      $$('#bf .chip2').forEach(x => x.classList.toggle('is-on', x.dataset.f === start));
     });
     return head({ cr: [['Библиотека']], h: 'Библиотека<br><span class="g">нормативов и&nbsp;книг</span>',
         lead: 'Законы, своды правил, приказы МЧС и&nbsp;книги, на&nbsp;которые мы&nbsp;опираемся в&nbsp;работе. Следим за&nbsp;изменениями и&nbsp;отмечаем новые редакции.' }) +
-      sec(chips('bf', [['all', `Все документы · ${D.books.length}`], ...kinds.map(k => [k, k])]) + '<div class="lib-grid lbx" id="bgrid" data-swap></div>', { cls: 'sec--first' }) +
+      sec(chips('bf', [['all', `Все документы · ${D.books.length}`], ...D.bookCats.map(c => [c.id, c.short])]) + '<div class="lbw" id="bgrid" data-swap></div>', { cls: 'sec--first' }) +
       cta();
   };
 
@@ -266,8 +332,7 @@
     const svcs = S.filter(s => s.norms.some(n => findBook(n) === b));
     const book = /Учебник|Справочник/.test(b.kind), status = book ? 'Учебное издание' : 'Действует';
     // обложка крупно: у нарисованной — внизу дата и вид документа
-    const cover = b.img ? `<img src="img/${b.img}.webp" alt="${b.t}">`
-      : `<div class="cv cv--${b.cover.c}"><div class="cv-h">${b.cover.h}</div><div class="cv-n">${b.num}</div><div class="cv-t">${b.t}</div><div class="cv-l">${'<i></i>'.repeat(8)}</div><p class="cv-f"><span>${b.date}</span><span>${b.kind}</span></p></div>`;
+    const cover = C.cover(b, 8);
     return `<section class="pgh bkh"><div class="wrap2">${crumbs([['Библиотека', 'biblioteka.html'], [b.num]])}
         <div class="bkh-g">
           <div class="bkh-v${book ? ' bkh-v--book' : ''}"><div class="bkh-doc">${book ? '<i class="bk-e"></i>' : '<i class="bk-s"></i><i class="bk-s"></i>'}<div class="bk-p">${cover}</div></div></div>
@@ -337,7 +402,7 @@
         lead: 'Работаем дистанционно по&nbsp;всей России. Позвоните, напишите в&nbsp;мессенджер или оставьте заявку&nbsp;— специалист перезвонит и&nbsp;подскажет, какой документ нужен.' }) +
       sec(`<div class="cnt">
           <div class="cnt-l">
-            <div class="cnt-row"><p class="side-k">Телефон</p><div><a class="cnt-big" href="${D.phoneHref}">${D.phone}</a><p class="cnt-s">${D.hours}</p></div></div>
+            <div class="cnt-row"><p class="side-k">Телефон</p><div class="cnt-tel"><div><a class="cnt-big" href="${D.phoneHref}">${D.phone}</a><p class="cnt-s">${D.hours}</p></div>${U.qr(D.phoneHref)}</div></div>
             <div class="cnt-row"><p class="side-k">Почта</p><div><a class="cnt-mid" href="mailto:${D.email}">${D.email}</a><p class="cnt-s">Ответим в&nbsp;течение рабочего дня</p></div></div>
             <div class="cnt-row"><p class="side-k">Мессенджеры</p><div>${U.msgBlock(['max', 'tg'])}</div></div>
             <div class="cnt-row cnt-row--3">

@@ -20,7 +20,10 @@
 /* стилизованные обложки нормативов */
 .cv { height: 100%; display: flex; flex-direction: column; padding: 9%; background: #fff; }
 .cv-h { margin: -9% -9% 0; padding: 7% 9%; font-size: .5625rem; line-height: 1.3; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #fff; }
-.cv--teal .cv-h { background: #13707b; } .cv--red .cv-h { background: #c9382a; } .cv--dark .cv-h { background: #2a2c30; } .cv--paper { background: #f3eee4; } .cv--paper .cv-h { background: #7d2c21; }
+/* цвет вкладыша — раздел библиотеки (OG.bookCats) */
+.cv-h, .lb-h i { background: var(--cc); }
+.cv--pb, .lb-cat--pb { --cc: #13707b; } .cv--prikaz, .lb-cat--prikaz { --cc: #c9382a; } .cv--rek, .lb-cat--rek { --cc: #a8700f; }
+.cv--pisma, .lb-cat--pisma { --cc: #2c5aa6; } .cv--ucheb, .lb-cat--ucheb { --cc: #5d4a9e; } .cv--old, .lb-cat--old { --cc: #6e4a34; }
 .cv-n { margin-top: 14%; font-size: .75rem; font-weight: 600; color: var(--ink-2); }
 .cv-t { margin-top: 5%; font-size: .625rem; line-height: 1.35; font-weight: 600; text-transform: uppercase; color: var(--ink); }
 .cv-l { margin-top: 10%; display: grid; gap: 5px; }

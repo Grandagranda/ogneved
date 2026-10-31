@@ -14,6 +14,34 @@
   // бегущая лента: два одинаковых ряда, сдвиг на половину — шов не виден; вторая копия скрыта от чтения с экрана
   const logos = hide => D.clients.map(l => `<div class="cl-i"${hide ? ' aria-hidden="true"' : ''}><img src="img/${l.img}.webp" alt="${hide ? '' : l.t}" style="height:${(l.h * .82).toFixed(2)}rem" loading="lazy"></div>`).join('');
   $('#clients').innerHTML = `<div class="cl-track">${logos(false)}${logos(true)}</div>`;
+  // лента идёт сама и не останавливается; зажатой мышью её можно протянуть в обе стороны, после отпускания — по инерции
+  {
+    const box = $('#clients'), tr = $('.cl-track', box), RUN = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 78;
+    let half = 0, x = 0, v = 0, drag = false, lx = 0, lt = 0, prev = 0, seen = false;
+    const size = () => { half = tr.offsetWidth / 2; };
+    size(); addEventListener('resize', size);
+    $$('img', tr).forEach(i => { i.draggable = false; });
+    const step = t => {
+      requestAnimationFrame(step);
+      const dt = Math.min(.05, (t - prev) / 1000 || 0); prev = t;
+      if (!seen || drag || !half) return;
+      x += (v - (RUN ? half / RUN : 0)) * dt; v *= Math.pow(.04, dt);
+      x = ((x % half) - half) % half;
+      tr.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
+    };
+    new IntersectionObserver(es => { seen = es[0].isIntersecting; }).observe(box);
+    requestAnimationFrame(step);
+    box.addEventListener('pointerdown', e => { if (e.button) return; drag = true; v = 0; lx = e.clientX; lt = e.timeStamp; box.setPointerCapture(e.pointerId); box.classList.add('is-drag'); });
+    box.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const dx = e.clientX - lx, dt = Math.max(1, e.timeStamp - lt);
+      x += dx; v = dx / dt * 1000; lx = e.clientX; lt = e.timeStamp;
+      x = ((x % half) - half) % half;
+      tr.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
+    });
+    const up = () => { drag = false; box.classList.remove('is-drag'); };
+    box.addEventListener('pointerup', up); box.addEventListener('pointercancel', up);
+  }
 
   // ── о нас ──
   $('#nums').innerHTML = D.about.facts.map((f, i) =>
@@ -63,13 +91,14 @@
     ok.textContent = `${pad(k + 1)} / ${pad(cards.length)}`;
   });
 
-  // ── работы: фильтр по услугам, 4 карточки в асимметричной сетке ──
+  // ── работы: фильтр по услугам, 4 карточки в асимметричной сетке; порядок свой при каждой загрузке ──
+  const WK = C.shuffle(D.works);
   const used = S.filter(s => D.works.some(w => w.s === s.id));
   const wf = $('#works-f'), wl = $('#works-list');
   const work = (w, i) => C.wkc(w, 'wkc--' + i);
   wf.innerHTML = [['all', 'Все проекты'], ...used.map(s => [s.id, s.short])].map(([v, t], i) => `<button class="chip2${i ? '' : ' is-on'}" data-f="${v}">${t}</button>`).join('');
   const showWorks = v => {
-    const list = D.works.filter(w => v === 'all' || w.s === v).slice(0, 4);
+    const list = WK.filter(w => v === 'all' || w.s === v).slice(0, 4);
     wl.classList.add('is-swap');
     setTimeout(() => { wl.innerHTML = list.map(work).join(''); wl.classList.remove('is-swap'); }, wl.children.length ? 260 : 0);
   };
@@ -164,8 +193,47 @@
     }, { passive: false });
   }
 
+  // ── панель блоков над кнопками связи: значки как у кнопок, сверху счётчик и полоска пройденного, подпись — той же плашкой, что у кнопок ──
+  {
+    const I = body => `<svg viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
+    const LINKS = [
+      ['top', 'Главная', '<path d="M12 3l7 2.5v6c0 4.5-3 7.5-7 9.5-4-2-7-5-7-9.5v-6z"/>'],
+      ['services', 'Услуги', '<rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/>'],
+      ['about', 'О нас', '<circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.4 2.7-5 5.5-5s4.9 1.6 5.5 5"/><path d="M15.5 5.6a3.2 3.2 0 0 1 0 5.8M17 14.4c2 .6 3.1 2.2 3.5 4.6"/>'],
+      ['objects', 'Объекты', '<path d="M4 20.5h16M6 20.5v-16h8v16M14 10h4.5v10.5"/><path d="M9 8h2M9 11.5h2M9 15h2"/>'],
+      ['works', 'Наши работы', '<rect x="3.5" y="7.5" width="17" height="12" rx="1.5"/><path d="M9 7.5v-2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3.5 12.5h17"/>'],
+      ['price', 'Стоимость', '<path d="M9 20.5v-17h5a4.5 4.5 0 0 1 0 9H6.5M6.5 16.5H13"/>'],
+      ['steps', 'Как мы работаем', '<path d="M3.5 19.5H8V15h4.5v-4.5H17V6h3.5"/>'],
+      ['geo', 'География', '<path d="M12 21s-6.5-5.4-6.5-11a6.5 6.5 0 0 1 13 0c0 5.6-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'],
+      ['faq', 'FAQ', '<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.7 2.2c-.8.4-1.3 1-1.3 1.9"/><path d="M12 16.6v.1"/>'],
+      ['blog', 'Статьи', '<rect x="4.5" y="4" width="15" height="16" rx="1.5"/><path d="M8 8.5h8M8 12h8M8 15.5h5"/>'],
+      ['library', 'Библиотека', '<path d="M12 6.5C10 5 7.5 4.5 3.5 4.8v13.7c4-.3 6.5.2 8.5 1.7 2-1.5 4.5-2 8.5-1.7V4.8C16.5 4.5 14 5 12 6.5zM12 6.5v13.7"/>'],
+    ];
+    const nav = document.createElement('nav');
+    nav.className = 'rl'; nav.setAttribute('aria-label', 'Блоки страницы');
+    nav.innerHTML = `<p class="rl-n num"><b>01</b>/${pad(LINKS.length)}</p><i class="rl-p"><i></i></i>${LINKS.map(([id, t, ic]) => `<a href="#${id}" data-off="1" aria-label="${t}">${I(ic)}<span class="d-tip">${t}</span></a>`).join('')}`;
+    $('.dock').prepend(nav);
+    const as = $$('a', nav), secs = LINKS.map(([id]) => document.getElementById(id)), bar = $('.rl-p i', nav), num = $('.rl-n b', nav), hero = secs[0], ftr = $('#ftr');
+    let on = -1, flash = 0, wait = false;
+    const paint = () => {
+      wait = false;
+      const vh = innerHeight, line = vh * .45, tops = secs.map(s => s.getBoundingClientRect().top);
+      let i = 0; tops.forEach((y, k) => { if (y <= line) i = k; });
+      const next = tops[i + 1] ?? ftr.getBoundingClientRect().top, part = Math.min(1, Math.max(0, (line - tops[i]) / (next - tops[i] || 1)));
+      bar.style.transform = `scaleX(${((i + part) / LINKS.length).toFixed(4)})`;
+      nav.classList.toggle('is-show', hero.getBoundingClientRect().bottom < vh * .5);
+      if (i === on) return;
+      as.forEach((a, k) => a.classList.toggle('is-on', k === i));
+      num.textContent = pad(i + 1);
+      if (on >= 0) { as[on].classList.remove('is-flash'); as[i].classList.add('is-flash'); clearTimeout(flash); flash = setTimeout(() => as[i].classList.remove('is-flash'), 1600); }
+      on = i;
+    };
+    const ask = () => { if (!wait) { wait = true; requestAnimationFrame(paint); } };
+    addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); addEventListener('load', ask); ask();
+  }
+
   // ── библиотека ──
-  $('#lib').innerHTML = D.books.slice(0, 5).map(C.book).join('');
+  $('#lib').innerHTML = D.bookCats.map(C.bookCat).join('');
 
   // ── вопросы ──
   // под заголовком — «Не нашли ответа?» без подложки: строка и одна кнопка «Связаться»
