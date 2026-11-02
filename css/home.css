@@ -171,13 +171,10 @@ html.lenis, html.lenis body { height: auto; }
 .hl b { font-weight: inherit; color: #fff; }
 .hero-sub { position: absolute; z-index: 3; left: 0; top: 26.0625rem; width: 29.3125rem; font-size: 1rem; line-height: 1.35; color: var(--ink-52); }
 .hero-cta { position: absolute; z-index: 3; left: 0; top: 31.1875rem; width: 16.6875rem; padding: 0; }
-/* Figma «home» 2059:1044 — ролик 687, −16 · 1073×791 (петля img/hero.mp4) */
-.hero-art { position: absolute; z-index: 1; left: 26.6875rem; top: -1rem; width: 67.0625rem; height: 49.4375rem; }
+/* петля img/hero.mp4 1756×1176: фон ролика сведён с фоном экрана (_tools/hero-video.cjs), края кадра не видны. На 1920: 715, 26 · 1004×672 —
+   крыша начинается под шапкой, резервуар кончается над формой. На узких ПК кадр сжимается, чтобы угол здания не заходил под карточку */
+.hero-art { position: absolute; z-index: 1; left: 28.4375rem; top: 22.59rem; width: min(62.75rem, 62.05vw - 2.72rem); aspect-ratio: 1756 / 1176; transform: translateY(-50%); }
 .art-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* Rectangle 34 (743, 0 · 173×749): левый край ролика тает в фон */
-.hero-vfade { position: absolute; z-index: 2; left: 30.1875rem; top: 0; width: 10.8125rem; height: 46.8125rem; background: linear-gradient(to left, rgba(247, 246, 252, 0), rgba(247, 246, 252, .29) 48.414%, #f7f6fc); pointer-events: none; }
-/* Ellipse 2 (повёрнута, блюр 33.9): пятно цвета фона прячет правый край ролика — растр экспорта, обрезанного кадром: 1215, 0 · 705×504 (_tools/hero-glow.cjs) */
-.hero-glow { position: absolute; z-index: 2; left: 59.6875rem; top: 0; width: 44.0625rem; height: 31.5rem; pointer-events: none; }
 /* крестики на углах рамки первого экрана, как на стыках блоков ниже */
 .hero-stage::after { content: ''; position: absolute; z-index: 5; left: calc(var(--fx) - .34375rem); right: calc(var(--fx) - .34375rem); top: calc(3.8125rem - .34375rem); height: calc(36.4375rem + .6875rem); pointer-events: none;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M5.5 0v11M0 5.5h11' stroke='%230f1012' stroke-opacity='.32'/%3E%3C/svg%3E") left top / .6875rem no-repeat,
@@ -206,7 +203,7 @@ html.lenis, html.lenis body { height: auto; }
 .hero.is-ready .art-svg, .hero.is-ready .art-tags { opacity: 1; transition: opacity 1s ease .6s; }
 @keyframes art-in { from { transform: translateY(.75rem) scale(.99); } }
 
-/* ── пометки услуг поверх ролика: координаты — пиксели ролика 1676×1236, толщина линий — в пикселях экрана (--u) ── */
+/* ── пометки услуг поверх ролика: координаты — пиксели ролика 1756×1176, толщина линий — в пикселях экрана (--u) ── */
 .art-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 .art-tags { position: absolute; inset: 0; pointer-events: none; }
 .hero.is-off .art-svg *, .hero.is-off .art-tags *, .hero.is-off .plate * { animation-play-state: paused !important; }
@@ -225,30 +222,31 @@ html.lenis, html.lenis body { height: auto; }
 .ping { fill: none; stroke: var(--red); stroke-width: 1.25px; vector-effect: non-scaling-stroke; opacity: 0; transform-box: fill-box; transform-origin: center; animation: ping 2.4s cubic-bezier(.2, .6, .35, 1) calc(.5s + var(--i, 0) * .4s) infinite; }
 @keyframes ping { 0% { opacity: .9; transform: scale(.4); } 60%, 100% { opacity: 0; transform: scale(2.4); } }
 
-/* 01 · проезд: полоса перед АЦ уходит под машину, цепочка размеров «до фасада + ширина» */
-.lane { fill: var(--red); fill-opacity: .12; }
+/* проезд: полоса от кормы АЦ тает к автолестнице (заливка и кромки — градиенты в hero.js), цепочка размеров «до фасада + ширина» */
+.lane { fill-opacity: 1; }
 .ly.is-on .lane { animation: lane-in 1.2s var(--e-out) .2s both; }
 @keyframes lane-in { from { fill-opacity: 0; } }
-.lane-edge { stroke: var(--red); stroke-width: calc(var(--u) * 1.25); }
+.lane-edge { stroke-width: calc(var(--u) * 1.25); }
 .dim-ln { stroke: var(--red); stroke-width: var(--u); }
 .dim-ext { stroke: var(--ink); stroke-opacity: .4; stroke-width: var(--u); stroke-dasharray: calc(var(--u) * 4) calc(var(--u) * 4); }
 .dim-tk { stroke: var(--red); stroke-width: calc(var(--u) * 1.5); opacity: 0; transition: opacity .3s; }
 .ly.is-on .dim-tk { opacity: 1; transition: opacity .4s ease .9s; }
 
-/* 03 · вода: белые сигналы по красному рукаву и по линии на лестнице (смещение штриха = путь от гидранта) */
-.sig path { stroke: #fff; stroke-dasharray: calc(var(--u) * 16) calc(var(--u) * 300); stroke-dashoffset: var(--o); animation: sig 3.2s linear infinite; }
+/* вода: белые сигналы по рукавам от резервуара (смещение штриха = путь от резервуара); внутри него линия светлая — сигнал красный */
+.sig path { stroke: #fff; stroke-dasharray: calc(var(--u) * 18) calc(var(--u) * 170); stroke-dashoffset: var(--o); animation: sig 1.9s linear infinite; }
 .sig-h { stroke-width: calc(var(--u) * 6); opacity: .3; }
 .sig-c { stroke-width: calc(var(--u) * 2); opacity: .95; }
-@keyframes sig { from { stroke-dashoffset: calc(var(--o) + var(--u) * 316); } to { stroke-dashoffset: var(--o); } }
+.sig--in path { stroke: var(--red); }
+@keyframes sig { from { stroke-dashoffset: calc(var(--o) + var(--u) * 188); } to { stroke-dashoffset: var(--o); } }
 .hyd { fill: none; stroke: var(--red); stroke-width: calc(var(--u) * 1.5); }
 
-/* 04 · дислокация: маршрут прибытия по оси проезда к передку АЦ */
+/* дислокация и ввод сил: маршрут бежит пунктиром, стрелка появляется в конце */
 .route { stroke: var(--red); stroke-width: calc(var(--u) * 1.75); stroke-dasharray: calc(var(--u) * 8) calc(var(--u) * 8); animation: route 1.1s linear infinite; }
 @keyframes route { to { stroke-dashoffset: calc(var(--u) * -16); } }
 .route-ar { fill: var(--red); opacity: 0; transition: opacity .3s; }
 .ly.is-on .route-ar { opacity: 1; transition: opacity .4s ease .8s; }
 
-/* 05 · численность: уголки вокруг бойцов */
+/* численность: уголки вокруг бойцов и машин */
 .brk { stroke: var(--red); stroke-width: calc(var(--u) * 1.5); stroke-linecap: square; opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(1.25); transition: opacity .3s, transform .3s; }
 .ly.is-on .brk { opacity: 1; transform: none; transition: opacity .4s ease calc(.25s + var(--i) * .12s), transform .7s var(--e-out) calc(.25s + var(--i) * .12s); }
 
@@ -265,15 +263,15 @@ html.lenis, html.lenis body { height: auto; }
 .tg-t--r.is-on { transform: translate(calc(-100% - .375rem), -50%); }
 .tg-t--c.is-on { transform: translate(-50%, -50%); }
 
-/* ── карточка услуг (свободное небо справа от лестницы): шесть направлений, у выбранного — красный квадрат и линия-таймер ── */
-.plate { position: absolute; z-index: 4; left: 76.875rem; top: 4.375rem; width: 14.75rem; padding: 0 .75rem .25rem; border-radius: .5rem; background: rgba(255, 255, 255, .9); box-shadow: 0 1.25rem 2.5rem -1.5rem rgba(60, 70, 110, .4), 0 0 0 1px rgba(15, 16, 18, .05);
+/* ── карточка работ (небо справа от дыма, правый край держится внутри экрана): шесть услуг, у выбранной — красный квадрат и линия-таймер ── */
+.plate { position: absolute; z-index: 4; right: max(-7.85rem, 1rem - (100vw - var(--cw)) / 2); top: 4.375rem; width: 16rem; padding: 0 .625rem .25rem; border-radius: .5rem; background: rgba(255, 255, 255, .9); box-shadow: 0 1.25rem 2.5rem -1.5rem rgba(60, 70, 110, .4), 0 0 0 1px rgba(15, 16, 18, .05);
   opacity: 0; transform: translateY(.75rem); transition: opacity .8s ease .7s, transform 1s var(--e-out) .7s; }
 .hero.is-ready .plate { opacity: 1; transform: none; }
 .pl-hd { height: 1.875rem; padding-top: .6875rem; border-bottom: 1px solid rgba(15, 16, 18, .08); font-size: .625rem; line-height: 1.35; font-weight: 600; text-transform: uppercase; color: var(--grey); }
 .pl-i { position: relative; display: flex; align-items: center; gap: .5rem; width: 100%; height: 1.625rem; border-bottom: 1px solid rgba(15, 16, 18, .06); text-align: left; color: rgba(15, 16, 18, .45); font-size: .8125rem; line-height: 1.2; transition: color .4s; }
 .pl-list li:last-child .pl-i { border-bottom: 0; }
 .pl-i b { font-weight: 400; white-space: nowrap; }
-.pl-n { flex: none; width: 1.125rem; font: 500 .6875rem/1 var(--f-num); letter-spacing: -.01em; color: rgba(15, 16, 18, .3); transition: color .4s; }
+.pl-n { flex: none; width: 1rem; font: 500 .6875rem/1 var(--f-num); letter-spacing: -.01em; color: rgba(15, 16, 18, .3); transition: color .4s; }
 .pl-sq { flex: none; width: .3125rem; height: .3125rem; margin-left: auto; background: transparent; transition: background-color .4s; }
 .pl-i:hover, .pl-i.is-on { color: var(--ink); }
 .pl-i.is-on .pl-n { color: var(--red); }
