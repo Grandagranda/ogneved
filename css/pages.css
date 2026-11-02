@@ -256,7 +256,7 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 
 /* ── графическая часть проекта: две схемы на одной панели (js/schemes.js) ──
    слева площадка на мозаике, справа сухотруб на тёмном; знаки — в единицах панели 1400×700 */
-.sxw { display: grid; gap: .625rem; }
+.sxw { --blue: #0032df; display: grid; gap: .625rem; }
 .sx { position: relative; aspect-ratio: 2 / 1; border-radius: .75rem; overflow: hidden; background: #fff; box-shadow: var(--sh-card), 0 0 0 1px rgba(15, 16, 18, .04); isolation: isolate; }
 .sx-dark { position: absolute; top: 0; bottom: 0; right: 0; left: calc(936 / 1400 * 100%); background: var(--ink); }
 .sx > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -264,35 +264,42 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 .sx-road { fill: var(--tint-2); }
 .sx-room { fill: #fff; }
 .sx-wall { fill: none; stroke: var(--ink); stroke-width: 1.5; }
-.sx-curb { fill: none; stroke: rgba(15, 16, 18, .14); }
 .sx-t { font: 500 12px/1 var(--f); letter-spacing: 0; fill: var(--ink); }
 .sx-c { text-anchor: middle; }
 .sx-t--r { fill: var(--red); }
 .sx-halo { stroke: #fff; stroke-width: 4; stroke-linejoin: round; }
 .sx-tl { stroke: var(--ink); stroke-width: 1; }
 .sx-h { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; }
-.sx-hd { fill: none; stroke: #fff; stroke-width: 1.6; }
-.sx-comb { stroke-width: 2.4; }
+.sx-rp { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linejoin: round; }
 .sx-dash { stroke-dasharray: 8 6; }
 .sx-p { fill: none; stroke: var(--red); stroke-width: 3.4; stroke-linejoin: round; }
 .sx-p--t { stroke-width: 2.4; }
 .sx-f { fill: var(--ink); }
 .sx-r { fill: var(--red); stroke: var(--red); }
-.sx-ac path, .sx-ac ellipse { fill: #fff; stroke: var(--red); stroke-width: 1.6; }
-.sx-ac-t { font: 500 10px/1 var(--f); fill: var(--ink); text-anchor: middle; }
-.sx-pg circle { fill: #fff; stroke: var(--ink); stroke-width: 1.6; }
-.sx-pg path { fill: var(--ink); }
+.sx-ac path, .sx-ac ellipse, .sx-vh path { fill: #fff; stroke: var(--red); stroke-width: 1.6; }
+.sx-vh-t { font: 500 15px/1 var(--f); fill: var(--red); text-anchor: middle; }
+.sx-pg circle { fill: #fff; stroke: var(--blue); stroke-width: 1.2; }
+.sx-pg path { fill: #2900f4; stroke: var(--blue); stroke-width: 1; }
+.sx-pg .sx-ax, .sx-ax { fill: none; stroke: var(--blue); stroke-width: 1.6; }
+.sx-t--b { fill: var(--blue); }
+.sx-plate { fill: #fff; }
+.sx-ey path { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-linejoin: round; }
+.sx-ey .sx-rib { stroke-width: 3.4; stroke-dasharray: .9 2.6; }
+.sx-in path, .sx-in circle { fill: #fff; stroke: var(--ink); stroke-width: 1; }
+.sx-in path:first-child, .sx-in .sx-in-v { stroke-width: 1.6; }
 .sx-rs circle { fill: #fff; stroke: var(--ink); stroke-width: 1.6; }
-.sx-rs path, .sx-st path:not(.sx-f) { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+.sx-st path:not(.sx-f) { fill: none; stroke: var(--ink); stroke-width: 1.6; }
 .sx-dr path { fill: #fff; stroke: var(--ink); stroke-width: 1.4; }
 .sx-dr circle { fill: #fff; stroke: var(--ink); stroke-width: 1.4; }
 .sx-fl path:first-child { fill: none; stroke: var(--red); stroke-width: 2; }
-.sx-pb circle, .sx-sh path { fill: #fff; stroke: var(--red); stroke-width: 1.6; }
+.sx-pb circle, .sx-kp circle, .sx-sh path { fill: #fff; stroke: var(--red); stroke-width: 1.6; }
 .sx-pb-t { font: 500 13px/1 var(--f); fill: var(--red); text-anchor: middle; }
 .sx-pb-n { font: 500 12px/1 var(--f); fill: var(--red); }
 .sx-hang path { fill: none; stroke: rgba(255, 255, 255, .55); stroke-width: 1.2; }
 .sx-valve path { fill: none; stroke: #fff; stroke-width: 1.2; }
 .sx-valve .sx-fw { fill: #fff; }
+.sx-valve .sx-nut { stroke: var(--red); stroke-width: 2.2; }
+.sx-hang .sx-fl2 { stroke: #fff; stroke-width: 1; }
 .sx-w .sx-t { fill: rgba(255, 255, 255, .72); }
 .sx-t--g { fill: var(--grey); text-transform: uppercase; font-size: 11px; }
 /* появление: сначала техника, затем рукава, стояки и стволы, последней — труба на тёмной половине */
@@ -313,8 +320,8 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 .sx.is-on .sx-sg { animation: sx-sg .8s ease 3s backwards; }
 .sx-sg path { --P: 300px; fill: none; stroke-linecap: round; stroke-dasharray: var(--L) calc(var(--P) - var(--L)); stroke-dashoffset: var(--o); animation: sx-run 2.8s linear infinite paused; }
 .sx.is-run .sx-sg path { animation-play-state: running; }
-.sx-sg-t { --L: 44px; --o: 0px; stroke-opacity: .42; }
-.sx-sg-h { --L: 13px; --o: -31px; }
+.sx-sg-t { --L: 44px; --o: var(--s, 0px); stroke-opacity: .42; }
+.sx-sg-h { --L: 13px; --o: calc(var(--s, 0px) - 31px); }
 .sx-sg--r path { stroke: var(--red); stroke-width: 3; }
 .sx-sg--w path { stroke: #fff; stroke-width: 1.8; }
 @keyframes sx-sg { from { opacity: 0; } }
@@ -329,12 +336,111 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 .sx [data-l].is-dim { opacity: .14; }
 .sx.is-dim .sx-veil { opacity: .45; }
 @media (prefers-reduced-motion: reduce) {
-  .sx-dw { stroke-dashoffset: 0; }
-  .sx-pop, .sx-fade { opacity: 1; transform: none; }
+  .sx-dw, .sx-ll { stroke-dashoffset: 0; }
+  .sx-pop, .sx-fade, .sx-drv { opacity: 1; transform: none; }
+  .sx-rise { opacity: 1; transform: rotate(var(--r1)); }
+  .sx-ph[style*="--d:0s"] { opacity: 1; }
   .sx .sx-veil, .sx .sx-road, .sx .sx-spec { opacity: 1; transition: none; }
   .sx * { animation: none !important; }
   .sx-sg { display: none; }
 }
+/* знаки и слои остальных объектов (js/schemes-obj.js) */
+.sx-w .sx-t { fill: rgba(255, 255, 255, .78); }
+.sx-w .sx-t--r { fill: var(--red); }
+.sx-w .sx-t--g { fill: rgba(255, 255, 255, .45); }
+.sx-w .sx-h { stroke: #fff; }
+.sx-w .sx-f { fill: #fff; }
+.sx-w .sx-wall { stroke: rgba(255, 255, 255, .72); stroke-width: 1.2; }
+.sx-w .sx-rs circle { fill: var(--ink); stroke: #fff; }
+.sx-w .sx-st path:not(.sx-f), .sx-w .sx-fm circle, .sx-w .sx-fm path:not(.sx-f) { stroke: #fff; }
+.sx-w .sx-fm circle { fill: var(--ink); }
+.sx-w .sx-mk { stroke: rgba(255, 255, 255, .6); }
+.sx-on-d .sx-al path, .sx-on-d .sx-al circle { fill: var(--ink); }
+.sx-fm circle { fill: #fff; stroke: var(--ink); stroke-width: 1.2; }
+.sx-fm path:not(.sx-f) { fill: none; stroke: var(--ink); stroke-width: 1.2; }
+.sx-al path, .sx-al circle { fill: #fff; stroke: var(--red); stroke-width: 1.4; }
+.sx-tw path, .sx-tw circle, .sx-xc path, .sx-xc circle { fill: #fff; stroke: var(--ink); stroke-width: 1.2; }
+.sx-mk { fill: none; stroke: var(--ink); stroke-width: 1; }
+.sx-res { font: 500 20px/1 var(--f); fill: var(--red); }
+.sx-num { font-size: 15px; }
+.sx-t--g2 { fill: var(--grey); }
+.sx-lr { fill: none; stroke: var(--red); stroke-width: 1.4; }
+.sx-lrr { fill: none; stroke: var(--red); stroke-width: 6; stroke-dasharray: 1.2 7; }
+.sx-cg { fill: var(--red); }
+.sx-w .sx-cg { fill: #fff; }
+.sx-rise { opacity: 0; transform: rotate(var(--r0)); }
+.sx.is-on .sx-rise { animation: sx-rise 1.2s var(--e-out) var(--a) forwards; }
+@keyframes sx-rise { 20% { opacity: 1; } to { opacity: 1; transform: rotate(var(--r1)); } }
+.sx-swp { animation: sx-swp var(--t) ease-in-out var(--a) infinite alternate paused; }
+.sx.is-run .sx-swp { animation-play-state: running; }
+@keyframes sx-swp { to { transform: rotate(var(--d)); } }
+.sx-sl { fill: none; stroke: var(--red); stroke-width: 8; }
+.sx-sr { fill: none; stroke: var(--ink); stroke-width: 5.6; }
+.sx-sg2 { fill: none; stroke: var(--red); stroke-width: 6; stroke-dasharray: 1.2 6.4; }
+.sx-ll { fill: none; stroke: var(--red); stroke-width: 2.6; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.sx.is-on .sx-ll { animation: sx-draw .6s ease var(--a) forwards; }
+.sx-tr { fill: var(--ink); stroke: #fff; stroke-width: 1; }
+.sx-zb { stroke: var(--blue); stroke-width: 1.2; }
+.sx-zc { fill: none; stroke: var(--red); stroke-width: 1.2; }
+.sx-zc--b { stroke: var(--blue); }
+.sx-zm { fill: #fff; stroke: var(--blue); stroke-width: 1.2; }
+.sx-zw { fill: none; stroke: rgba(255, 255, 255, .5); stroke-width: 1; }
+.sx-zw--r { stroke: var(--red); }
+.sx-fln { fill: none; stroke: rgba(255, 255, 255, .2); stroke-width: 1; }
+.sx-fln2 { fill: none; stroke: rgba(15, 16, 18, .18); stroke-width: 1; }
+.sx-o { fill-opacity: .55; }
+.sx-un { fill: none; stroke: #f2b100; stroke-width: 5; stroke-linecap: round; }
+.sx-tab { fill: none; stroke: var(--red); stroke-width: 2; }
+.sx-lg { fill: #fff; stroke: rgba(15, 16, 18, .1); }
+.sx-lvl { fill: none; stroke: var(--red); stroke-width: 1.2; stroke-dasharray: 6 4; }
+.sx-lvt { fill: var(--red) !important; }
+.sx-bm { fill: none; stroke: var(--red); stroke-width: 7; stroke-linejoin: round; }
+.sx-ph { opacity: 0; animation: sx-ph 9s linear var(--d) infinite paused; }
+.sx.is-run .sx-ph { animation-play-state: running; }
+@keyframes sx-ph { 0%, 30% { opacity: 1; } 33.3%, 96.7% { opacity: 0; } 100% { opacity: 1; } }
+.sx-tk { fill: #fff; stroke: var(--ink); stroke-width: 1.4; }
+.sx-tk--i { fill: none; stroke-width: 1.2; }
+.sx-tp { fill: none; stroke: var(--ink); stroke-width: 1.2; }
+.sx-tp--x { stroke-width: 2; }
+.sx-zr { fill: none; stroke: var(--red); stroke-width: 1.2; }
+.sx-fc { stroke: var(--red); stroke-width: 1.6; }
+.sx-fr { fill: none; stroke: var(--red); stroke-width: 1.6; }
+.sx-bx { fill: #fff; stroke: var(--blue); stroke-width: 1.6; }
+.sx-rib2 { fill: none; stroke: var(--ink); stroke-width: 3.6; stroke-dasharray: 1.2 3; }
+.sx-iso { fill: none; stroke: rgba(255, 255, 255, .6); stroke-width: 1; }
+.sx-iso--t { stroke: rgba(255, 255, 255, .34); }
+.sx-iso--o { stroke: var(--red); stroke-dasharray: 5 4; }
+.sx-burn { fill: var(--red); }
+.sx-stg { opacity: .45; animation: sx-stg 8s linear var(--d) infinite paused; }
+.sx.is-run .sx-stg { animation-play-state: running; }
+@keyframes sx-stg { 0%, 18% { opacity: 1; } 24%, 96% { opacity: .45; } 100% { opacity: 1; } }
+.sx-pt { fill: none; stroke: var(--red); stroke-width: 1.6; }
+.sx-dm { fill: none; stroke: var(--ink); stroke-width: 1.1; }
+.sx-drv { transform: translateY(250px); opacity: 0; }
+.sx.is-on .sx-drv { animation: sx-drv 1.5s var(--e-out) .7s forwards; }
+@keyframes sx-drv { 12% { opacity: 1; } to { opacity: 1; transform: none; } }
+.sx-tt rect { fill: #fff; stroke: var(--red); stroke-width: 1.6; }
+.sx-wy { fill: none; stroke: var(--tint-2); stroke-width: 26; }
+.sx-wc { fill: none; stroke: var(--ink); stroke-width: 1; stroke-dasharray: 10 8; }
+.sx-bd { fill: #fff; stroke: var(--blue); stroke-width: 1.4; }
+.sx-tb rect { fill: var(--ink); }
+.sx-trk { offset-rotate: auto; offset-distance: 0%; opacity: 0; }
+.sx-trk path:first-child { fill: #fff; stroke: var(--red); stroke-width: 1.6; }
+.sx-trk path + path { fill: none; stroke: var(--red); stroke-width: 1.6; }
+.sx.is-on .sx-trk { opacity: 1; animation: sx-trk 11s linear 1s infinite paused; }
+.sx.is-run .sx-trk { animation-play-state: running; }
+@keyframes sx-trk { 0% { opacity: 0; } 2% { opacity: 1; } 92% { opacity: 1; offset-distance: 100%; } 100% { opacity: 0; offset-distance: 100%; } }
+.sx-ring--b { stroke: var(--blue); }
+.sxk-ic .sx-al path, .sxk-ic .sx-al circle { stroke-width: 2; }
+.sxk-ic .sx-ic-l { fill: none; stroke: var(--red); stroke-width: 2; }
+.sxk-ic .sx-ic-p rect { stroke: var(--red); stroke-width: 1.4; }
+.sxk-ic .sx-ic-s path { fill: none; stroke: var(--red); stroke-width: 1.6; }
+.sxk-ic .sx-ic-z circle { stroke: var(--blue); stroke-width: 1.4; }
+.sxk-ic .sx-ic-z circle + circle { fill: #fff; }
+.sxk-ic .sx-ic-z--m circle { fill: #fff; }
+.sxk-ic .sx-ic-z--m circle + circle { fill: var(--blue); }
+.sxk-ic .sx-ic-f circle { fill: var(--red); }
+.sxk-ic .sx-ic-f path { fill: none; stroke: var(--red); stroke-width: 2; }
 .sxh { position: absolute; top: 1.75rem; }
 .sxh--l { left: 2.25rem; }
 .sxh--r { left: calc(936 / 1400 * 100% + 2.25rem); color: #fff; }
@@ -349,7 +455,7 @@ li.fl:hover .fl-x i { background: var(--red); color: #fff; }
 .sxk { position: relative; display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; min-height: 12.5rem; padding: 1.25rem 1.25rem 1.25rem; border-radius: .375rem; background: #fff; text-align: left; box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .08); transition: box-shadow .4s; }
 .sxk-ic { display: block; height: 1.75rem; margin-bottom: auto; }
 .sxk-ic svg { display: block; width: auto; height: 100%; overflow: visible; }
-.sxk-ic .sx-ic-h path { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+.sxk-ic .sx-ic-h path, .sxk-ic .sx-ic-h rect { fill: none; stroke: var(--ink); stroke-width: 2; }
 .sxk b { padding-top: 1.5rem; font: 300 2.5rem/1 var(--f-num); letter-spacing: -.05em; white-space: nowrap; }
 .sxk small { font-size: .35em; font-weight: 400; letter-spacing: 0; color: var(--grey); }
 .sxk span { margin-top: .625rem; min-height: 3.375rem; font-size: .8125rem; line-height: 1.38; color: var(--ink-52); }

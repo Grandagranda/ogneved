@@ -176,7 +176,7 @@
   // графическая часть: две схемы на одной панели (js/schemes.js), под панелью — карточки условных обозначений;
   // наведение на карточку оставляет яркими только её слои
   const schemes = w => {
-    const B = window.OG_SCH, x = B && B[w.id]; if (!x) return '';
+    const B = window.OG_SCH, x = B && B.get(w.id); if (!x) return '';
     const vb = `viewBox="0 0 ${B.W} ${B.H}"`;
     const top = (s, cls) => `<div class="sxh ${cls}"><p class="side-k">${s.l}</p><h3>${s.t}</h3><p class="sxh-s">${s.s}</p></div>`;
     after.push(() => {
@@ -193,10 +193,10 @@
         <div class="sx" id="sx" role="img" aria-label="${x.sheets.map(s => s.t + ': ' + s.s).join('. ').replace(/&nbsp;/g, ' ')}">
           <i class="sx-dark"></i>
           <svg class="sx-veil" ${vb} aria-hidden="true">${B.veil(x.veil)}</svg>
-          <svg class="sx-art" ${vb} aria-hidden="true"><defs><pattern id="sx-hatch" width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V26M0 0H26" fill="none" stroke="#f5312a" stroke-opacity=".34"/></pattern></defs>${x.art}</svg>
+          <svg class="sx-art" ${vb} aria-hidden="true"><defs><pattern id="sx-hatch" width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V26M0 0H26" fill="none" stroke="#f5312a" stroke-opacity=".34"/></pattern>${[['hb', '#0032df', .34], ['hr', '#f5312a', .5], ['hw', '#fff', .24]].map(([n, c, o]) => `<pattern id="sx-${n}" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V11" fill="none" stroke="${c}" stroke-opacity="${o}"/></pattern>`).join('')}</defs>${x.art}</svg>
           <svg class="sx-run" ${vb} aria-hidden="true">${x.run}</svg>
           ${top(x.sheets[0], 'sxh--l')}${top(x.sheets[1], 'sxh--r')}
-          <dl class="sx-spec">${x.spec.map(([t, v]) => `<div><dt>${t}</dt><dd class="num">${v}</dd></div>`).join('')}</dl>
+          ${x.spec ? `<dl class="sx-spec">${x.spec.map(([t, v]) => `<div><dt>${t}</dt><dd class="num">${v}</dd></div>`).join('')}</dl>` : ''}
           <p class="sx-tag"><i></i>Планировка скрыта, расположение условное</p>
         </div>
         <ul class="sxk-ls" style="--n:${x.keys.length + 1}">${x.keys.map(c => `<li><button class="sxk" data-k="${c.k}"><i class="sxk-ic">${B.ICON[c.i]}</i><b>${c.b}${c.u ? ` <small>${c.u}</small>` : ''}</b><span>${c.t}</span></button></li>`).join('')}

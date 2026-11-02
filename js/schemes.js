@@ -3,8 +3,8 @@
 // Планировку, адрес, название объекта, штамп и номера помещений с листов не переносим; мозаика под схемой
 // выдуманная (veil), из чертежа в неё ничего не попадает — контур реального здания по ней не восстановить.
 //
-// Новый объект — запись в OG_SCH с ключом = id работы из data.js:
-//   note — пояснение в шапке блока; sheets — подписи двух половин панели; spec — строки на тёмной половине;
+// Новый объект — функция в OG_SCH.list с ключом = id работы из data.js (ДГУ здесь, остальные в schemes-obj.js):
+//   note — пояснение в шапке блока; sheets — подписи двух половин панели; spec — строки на тёмной половине, если есть;
 //   keys — карточки под схемой: k совпадает с data-l у слоёв (наведение оставляет яркими только их), i — знак из ICON;
 //   veil — посев мозаики и вырез под помещение; art — рисунок; run — бегущие сигналы.
 // Координаты — пиксели панели 1400×700 (кадр 1920). Геометрию труб снимать с PDF: _tools/pdf-paths.cjs.
@@ -53,42 +53,60 @@
   const at = (x, y, s) => `<g transform="translate(${x} ${y})">${s}</g>`;
   const tx = (x, y, t, cls = '', o = '') => `<text x="${x}" y="${y}"${cls ? ` class="${cls}"` : ''}${o ? ' ' + o : ''}>${t}</text>`;
   const halo = (x, y, t, cls = '') => tx(x, y, t, 'sx-halo ' + cls) + tx(x, y, t, cls);
+  // рукава от гидранта охватывают его знак и сходятся у автоцистерны; нижний, всасывающий, с рёбрами
+  const EYE = 'M19 2.6C15 5.9 8.8 15.2-1.2 15.2-13.2 15.2-16.9 8.7-20 5.6';
   const G = {
     // пожарная автоцистерна: пятиугольник острием по ходу, овал — цистерна
-    ac: (n = '') => `<path d="M0-20H52L70 0 52 20H0Z"/><ellipse cx="27" rx="17" ry="10"/>${n ? `<text x="27" y="3.6" class="sx-ac-t">${n}</text>` : ''}`,
-    pg: () => '<circle r="9"/><path d="M0-9A9 9 0 0 1 0 9Z"/>',       // пожарный гидрант
-    rs: () => '<circle r="10"/><path d="M-3.5 3.5L3.5-3.5"/>',         // сухотрубный стояк
-    dr: () => '<path d="M0-20L12 0 0 20-12 0Z"/><circle r="5"/>',      // дренчерный ороситель
-    st: L => `<path d="M0 0H${L - 34}"/><path d="M${L - 44}-7L${L - 22} 0 ${L - 44} 7Z" class="sx-f"/><circle cx="${L - 17}" r="5" class="sx-f"/><circle cx="${L - 6}" r="5" class="sx-f"/>`, // ствол на рабочей линии
-    arw: () => '<path d="M0-8H86L80-22 122 0 80 22 86 8H0L11 0Z" class="sx-f"/>',                                   // решающее направление
+    ac: () => '<path d="M0-20H52L70 0 52 20H0Z"/><ellipse cx="27" rx="17" ry="10"/>',
+    vh: n => `<path d="M0-20H52L70 0 52 20H0Z"/><text x="27" y="5.4" class="sx-vh-t">${n}</text>`,     // автомобиль с буквами вместо цистерны
+    pg: () => '<circle r="10"/><path d="M-10 0A10 10 0 0 1 10 0Z"/>',   // пожарный гидрант: закрашен верх
+    ey: () => `<path d="M-26 0H-10M-20-5.6L-26 0-20 5.6M19-2.6L21.4 0 19 2.6M21.4 0H25.6M19-2.6C15-5.9 8.8-15.2-1.2-15.2-13.2-15.2-16.9-8.7-20-5.6M-21.6-3.4l1.6 1.6M16.8-5.8l1.6 1.6"/><path d="${EYE}"/><path d="${EYE}" class="sx-rib"/>`,
+    rs: () => '<circle r="10"/>',                                       // сухотрубный стояк
+    dr: () => '<path d="M0-20L12 0 0 20-12 0Z"/><circle r="5"/>',       // пеногенератор на сухотрубе
+    st: L => `<path d="M0 0H${L - 34}M9-5V5"/><path d="M${L - 44}-7L${L - 22} 0 ${L - 44} 7Z" class="sx-f"/><circle cx="${L - 17}" r="5" class="sx-f"/><circle cx="${L - 6}" r="5" class="sx-f"/>`, // ствол на рабочей линии
+    arw: () => '<path d="M0-15L68-7 66-24 90 0 66 24 68 7 0 15 15 0Z" class="sx-f"/>',                                 // решающее направление
     fl: () => '<path d="M0 0V-46"/><path d="M0-46H30V-27H0Z" class="sx-r"/><circle r="3.5" class="sx-r"/>',          // место возникновения пожара
     pb: n => `<circle r="19"/><text y="4.6" class="sx-pb-t">ПБ</text><text x="24" y="-13" class="sx-pb-n">${n}</text>`, // пост безопасности ГДЗС
+    kp: () => '<circle r="23"/><text y="4.6" class="sx-pb-t">КПП</text>',                                            // контрольно-пропускной пункт ГДЗС
     sh: () => '<path d="M0 18V-20H26V-2H0"/><path d="M-9 18H9L0 3Z"/><text x="13" y="-6.6" class="sx-pb-t">Ш</text>',   // оперативный штаб
   };
   const fade = (a, s) => `<g class="sx-fade" style="--a:${a}s">${s}</g>`;
   const pop = (x, y, kind, a, ...args) => at(x, y, `<g class="sx-${kind} sx-pop" style="--a:${a}s">${G[kind](...args)}</g>`);
-  // подпись дробью: номер над линией, сеть под линией
-  const frac = (x, y, a, b) => tx(x, y - 34, a, 'sx-t sx-c') + `<path d="M${x - 19} ${y - 29.5}h38" class="sx-tl"/>` + tx(x, y - 17, b, 'sx-t sx-c');
   const STEP = 300, LOOP = 2.8, TAIL = 44;   // шаг сигналов, время круга и длина хвоста — те же числа в .sx-sg path
   // рисуемая линия: длина нормирована; a — когда начать, z — сколько рисовать
   const ln = (d, cls, a, z = .6) => `<path d="${d}" pathLength="1" class="sx-dw ${cls}" style="--a:${a}s;--z:${z}s"/>`;
-  // сигнал: голова и хвост с общим концом. Штрихи считаются от начала маршрута,
-  // поэтому на общем участке совпадают и расходятся на развилке
-  const sig = d => `<path d="${d}" class="sx-sg-t"/><path d="${d}" class="sx-sg-h"/>`;
+  // сигнал: голова и хвост с общим концом. Штрихи считаются от начала маршрута, поэтому на общем участке совпадают
+  // и расходятся на развилке; s — задержка в пикселях пути, ею сводят разные маршруты в один штрих у места слияния
+  const sig = (d, s = 0) => `<path d="${d}" class="sx-sg-t" style="--s:${s}px"/><path d="${d}" class="sx-sg-h" style="--s:${s}px"/>`;
+  const len = d => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d); return p.getTotalLength(); };
+  const wrap = v => +(((v % STEP) + STEP) % STEP).toFixed(1);
+  // когда сигнал доходит до конца маршрута — чтобы кольцо срабатывания попало в этот момент
+  const arrive = (d, s = 0) => (wrap(len(d) + s - TAIL) / STEP * LOOP).toFixed(2);
 
   // знаки для карточек под схемой
   const ICON = {
-    wa: `<svg viewBox="-12 -12 24 24" class="sx-pg">${G.pg()}</svg>`,
+    wa: `<svg viewBox="-31 -15 62 30" class="sx-pg"><path d="M-31 0H31" class="sx-ax"/><circle r="14.5"/><path d="M0-14.5A14.5 14.5 0 0 1 0 14.5Z"/></svg>`,
     ac: `<svg viewBox="-2 -22 74 44" class="sx-ac">${G.ac()}</svg>`,
-    ho: `<svg viewBox="0 0 64 32" class="sx-ic-h"><path d="M0 26H32M32 26V10M12 10H52M12 10V2M32 10V2M52 10V2"/></svg>`,
-    st: `<svg viewBox="0 -14 64 28" class="sx-st">${G.st(64)}</svg>`,
+    ho: `<svg viewBox="0 -4 87 44" class="sx-ic-h"><path d="M0 18H59M27 15v6M42.5 18V0H59M42.5 18V36H59M59-3V3M59 15v6M59 33v6M60 0H87M60 18H87M60 36H87"/></svg>`,
+    st: `<svg viewBox="-7 -18 88 36" class="sx-st"><path d="M-7 0H0"/>${G.st(81)}<text x="29" y="-8" class="sx-t sx-c">РСКУ-50А</text><text x="29" y="17" class="sx-t sx-c">4</text></svg>`,
     dr: `<svg viewBox="-14 -22 28 44" class="sx-dr">${G.dr()}</svg>`,
   };
 
+  // подпись вдоль трубы: посередине отрезка, со сдвигом по нормали
+  const along = ([x0, y0], [x1, y1], dx, dy, deg, t) => tx(0, 0, t, 'sx-t', 'transform="translate(' + ((x0 + x1) / 2 + dx) + ' ' + ((y0 + y1) / 2 + dy) + ') rotate(' + deg + ')" text-anchor="middle"');
+  // от автоцистерны рукав уходит вниз или вверх и плавно ложится на уровень
+  const out = (x, y, l) => 'M' + x + ' ' + y + 'C' + x + ' ' + (y + (l - y) * .84) + ' ' + (x + 24) + ' ' + l + ' ' + (x + 33) + ' ' + l;
+  // гидрант: ось сети и повёрнутая дробью подпись на ней, s — подпись сверху (-1) или снизу (1)
+  const hydrant = (x, y, s, a, b, t) => { const py = s < 0 ? y - 79 : y + 25, m = py + 27;
+    return fade(t, '<rect x="' + (x - 17) + '" y="' + py + '" width="34" height="54" rx="7" class="sx-plate"/><path d="M' + x + ' ' + (py + 6) + 'V' + (py + 48) + 'M' + x + ' ' + (y - 22) + 'V' + (y + 22) + '" class="sx-ax"/>' + tx(0, 0, a, 'sx-t sx-t--b sx-c', 'transform="translate(' + (x - 4.5) + ' ' + m + ') rotate(-90)"') + tx(0, 0, b, 'sx-t sx-t--b sx-c', 'transform="translate(' + (x + 13) + ' ' + m + ') rotate(-90)"')) + pop(x, y, 'pg', t) + pop(x, y, 'ey', t + .35); };
+
   // ── ДГУ ──
-  // Сухотруб снят с листа координатами чертежа (ox, oy) и отзеркален, чтобы головки смотрели на технику; стояк укорочен: схема без масштаба.
+  // Связи и знаки — по рисунку заказчика (ДизельГенераторная.ai), размеры знаков — панельные. Проезд полосой слева;
+  // рукава заканчиваются соединительными головками в стене помещения, дальше по нему идёт труба к пеногенераторам.
+  // Сухотруб снят с листа координатами чертежа (ox, oy) и отзеркален; стояк укорочен: схема без масштаба.
+  const dgu = () => {
   const K = .9, AX = ox => +(1417.5 - K * ox).toFixed(1), AY = oy => +(120 + K * (oy - 108.3)).toFixed(1);
-  const Y1 = 600, Y2 = 636;                                       // уровни соединительных головок = уровни рукавов
+  const Y1 = 608, Y2 = 636;                                       // уровни головок на тёмной половине
   const riser = AX(346.7), top = AY(521.7), link = AX(393.4), head = AX(461), valve = AX(441.3), vEnd = AX(403.8);
   const far = [AX(150.7), AY(327)];                               // дальний конец магистрали Ду 80
   const j2 = [AX(243.1), AY(418.6)], j3 = [AX(333.2), AY(508.8)]; // врезки ветвей
@@ -99,114 +117,140 @@
     [323, 499.6], [287, 463.8], [245.6, 422.5], [198.3, 375.2], [156.1, 331]];
   const hang = ([x, y], i) => { const a = AX(x), b = AY(y), s = 9; return `<path d="M${a - s} ${b - s}L${a + s} ${b + s}M${a - s - 4} ${b - s}h8M${a + s - 4} ${b + s}h8" transform="rotate(${i > 8 ? 0 : 90} ${a} ${b})"/>`; };
   const clamp = y => `M${riser - 9} ${y}h18m-18-5v10m18-10v10`;
-  // подпись вдоль трубы: посередине отрезка, со сдвигом по нормали
-  const along = ([x0, y0], [x1, y1], dx, dy, deg, t) => tx(0, 0, t, 'sx-t', `transform="translate(${(x0 + x1) / 2 + dx} ${(y0 + y1) / 2 + dy}) rotate(${deg})" text-anchor="middle"`);
 
-  // рукава от автоцистерн
-  const main = 'M162 636H226Q246 636 246 616V592';                // АЦ-4 → разветвление
-  const LINES = [[216, 248], [246, 316], [276, 384]].map(([x, y]) => [`V${y + 20}Q${x} ${y} ${x + 20} ${y}H420`, x, y]);  // три линии к стоякам
-  const hose3 = `M876 ${Y2}H${riser}`, hose2 = `M725 616V612Q725 ${Y1} 737 ${Y1}H${link}V${Y2}`;
+  // площадка: левый край знаков, ряды техники и уровни рукавов
+  const ROAD = 412, RX = 640, RT = 141, RB = 644;                 // полоса проезда, стены помещения
+  const X0 = 36, AC = X0 + 51, AR = 319;                          // левая колонка и автоцистерны у помещения
+  const A1 = 240, A2 = 502, A4 = 627, L1 = 284, L2 = 546, L3 = 583;
+  const BR = 352, T1 = 315, T2 = 391, NX = 509, RS = 539;         // разветвление, засечки, цифра на линии, стояк
+  const ROWS = [[240, 1], [L1, 1], [328, 2]];                     // три линии к стволам
+  const E0 = 573, HX = RX - 13, JX = 663;                         // конец рукава, центр головки, перемычка в помещении
+  const DR = [[700, 354], [805, 354], [900, 269]];                // пеногенераторы в помещении
+
+  const hose1 = out(AC + 13, A1 + 20, L1) + 'H' + BR, hose2 = out(AC + 13, A2 + 20, L2) + 'H' + (AR + 46);
+  const c3 = out(AR + 13, A2 + 20, L2), c4 = out(AR + 13, A4 - 20, L3);
+  const feed3 = `${c3}H${JX}V${L3}`, leaf = ([x, y]) => `${c4}H${x}V${y + 20}`;
+
+  // соединительная головка в стене: клапан по ходу, задвижка, головка
+  const inlet = y => `<path d="M${E0} ${y}H${HX - 13}"/><path d="M${E0 + 5.4} ${y - 5.8}l5 5.8-5 5.8z" class="sx-in-t"/><path d="M${E0 + 15.5} ${y - 4.4}l17 8.8v-8.8l-17 8.8z" class="sx-in-v"/><circle cx="${HX}" cy="${y}" r="13"/><circle cx="${HX}" cy="${y}" r="8"/><path d="M${HX - 5.7} ${y - 5.7}l11.4 11.4m0-11.4l-11.4 11.4"/>`;
+  // узел ввода на тёмной половине: двойная скоба головки, две риски и задвижка с закрашенной половиной
+  const gate = y => `<path d="M${valve} ${y - 10.5}v21M${vEnd} ${y - 10.5}v21M${valve + 3.7} ${y - 10.5}l26.3 21v-21l-26.3 21z"/><path d="M${valve + 3.7} ${y - 10.5}v21l13.2-10.5z" class="sx-fw"/>`;
+  const nut = y => `M${head + 5} ${y - 8}h-5v16h5M${head + 2.7} ${y - 5}h4v10h-4`;
 
   const art = `
-    <rect x="0" y="548" width="${SPLIT}" height="${H - 548}" class="sx-road"/>
-    ${fade(.1, tx(36, 576, 'Проезд', 'sx-t sx-t--g'))}
+    <rect width="${ROAD}" height="${H}" class="sx-road"/>
+    ${fade(.1, tx(X0, 676, 'Проезд', 'sx-t sx-t--g'))}
     <g data-l="zone">
-      <rect x="640" y="186" width="${SPLIT - 640}" height="362" class="sx-room"/>
-      <rect x="640" y="186" width="${SPLIT - 640}" height="362" fill="url(#sx-hatch)"/>
-      <path d="M640 548V186H${SPLIT}M640 548H${SPLIT}" class="sx-wall"/>
-      ${fade(1.8, tx(660, 214, 'Помещение ДГУ', 'sx-t sx-t--r'))}
-      ${pop(806, 400, 'fl', 1.9)}
-      ${fade(2, tx(844, 374, 'Очаг', 'sx-t sx-t--r'))}
-    </g>
-    <path d="M0 548H640" class="sx-curb"/>
-    <g data-l="dr">${[700, 788, 876].map((x, i) => pop(x, 280, 'dr', 2 + i * .1)).join('')}</g>
-    <g data-l="wa">
-      ${pop(60, 636, 'pg', .1)}${pop(540, 636, 'pg', .2)}
-      ${fade(.2, frac(60, 636, 'ПГ-2', 'К-400') + frac(540, 636, 'ПГ-1', 'К-400') + '<path d="M69 636H92M549 636H572" class="sx-h"/>')}
-    </g>
-    <g data-l="ac">${[[92, 'АЦ-4'], [572, 'АЦ-1'], [690, 'АЦ-2'], [806, 'АЦ-3']].map(([x, n], i) => pop(x, 636, 'ac', .25 + i * .08, n)).join('')}</g>
-    <g data-l="ho">
-      ${ln(main, 'sx-h', .6, .35)}
-      <path d="M216 592H276" class="sx-h sx-comb sx-pop" style="--a:.9s"/>
-      ${LINES.map(([d, x], i) => ln(`M${x} 592${d}`, 'sx-h', .95 + i * .1, .7)).join('')}
-      <path d="M642 636H690" class="sx-h sx-dash sx-pop" style="--a:.7s"/>
-      ${fade(1, tx(292, 592, 'DN 80 · N 3', 'sx-t') + tx(292, 609, 'Q 12 л/с', 'sx-t'))}
-      ${fade(1, tx(772, 590, 'DN 80 · N 1 · Q 15 л/с', 'sx-t'))}
-      ${ln(`M725 616V612Q725 ${Y1} 737 ${Y1}H${SPLIT}`, 'sx-h', .7, .4)}
-      ${ln(`M876 ${Y2}H${SPLIT}`, 'sx-h', .75, .25)}
-      ${ln(`M${SPLIT} ${Y1}H${head}`, 'sx-hd', 1.1, .15)}${ln(`M${SPLIT} ${Y2}H${head}`, 'sx-hd', 1, .15)}
-    </g>
-    <g data-l="st">
-      ${LINES.map(([, , y], i) => pop(430, y, 'rs', 1.6 + i * .1) + pop(440, y, 'st', 1.7 + i * .1, 200) + fade(1.8 + i * .1, halo(460, y - 12, 'РСКУ-50А · Q 4 л/с', 'sx-t'))).join('')}
-    </g>
-    <g data-l="zone">
-      ${pop(494, 470, 'arw', 2.1)}
-      ${fade(2.2, halo(494, 436, 'Решающее направление', 'sx-t'))}
-    </g>
-    <g data-l="zone">${pop(372, 636, 'pb', .4, '3')}${pop(452, 636, 'sh', .45)}
-      ${fade(.6, tx(372, 674, 'Посты ГДЗС', 'sx-t sx-c') + tx(458, 674, 'Штаб', 'sx-t sx-c'))}
+      <rect x="${RX}" y="${RT}" width="${SPLIT - RX}" height="${RB - RT}" class="sx-room"/>
+      <rect x="${RX}" y="${RT}" width="${SPLIT - RX}" height="${RB - RT}" fill="url(#sx-hatch)"/>
+      <path d="M${SPLIT} ${RT}H${RX}V${RB}H${SPLIT}" class="sx-wall"/>
+      ${fade(1.8, tx(RX + 20, RT + 28, 'Помещение ДГУ', 'sx-t sx-t--r'))}
+      ${pop(835, 461, 'fl', 1.9)}
+      ${fade(2, tx(843, 454, 'Очаг', 'sx-t sx-t--r'))}
     </g>
     <g data-l="dr">
+      ${ln(`M${RX} ${L2}H${JX}V${L3}`, 'sx-rp', 1.3, .25)}
+      ${ln(`M${RX} ${L3}H${DR[2][0]}V${DR[2][1] + 20}`, 'sx-rp', 1.4, .8)}
+      ${DR.slice(0, 2).map(([x, y], i) => ln(`M${x} ${L3}V${y + 20}`, 'sx-rp', 1.6 + i * .15, .4)).join('')}
+      ${DR.map(([x, y], i) => pop(x, y, 'dr', 2 + i * .1)).join('')}
+    </g>
+    <g data-l="wa ho">${hydrant(X0 + 26, A1, -1, 'ПГ-2', 'К-400', .1)}${hydrant(X0 + 26, A2, 1, 'ПГ-1', 'К-400', .2)}</g>
+    <g data-l="ac">
+      ${[[AC, A1, 'АЦ-1', -1], [AC, A2, 'АЦ-2', -1], [AR, A2, 'АЦ-3', -1], [AR, A4, 'АЦ-4', 1]].map(([x, y, n, s], i) => pop(x, y, 'ac', .25 + i * .08) + fade(.3 + i * .08, tx(x + 27, y + (s < 0 ? -26 : 35), n, 'sx-t sx-c'))).join('')}
+    </g>
+    <g data-l="zone">
+      ${pop(X0, 335, 'vh', .4, 'АБГ')}${pop(X0, 418, 'vh', .45, 'Ш')}
+      ${pop(195, 335, 'kp', .5)}${pop(187, 416, 'sh', .55)}${pop(296, 196, 'pb', .6, '3')}
+      ${fade(.7, tx(296, 232, 'Посты ГДЗС', 'sx-t sx-c') + tx(195, 450, 'Штаб', 'sx-t sx-c'))}
+    </g>
+    <g data-l="ho">
+      ${ln(hose1, 'sx-h', .6, .4)}
+      <path d="M${T1} ${L1 - 6}v12" class="sx-h sx-pop" style="--a:.95s"/>
+      ${ln(`M${BR} ${L1}V${ROWS[0][0]}`, 'sx-h', .95, .15)}${ln(`M${BR} ${L1}V${ROWS[2][0]}`, 'sx-h', .95, .15)}
+      ${ROWS.map(([y, n], i) => ln(`M${BR} ${y}H${NX - 7}`, 'sx-h', 1.05 + i * .1, .4) + `<path d="M${T2} ${y - 6}v12" class="sx-h sx-pop" style="--a:${1.1 + i * .1}s"/>` + ln(`M${NX + 7} ${y}H${RS - 10}`, 'sx-h', 1.45 + i * .1, .1) + fade(1.4 + i * .1, halo(NX, y + 4.3, n, 'sx-t sx-c'))).join('')}
+      ${ln(`${c3}H${E0}`, 'sx-h', .7, .5)}${ln(`${c4}H${E0}`, 'sx-h', .75, .5)}
+      <path d="${hose2}" class="sx-h sx-dash sx-pop" style="--a:.9s"/>
+      ${fade(1, tx(190, L1 - 8, 'DN 80 · N 3 · Q 12 л/с', 'sx-t') + halo(428, L2 - 9, 'DN 80 · N 1 · Q 15 л/с', 'sx-t'))}
+    </g>
+    <g data-l="ho dr"><g class="sx-in sx-pop" style="--a:1.15s">${inlet(L2)}${inlet(L3)}</g></g>
+    <g data-l="st">
+      ${ROWS.map(([y], i) => pop(RS, y, 'rs', 1.6 + i * .1) + pop(RS + 10, y, 'st', 1.7 + i * .1, 85) + fade(1.8 + i * .1, halo(RS + 49, y - 9, 'РСКУ-50А', 'sx-t sx-c') + halo(RS + 49, y + 17, '4', 'sx-t sx-c'))).join('')}
+    </g>
+    <g data-l="zone">
+      ${pop(514, 437, 'arw', 2.1)}
+      ${fade(2.2, halo(559, 402, 'Решающее направление', 'sx-t sx-c'))}
+    </g>
+    <g data-l="dr">
+      ${[Y1, Y2].map(y => ln(`M${head + 6.7} ${y}H${valve}`, 'sx-p sx-p--t', 1, .1)).join('')}
       ${ln(`M${vEnd} ${Y2}H${riser}V${top}`, 'sx-p', 1.2, .5)}
       ${ln(`M${vEnd} ${Y1}H${link}V${Y2}`, 'sx-p', 1.2, .25)}
       ${ln(`M${riser} ${top}L${far[0]} ${far[1]}`, 'sx-p', 1.7, .55)}
       ${ln(`M${far[0]} ${far[1]}L${b1[0]} ${b1[1]}V${b1[1] + drop}`, 'sx-p sx-p--t', 2.25, .65)}
       ${ln(`M${j2[0]} ${j2[1]}L${b2[0]} ${b2[1]}V${b2[1] + drop}`, 'sx-p sx-p--t', 2.05, .55)}
       ${ln(`M${j3[0]} ${j3[1]}L${b3[0]} ${b3[1]}V${b3[1] + drop}`, 'sx-p sx-p--t', 1.85, .55)}
-      <g class="sx-hang sx-pop" style="--a:2.7s">${HANG.map(hang).join('')}<path d="${clamp(top + 14)}${clamp((top + Y2) / 2)}${clamp(Y2 - 14)}"/></g>
-      <g class="sx-valve sx-pop" style="--a:1s">
-        ${[Y1, Y2].map(y => `<path d="M${valve} ${y - 13}v26M${valve + 4} ${y - 13}v26M${valve + 4} ${y}l14-12v24z"/><path d="M${valve + 32} ${y - 12}v24l-14-12z" class="sx-fw"/><path d="M${head + 6} ${y - 10}h-6v20h6M${head + 6} ${y}H${valve}"/>`).join('')}
-      </g>
+      <g class="sx-hang sx-pop" style="--a:2.7s">${HANG.map(hang).join('')}<path d="${clamp(top + 14)}${clamp((top + Y2) / 2)}${clamp(Y2 - 14)}"/><path d="${[b1, b2, b3].map(([x, y]) => `M${x - 10} ${y + drop + .6}h20m-20 5.4h20`).join('')}" class="sx-fl2"/></g>
+      <g class="sx-valve sx-pop" style="--a:1s">${gate(Y1)}${gate(Y2)}<path d="${nut(Y1)}${nut(Y2)}" class="sx-nut"/></g>
       ${[b1, b2, b3].map(([x, y], i) => pop(x, y + drop + DRY, 'dr', 2.7 + i * .1)).join('')}
       <g class="sx-w sx-fade" style="--a:2.8s">
-        ${along(b1, far, -17, 17, 45, 'Ду 50 · L 6000')}${along(b2, j2, -17, 17, 45, 'Ду 50 · L 4500')}${along(b3, j3, -17, 17, 45, 'Ду 50 · L 4500')}
+        ${along(b1, far, 12, -12, 45, 'Ду 50 · L 6000')}${along(b2, j2, 12, -12, 45, 'Ду 50 · L 4500')}${along(b3, j3, 12, -12, 45, 'Ду 50 · L 4500')}
         ${along(far, j2, 17, 17, -45, 'Ду 80 · L 6000')}${along(j2, j3, 17, 17, -45, 'Ду 80 · L 5000')}
-        ${along([riser, top], [riser, Y2], 24, 0, -90, 'Ду 80 · H 6200')}
+        ${along([riser, top], [riser, Y2], -12, 0, -90, 'Ду 80 · H 6200')}
         ${tx(972, 668, 'Соединительные головки Ду 80', 'sx-t')}
       </g>
     </g>`;
 
-  // маршруты от АЦ-3 к оросителям; длина нужна, чтобы кольцо срабатывания попало в момент прихода сигнала
-  const LEAF = [[far, b1], [j2, b2], [j3, b3]].map(([j, b]) => [[876, Y2], [riser, Y2], [riser, top], j, b, [b[0], b[1] + drop]]);
+  // сигналы: на рукавах и трубе в помещении красные, на красной трубе — белые. Рукав АЦ-2 вливается в рукав АЦ-3,
+  // а тот — в трубу от АЦ-4: задержки сводят их в один штрих у места слияния
+  const LEAF = [[far, b1], [j2, b2], [j3, b3]].map(([j, b]) => [[head + 6.7, Y2], [riser, Y2], [riser, top], j, b, [b[0], b[1] + drop]]);
   const walk = p => `M${p[0]}${p.slice(1).map(q => 'L' + q).join('')}`;
-  const dist = p => p.slice(1).reduce((t, q, i) => t + Math.hypot(q[0] - p[i][0], q[1] - p[i][1]), 0);
-  const arrive = p => ((dist(p) - TAIL) % STEP) / STEP * LOOP;
+  const s2 = wrap(len(c3) - len(hose2)), s4 = wrap(len(feed3) - len(`${c4}H${JX}`));
+  // белый сигнал приходит к оросителю вместе с красным на его паре в помещении
+  const sw = wrap(len(leaf(DR[0])) + s4 - len(walk(LEAF[2])));
+  const sw1 = wrap(sw + (link - head - 6.7) - len(`M${head + 6.7} ${Y1}H${link}V${Y2}`));
   // порядок: ближняя ветвь срабатывает первой; у каждого оросителя на трубе — пара в помещении
-  const rings = [2, 1, 0].map((n, i) => { const b = [b1, b2, b3][n], a = arrive(LEAF[n]).toFixed(2);
-    return `<circle cx="${b[0]}" cy="${b[1] + drop + DRY}" r="30" class="sx-ring sx-ring--w" style="--a:${a}s"/><circle cx="${[700, 788, 876][i]}" cy="280" r="30" class="sx-ring" style="--a:${a}s"/>`; }).join('');
+  const rings = [2, 1, 0].map((n, i) => { const b = [b1, b2, b3][n];
+    return `<circle cx="${b[0]}" cy="${b[1] + drop + DRY}" r="30" class="sx-ring sx-ring--w" style="--a:${arrive(walk(LEAF[n]), sw)}s"/><circle cx="${DR[i][0]}" cy="${DR[i][1]}" r="30" class="sx-ring" style="--a:${arrive(leaf(DR[i]), s4)}s"/>`; }).join('');
 
-  // красные сигналы — на рукавах, белые — на трубе: обе группы обрезаны по соединительным головкам
   const run = `<defs>
-      <clipPath id="sx-hose"><rect x="0" y="560" width="${head}" height="140"/><rect x="0" y="0" width="${SPLIT}" height="560"/></clipPath>
-      <clipPath id="sx-pipe"><rect x="${head}" y="0" width="${W - head}" height="${H}"/><rect x="${SPLIT}" y="0" width="${head - SPLIT}" height="560"/></clipPath>
+      <clipPath id="sx-hose"><rect width="${RX}" height="${H}"/></clipPath>
+      <clipPath id="sx-rooms"><rect x="${RX}" width="${SPLIT - RX}" height="${H}"/></clipPath>
     </defs>
     <g class="sx-sg sx-sg--r" data-l="ho" clip-path="url(#sx-hose)">
-      ${LINES.map(([d, x]) => sig(`${main}H${x}${d.replace('H420', 'H606')}`)).join('')}
-      ${sig(hose2)}${sig(hose3)}${sig('M642 636H690')}
+      ${ROWS.map(([y]) => sig(`${hose1}V${y}H${RS + 72}`)).join('')}
+      ${sig(hose2, s2)}${sig(feed3)}${sig(leaf(DR[0]), s4)}
     </g>
-    <g class="sx-sg sx-sg--w" data-l="dr" clip-path="url(#sx-pipe)">
-      ${LEAF.map(p => sig(walk(p))).join('')}${sig(hose2)}
+    <g class="sx-sg sx-sg--r" data-l="dr" clip-path="url(#sx-rooms)">
+      ${sig(feed3)}${DR.map(q => sig(leaf(q), s4)).join('')}
+    </g>
+    <g class="sx-sg sx-sg--w" data-l="dr">
+      ${LEAF.map(p => sig(walk(p), sw)).join('')}${sig(`M${head + 6.7} ${Y1}H${link}V${Y2}`, sw1)}
     </g>
     <g class="sx-sg" data-l="dr">${rings}</g>`;
 
+  return {
+    note: 'Оставили рабочий слой: технику, рукавные линии, трубопровод и&nbsp;расчётные значения. Планировку и&nbsp;адрес закрыли, полный комплект листов получает только заказчик.',
+    sheets: [
+      { t: 'Расстановка сил и&nbsp;средств', s: 'Тушение в&nbsp;помещении ДГУ, первая пенная атака', l: 'Лист 04' },
+      { t: 'Сухотруб к&nbsp;оросителям', s: 'Аксонометрическая схема', l: 'Лист 07' },
+    ],
+    veil: { seed: 7, w: SPLIT, h: H, cut: [[0, 0, ROAD, H], [RX, RT, SPLIT - RX, RB - RT]] },
+    art, run,
+    spec: [['Труба Ду 80', '17,2 м'], ['Труба Ду 50', '15 м'], ['Обратные клапаны', '2'], ['Подвесы и крепления', '17']],
+    keys: [
+      { k: 'wa', i: 'wa', b: '2', t: 'пожарных гидранта на&nbsp;кольцевой сети К-400' },
+      { k: 'ac', i: 'ac', b: '4', t: 'пожарных автоцистерны задействованы в&nbsp;схемах боевого развёртывания' },
+      { k: 'ho', i: 'ho', b: '12 + 15', u: 'л/с', t: 'подача по&nbsp;магистральным линиям DN&nbsp;80' },
+      { k: 'st', i: 'st', b: '3', t: 'пожарных ствола РСКУ-50А поданы на&nbsp;защиту смежных с&nbsp;горящим помещений' },
+      { k: 'dr', i: 'dr', b: '3', t: 'стационарных пеногенератора задействованы в&nbsp;тушении пожара через сухотрубы' },
+    ],
+  };
+  };
+
   window.OG_SCH = {
     W, H, SPLIT, veil, ICON,
-    dgu: {
-      note: 'Оставили рабочий слой: технику, рукавные линии, трубопровод и&nbsp;расчётные значения. Планировку и&nbsp;адрес закрыли, полный комплект листов получает только заказчик.',
-      sheets: [
-        { t: 'Расстановка сил и&nbsp;средств', s: 'Тушение в&nbsp;помещении ДГУ, первая пенная атака', l: 'Лист 04' },
-        { t: 'Сухотруб к&nbsp;оросителям', s: 'Аксонометрическая схема', l: 'Лист 07' },
-      ],
-      veil: { seed: 7, w: SPLIT, h: 548, cut: [[640, 186, SPLIT - 640, 362]] },
-      art, run,
-      spec: [['Труба Ду 80', '17,2 м'], ['Труба Ду 50', '15 м'], ['Обратные клапаны', '2'], ['Подвесы и крепления', '17']],
-      keys: [
-        { k: 'wa', i: 'wa', b: '2', t: 'пожарных гидранта на&nbsp;кольцевой сети К-400' },
-        { k: 'ac', i: 'ac', b: '4', t: 'автоцистерны в&nbsp;расстановке на&nbsp;проезде' },
-        { k: 'ho', i: 'ho', b: '12 + 15', u: 'л/с', t: 'подача по&nbsp;магистральным линиям DN&nbsp;80' },
-        { k: 'st', i: 'st', b: '3', t: 'ствола РСКУ-50А через сухотрубные стояки' },
-        { k: 'dr', i: 'dr', b: '3', t: 'дренчерных оросителя с&nbsp;водопенными насадками' },
-      ],
-    },
+    kit: { at, tx, halo, G, fade, pop, ln, sig, len, wrap, arrive, along, out, hydrant, STEP, LOOP, TAIL },
+    list: { dgu },
+    // схема собирается только для открытой страницы
+    get(id) { const f = this.list[id]; return f ? f() : null; },
   };
 })();
