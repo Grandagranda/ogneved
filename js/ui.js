@@ -46,7 +46,7 @@
     }).join('');
     el.classList.add('hx');
     el.innerHTML = `<div class="hx-in">
-      <a class="hx-logo" href="index.html" aria-label="ОГНЕВЕД — на главную"><img src="img/logo.svg" width="976" height="214" alt="ОГНЕВЕД"><small>эксперты в тушении пожаров</small></a>
+      <a class="hx-logo" href="index.html" aria-label="ОГНЕВЕД — на главную"><img src="img/logo.svg" width="940" height="214" alt="ОГНЕВЕД"><small>эксперты в тушении пожаров</small></a>
       <nav class="hx-nav" aria-label="Разделы сайта">${links}</nav>
       <a class="hx-tel" href="${D.phoneHref}">${D.phone}</a>
       <button class="hx-btn" data-open="form"><span>Оставить заявку</span>${AR_UP}</button></div>
@@ -113,7 +113,7 @@
     const S = D.svcOrder.map(D.svc);
     el.innerHTML = `<div class="wrap2 fd">
       <div class="fd-top">
-        <div class="fd-brand-w"><a class="fd-brand" href="${MAIN ? '#top' : 'index.html'}" aria-label="ОГНЕВЕД — ${MAIN ? 'наверх' : 'на главную'}"><img src="img/logo-white.svg" width="976" height="214" alt="ОГНЕВЕД"><small>эксперты в&nbsp;тушении пожаров</small></a>
+        <div class="fd-brand-w"><a class="fd-brand" href="${MAIN ? '#top' : 'index.html'}" aria-label="ОГНЕВЕД — ${MAIN ? 'наверх' : 'на главную'}"><img src="img/logo-white.svg" width="940" height="214" alt="ОГНЕВЕД"><small>эксперты в&nbsp;тушении пожаров</small></a>
           <p class="fd-claim">Расчёты и&nbsp;проектная документация в&nbsp;области пожаротушения для зданий и&nbsp;сооружений по&nbsp;всей России</p></div>
         <div class="fd-col"><p class="fd-l">Телефон</p><a class="fd-v" href="${D.phoneHref}">${D.phone}</a><p class="fd-s">${D.hours}</p></div>
         <div class="fd-col"><p class="fd-l">Почта</p><a class="fd-v" href="mailto:${D.email}">${D.email}</a><p class="fd-s">Ответим в&nbsp;течение рабочего дня</p></div>

@@ -1,17 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 976 214" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 214" fill="none">
   <title>ОГНЕВЕД</title>
-  <defs><mask id="og-mw" maskUnits="userSpaceOnUse" x="0" y="0" width="104" height="122"><path d="M52 8L96 22V64C96 92 82 107 52 114C22 107 8 92 8 64V22Z" fill="#fff" stroke="#000" stroke-width="29" stroke-linejoin="miter"/></mask></defs>
-  <g transform="scale(1.75)">
-    <path d="M52 8L96 22V64C96 92 82 107 52 114C22 107 8 92 8 64V22Z" stroke="#ffffff" stroke-width="16" stroke-linejoin="miter" stroke-miterlimit="10"/>
-    <g mask="url(#og-mw)"><path fill="#ffffff" d="M25 62L79 18.8V40.8L25 84Z"/><path fill="#f5312a" d="M25 91L79 47.8V69.8L25 113Z"/></g>
+  <defs><clipPath id="og-mw"><path d="M104.4 43.6L153.9 60.6V111.5C153.9 148.7 104.4 172.1 104.4 172.1S54.9 150.1 54.9 111.5V60.5Z"/></clipPath></defs>
+  <g transform="translate(-36.2 0)">
+    <path d="M104.4 27.7L166.1 48.9V112.4C166.1 158.8 104.4 188 104.4 188S42.7 160.6 42.7 112.4V48.9Z" stroke="#ffffff" stroke-width="13" stroke-miterlimit="17.5"/>
+    <g clip-path="url(#og-mw)"><path fill="#ffffff" d="M65 100.4L143.8 37.4V69.5L65 132.5Z"/><path fill="#f5312a" d="M65 142.7L143.8 79.7V111.8L65 174.8Z"/></g>
   </g>
   <g transform="translate(0 57)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="10">
-    <g transform="translate(218 0)" stroke="#ffffff" color="#ffffff"><rect x="10" y="10" width="110" height="80" rx="30"/></g>
-    <g transform="translate(363 0)" stroke="#ffffff" color="#ffffff"><path d="M10 100V10H76"/></g>
-    <g transform="translate(454 0)" stroke="#ffffff" color="#ffffff"><path d="M10 0V100M84 0V100M20 50H74"/></g>
-    <g transform="translate(563 0)" stroke="#ffffff" color="#ffffff"><path stroke="none" fill="currentColor" d="M0 0H80V20H20V32H0ZM0 68H20V80H80V100H0Z"/><g fill="#f5312a"><path stroke="none" d="M0 40H72V60H0Z"/></g></g>
-    <g transform="translate(658 0)" stroke="#ffffff" color="#ffffff"><path d="M10 100V10H64A20 20 0 0 1 64 50H10M10 50H68A20 20 0 0 1 68 90H10"/></g>
-    <g transform="translate(771 0)" stroke="#ffffff" color="#ffffff"><path stroke="none" fill="currentColor" d="M0 0H80V20H20V32H0ZM0 68H20V80H80V100H0Z"/><path stroke="none" fill="currentColor" d="M0 40H72V60H0Z"/></g>
-    <g transform="translate(866 0)" stroke="#ffffff" color="#ffffff"><path d="M10 120V90H100V120M30 90V10H80V90"/><path d="M0 90H110"/></g>
+    <g transform="translate(181.8 0)" stroke="#ffffff" color="#ffffff"><rect x="10" y="10" width="110" height="80" rx="30"/></g>
+    <g transform="translate(326.8 0)" stroke="#ffffff" color="#ffffff"><path d="M10 100V10H76"/></g>
+    <g transform="translate(417.8 0)" stroke="#ffffff" color="#ffffff"><path d="M10 0V100M84 0V100M20 50H74"/></g>
+    <g transform="translate(526.8 0)" stroke="#ffffff" color="#ffffff"><path stroke="none" fill="currentColor" d="M0 0H80V20H20V32H0ZM0 68H20V80H80V100H0Z"/><g fill="#f5312a"><path stroke="none" d="M0 40H72V60H0Z"/></g></g>
+    <g transform="translate(621.8 0)" stroke="#ffffff" color="#ffffff"><path d="M10 100V10H64A20 20 0 0 1 64 50H10M10 50H68A20 20 0 0 1 68 90H10"/></g>
+    <g transform="translate(734.8 0)" stroke="#ffffff" color="#ffffff"><path stroke="none" fill="currentColor" d="M0 0H80V20H20V32H0ZM0 68H20V80H80V100H0Z"/><path stroke="none" fill="currentColor" d="M0 40H72V60H0Z"/></g>
+    <g transform="translate(829.8 0)" stroke="#ffffff" color="#ffffff"><path d="M10 120V90H100V120M30 90V10H80V90"/><path d="M0 90H110"/></g>
   </g>
 </svg>

@@ -41,6 +41,8 @@
     rz: `<svg viewBox="-23 -23 46 46" class="sx-ic-z sx-ic-z--m"><circle r="21"/><circle r="8"/></svg>`,
     ld: `<svg viewBox="-9 -22 18 44" class="sx-ic-s"><path d="M-6-21V21M6-21V21M-6-15H6M-6-7H6M-6 1H6M-6 9H6M-6 17H6"/></svg>`,
     lv: `<svg viewBox="-2 -22 60 44" class="sx-ic-h"><path d="M0 18H58M0-6H58M14 18l-5-9h10zM14-6l-5-9h10z"/></svg>`,
+    // площадка установки: красная штриховка, свой узор — у схемы может не быть #sx-st
+    ps: `<svg viewBox="0 0 66 34" class="sx-ic-p"><defs><pattern id="sx-ic-hs" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-40)"><rect width="9" height="3.6" fill="#f5312a"/></pattern></defs><rect x="1" y="1" width="64" height="32" fill="url(#sx-ic-hs)"/></svg>`,
     pl: `<svg viewBox="0 0 66 34" class="sx-ic-p"><rect x="1" y="1" width="64" height="32" fill="url(#sx-st)"/></svg>`,
     dm: `<svg viewBox="0 -10 70 20" class="sx-ic-h"><path d="M1-9V9M69-9V9M1 0H69M1 0l9-4v8zM69 0l-9-4v8z"/></svg>`,
     rt: `<svg viewBox="0 0 74 38" class="sx-ic-h"><path d="M1 34H26A16 16 0 0 0 42 18A16 16 0 0 1 58 2H73"/></svg>`,
@@ -460,8 +462,8 @@
       keys: [
         { k: 'rt', i: 'rt', b: 'R 9,7', u: 'м', t: 'минимальный радиус поворота ПППМ' },
         { k: 'wd', i: 'dm', b: '5,5', u: 'м', t: 'ширина проезда на&nbsp;узком участке' },
-        { k: 'st', i: 'al', b: '8', t: 'стоянок автолестницы АЛ-30' },
-        { k: 'zn', i: 'fa', b: '4', t: 'фасада: рабочие зоны и&nbsp;участки без обслуживания, красным' },
+        { k: 'st', i: 'ps', b: '8', t: 'площадок для автолестницы АЛ-30' },
+        { k: 'zn', i: 'fa', b: '4', t: 'фасада: рабочие зоны и&nbsp;участки без обслуживания обозначены красным' },
         { k: 'rv', i: 'rv', b: '1', t: 'участок разворота задним ходом' },
       ],
     };
