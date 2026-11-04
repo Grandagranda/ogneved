@@ -483,7 +483,7 @@ main.pg:empty ~ .ftr { display: none; }
 .sc-art { position: absolute; inset: 0; transform-origin: 62% 30%; transition: transform 1.4s var(--e-out); }
 :is(.sc:hover, .sc.is-play) .sc-art { transform: scale(1.025); }
 .sc-im { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.sc-n, .sc-d { position: absolute; z-index: 2; top: .75rem; display: inline-flex; align-items: center; height: 1.75rem; border-radius: .375rem; background: rgba(255, 255, 255, .92); font-size: .6875rem; line-height: 1; white-space: nowrap; }
+.sc-n, .sc-d { position: absolute; z-index: 2; pointer-events: none; top: .75rem; display: inline-flex; align-items: center; height: 1.75rem; border-radius: .375rem; background: rgba(255, 255, 255, .92); font-size: .6875rem; line-height: 1; white-space: nowrap; }
 .sc-n { left: .625rem; padding: 0 .875rem 0 .9375rem; font-family: Manrope, var(--f); font-weight: 600; color: var(--grey); }
 .sc-d { right: .75rem; gap: .4375rem; padding: 0 .625rem; font-weight: 500; text-transform: uppercase; }
 .sc-d::before { content: ''; width: .375rem; height: .375rem; border-radius: 1px; background: var(--red); }
@@ -626,7 +626,9 @@ main.pg:empty ~ .ftr { display: none; }
 .obx-b { display: grid; padding: 1.375rem 1rem .875rem; }
 .obx-n { font-size: .8125rem; color: var(--red); }
 .obx h3 { margin-top: .625rem; min-height: 2.3em; font-size: 1.5rem; line-height: 1.15; font-weight: 500; letter-spacing: -.03em; }
-.obx-btn { position: relative; display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--ln-2); font-size: .75rem; font-weight: 500; text-transform: uppercase; text-align: left; }
+.obx-btn { position: static; display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--ln-2); font-size: .75rem; font-weight: 500; text-transform: uppercase; text-align: left; }
+/* вся карточка объекта открывает заявку: слой кнопки на всю карточку */
+.obx-btn::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 .obx-btn .fb-ar { position: static; transition: transform .5s var(--e-out); }
 .obx:hover .obx-btn .fb-ar { transform: translate(3px, -3px); }
 /* сцены объектов (js/obj-fx.js): проигрываются при наведении, на телефоне — у карточки на экране (.is-play, C.play в cards.js) */

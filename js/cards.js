@@ -23,6 +23,7 @@
 
     // услуга: картинка на всю карточку, белая панель снизу, при наведении — сцена услуги (js/svc-fx.js)
     sc: (s, i, n = 6) => { const FX = window.OG_FX || {}, fx = FX[s.id]; return `<article class="sc" data-fx="${s.id}">
+      <a class="card-hit" href="usluga.html?id=${s.id}" tabindex="-1" aria-hidden="true"></a>
       <div class="sc-art"><img class="sc-im" src="img/s-${s.id}.webp" alt="" loading="lazy" decoding="async">
         ${fx ? `<svg class="sc-fx" viewBox="0 0 ${FX.W} ${FX.H}" aria-hidden="true">${fx}</svg>` : ''}</div>
       <span class="sc-n">${pad(i + 1)} / ${pad(n)}</span><span class="sc-d">${s.days} раб. дней</span>
@@ -47,6 +48,7 @@
 
     // статья: фото с меткой темы, белая панель наплывает на фото, дата и «Читать»
     arc: (a, cls = '', row) => `<article class="arc${cls ? ' ' + cls : ''}">
+      <a class="card-hit" href="statya.html?id=${a.id}" tabindex="-1" aria-hidden="true" draggable="false"></a>
       <a class="arc-img" href="statya.html?id=${a.id}" tabindex="-1" draggable="false">${pic(a.img, 'alt="" loading="lazy" decoding="async" draggable="false"', row)}</a>
       <span class="arc-tag">${a.tag}</span>
       <div class="arc-b">

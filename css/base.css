@@ -72,6 +72,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 /* ссылка на всю карточку */
 .cover-link::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+/* вся карточка — ссылка, когда панель с заголовком сама позиционирована (услуги, статьи): слой под панелью, поверх фото */
+.card-hit { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 
 /* ── появление при прокрутке: мягко снизу, по очереди внутри группы (js/motion.js) ── */
 .js-rv .rv { opacity: 0; transform: translateY(1.5rem); transition: opacity .9s var(--ease-out), transform 1.1s var(--ease-out); transition-delay: calc(var(--i, 0) * 70ms); }
