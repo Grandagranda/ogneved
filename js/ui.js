@@ -25,6 +25,17 @@
   const AR_UP = '<svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg>';
   const FLAG = '<svg class="flag" viewBox="0 0 14 11" aria-hidden="true"><path d="M14 9.036c0 .417-.164.816-.456 1.111a1.55 1.55 0 0 1-1.1.46H1.556a1.55 1.55 0 0 1-1.1-.46A1.58 1.58 0 0 1 0 9.036V7.464h14v1.572Z" fill="#CE2028"/><path d="M0 3.536h14v3.928H0z" fill="#22408C"/><path d="M12.444.393H1.556c-.413 0-.809.165-1.1.46A1.58 1.58 0 0 0 0 1.964v1.572h14V1.964c0-.417-.164-.816-.456-1.111a1.55 1.55 0 0 0-1.1-.46Z" fill="#fff"/></svg>';
   const MAIN = !!$('main.frame:not(.pg)');
+  // сенсорная раскладка (css/mobile.css): телефоны, вертикальные планшеты, телефоны боком. Тот же запрос — у <link> mobile.css
+  // на всех страницах (_tools/m/inject.cjs): менять в обоих местах
+  const MOB = window.OG_MQ = matchMedia('(max-width: 900px), (max-width: 1199px) and (orientation: portrait), (max-width: 1100px) and (max-height: 520px), (max-width: 1199px) and (hover: none) and (pointer: coarse)');
+
+  // слои телефона (меню, окна): открытый слой — запись в истории, «назад» его закрывает
+  const layers = [];
+  const layer = close => { layers.push(close); history.pushState({ ogl: layers.length }, ''); };
+  const unlayer = () => { if (layers.length) history.back(); };
+  addEventListener('popstate', () => { const f = layers.pop(); f && f(); });
+  // страница вернулась из кэша назад/вперёд — открытые слои закрываем, их записи в истории уже не наши
+  addEventListener('pageshow', e => { if (e.persisted) while (layers.length) layers.pop()(); });
 
   const page = location.pathname.split('/').pop() || 'index.html';
   const sect = { 'uslugi.html': 'uslugi.html', 'usluga.html': 'uslugi.html', 'raboty.html': 'raboty.html', 'rabota.html': 'raboty.html', 'blog.html': 'blog.html', 'statya.html': 'blog.html', 'biblioteka.html': 'biblioteka.html', 'kniga.html': 'biblioteka.html', 'kontakty.html': 'kontakty.html' }[page];
@@ -36,6 +47,55 @@
           <span class="mx-im"><img data-src="img/s-${s.id}.webp" alt=""></span>
           <span class="mx-tx"><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} дней</small></span></a></li>`).join('')}</ul>`,
   };
+
+  // ── меню телефона: лист под шапкой — разделы строками на линиях (у «Услуг» раскрывается список с миниатюрами),
+  //    на главной — переходы к блокам, внизу — телефон, мессенджеры и заявка. Открыто — запись в истории, «назад» закрывает ──
+  const BLOCKS = [['about', 'О нас'], ['objects', 'Объекты'], ['works', 'Наши работы'], ['price', 'Стоимость'], ['steps', 'Как мы работаем'], ['geo', 'География'], ['faq', 'Вопросы'], ['blog', 'Статьи'], ['library', 'Библиотека']];
+  const mm = { open: false, close: () => {} };
+  function mobileMenu(hdr) {
+    const bur = $('.hx-bur', hdr), nav = D.nav.map((n, i) => {
+      const on = sect === n.href ? ' is-on' : '', num = `<i class="num">${String(i + 1).padStart(2, '0')}</i>`;
+      if (!n.sub) return `<a class="mm-a${on}" href="${n.href}">${num}<b>${n.t}</b>${AR_UP}</a>`;
+      return `<div class="mm-r"><a class="mm-a${on}" href="${n.href}">${num}<b>${n.t}</b></a><button class="mm-tg" type="button" aria-expanded="false" aria-controls="mm-sv" aria-label="Показать услуги"><i></i></button></div>
+        <div class="mm-sv" id="mm-sv"><ul>${D.svcOrder.map(D.svc).map(s => `<li><a href="usluga.html?id=${s.id}"><span class="mm-im"><img data-src="img/m/t-${s.id}.webp" alt="" width="96" height="60"></span><span class="mm-tx"><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} дней</small></span></a></li>`).join('')}</ul></div>`;
+    }).join('');
+    const box = document.createElement('div');
+    box.className = 'mm'; box.id = 'mm'; box.inert = true;
+    box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', 'Меню');
+    box.innerHTML = `<div class="mm-in">
+        <nav class="mm-nav" aria-label="Разделы сайта">${nav}</nav>
+        ${MAIN ? `<div class="mm-pg"><p class="mm-k">На главной</p><div class="mm-chips">${BLOCKS.map(([id, t]) => `<a href="#${id}">${t}</a>`).join('')}</div></div>` : ''}
+        <div class="mm-ct">
+          <p class="mm-k">Позвоните или напишите</p>
+          <a class="mm-tel" href="${D.phoneHref}">${D.phone}</a><p class="mm-s">${D.hours}</p>
+          <div class="mm-msg"><a${ext(D.max)}>${ICO.max}<span>MAX</span></a><a${ext(D.tg)}>${ICO.tg}<span>Telegram</span></a><a href="mailto:${D.email}">${ICO.mail}<span>Почта</span></a></div>
+          <button class="btn btn--red mm-cta" type="button" data-open="form"><span>Оставить заявку</span></button>
+        </div>
+      </div>`;
+    document.body.append(box);
+    let pend = null, loaded = false;
+    const set = on => {
+      mm.open = on; box.inert = !on;
+      box.classList.toggle('is-open', on); hdr.classList.toggle('mm-on', on); document.documentElement.classList.toggle('is-mm', on);
+      bur.setAttribute('aria-expanded', on); bur.setAttribute('aria-label', on ? 'Закрыть меню' : 'Меню');
+      if (on && !loaded) { loaded = true; $$('img[data-src]', box).forEach(i => { i.src = i.dataset.src; i.removeAttribute('data-src'); }); }
+      if (!on && pend) { const t = pend; pend = null; requestAnimationFrame(() => scrollTo({ top: t.getBoundingClientRect().top + scrollY - (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0), behavior: 'smooth' })); }
+    };
+    // close(true) — без шага назад: слой меню забирает окно, которое открылось из него
+    mm.close = handoff => { if (!mm.open) return; if (handoff) { set(false); return true; } unlayer(); };
+    bur.addEventListener('click', () => { if (mm.open) mm.close(); else { set(true); layer(() => set(false)); } });
+    box.addEventListener('click', e => {
+      const tg = e.target.closest('.mm-tg');
+      if (tg) { const on = tg.getAttribute('aria-expanded') !== 'true'; tg.setAttribute('aria-expanded', on); $('.mm-sv', box).classList.toggle('is-open', on); return; }
+      // переход к блоку этой же страницы: сначала закрываем меню, потом едем к блоку
+      const a = e.target.closest('a[href]'); if (!a) return;
+      const u = new URL(a.href, location.href), here = p => p.replace(/\/$/, '/index.html');
+      if (u.hash && here(u.pathname) === here(location.pathname)) { const t = document.querySelector(u.hash); if (t) { e.preventDefault(); pend = t; mm.close(); } }
+    });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && mm.open) mm.close(); });
+    // раскладка сменилась на ПК (поворот планшета) — меню закрываем
+    MOB.addEventListener('change', () => { if (!MOB.matches && mm.open) mm.close(); });
+  }
 
   // ── шапка: логотип-слово, меню капсом, телефон, чёрная кнопка с красной стрелкой; у «Услуг» — панель при наведении ──
   function header() {
@@ -49,9 +109,12 @@
       <a class="hx-logo" href="index.html" aria-label="ОГНЕВЕД — на главную"><img src="img/logo.svg" width="940" height="214" alt="ОГНЕВЕД"><small>эксперты в тушении пожаров</small></a>
       <nav class="hx-nav" aria-label="Разделы сайта">${links}</nav>
       <a class="hx-tel" href="${D.phoneHref}">${D.phone}</a>
-      <button class="hx-btn" data-open="form"><span>Оставить заявку</span>${AR_UP}</button></div>
+      <button class="hx-btn" data-open="form"><span>Оставить заявку</span>${AR_UP}</button>
+      <a class="hx-call m-only" href="${D.phoneHref}" aria-label="Позвонить: ${D.phone}">${ICO.tel}</a>
+      <button class="hx-bur m-only" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mm"><i></i><i></i></button></div>
       <div class="mx">${Object.entries(PANELS).map(([k, f]) => `<div class="mx-p" data-mx="${k}" inert><div class="mx-in">${f()}</div></div>`).join('')}</div>`;
     const veil = document.createElement('div'); veil.className = 'mx-veil'; el.after(veil);
+    mobileMenu(el);
 
     // наведение с намерением: панель открывается после короткой паузы, закрывается с задержкой — курсор успевает
     // спуститься с пункта на панель наискосок; между панелями переключение без шторки
@@ -92,13 +155,14 @@
     // при прокрутке вниз шапка уходит, при движении вверх — возвращается; срабатывает только после 48px пути в одну сторону,
     // чтобы не дёргаться от мелких толчков. Внутри закреплённых блоков главной («Как мы работаем», «Объекты») шапка стоит на месте
     let last = scrollY, anchor = scrollY, dir = 0;
-    const pinned = () => [...document.querySelectorAll('#stk-run, #objects')].some(p => { const r = p.getBoundingClientRect(); return r.top < innerHeight * .5 && r.bottom > innerHeight * .5; });
+    // на телефоне «Объекты» — обычная лента, закреплены только карточки шагов
+    const pinned = () => [...document.querySelectorAll(MOB.matches ? '#stk-run' : '#stk-run, #objects')].some(p => { const r = p.getBoundingClientRect(); return r.top < innerHeight * .5 && r.bottom > innerHeight * .5; });
     const onS = () => {
       const y = scrollY, d = Math.sign(y - last);
       el.classList.toggle('is-scrolled', y > 8);
       if (cur && Math.abs(y - anchor) > 24) set(null);
       if (d && d !== dir) { dir = d; anchor = last; }
-      if (y < 600 || pinned()) el.classList.remove('is-hid');
+      if (y < (MOB.matches ? 240 : 600) || pinned()) el.classList.remove('is-hid');
       else if (dir > 0 && y - anchor > 48) el.classList.add('is-hid');
       else if (dir < 0 && anchor - y > 48) el.classList.remove('is-hid');
       last = y;
@@ -206,11 +270,13 @@
         <h3 class="mdl-h">Свяжитесь с&nbsp;нами <span class="g">удобным способом</span></h3><p class="mdl-s">Позвоните или напишите в&nbsp;мессенджер — ответим в&nbsp;течение 15&nbsp;минут в&nbsp;рабочее время.</p>${msgBlock(null, true)}
         <dl class="mdl-dl"><div><dt>Почта</dt><dd><a href="mailto:${D.email}">${D.email}</a></dd></div><div><dt>Режим работы</dt><dd>${D.hours}</dd></div></dl></div></div>
       <div class="dock" aria-label="Быстрые действия">
-        <button data-open="cnt" aria-label="Позвонить, написать или открыть QR-код">${ICO.qr}<span class="d-tip">Позвонить, написать, QR-код</span></button>
+        <button data-open="cnt" aria-label="Позвонить, написать или открыть QR-код">${ICO.qr.replace('<svg', '<svg class="pc-only"')}${ICO.tel.replace('<svg', '<svg class="m-only"')}<span class="d-tip">Позвонить, написать, QR-код</span></button>
         <button data-open="form" aria-label="Задать вопрос">${ICO.chat}<span class="d-tip">Задать вопрос</span></button>
         <button class="d-main" data-open="calc" aria-label="Рассчитать стоимость">${ICO.calc}<span>Рассчитать стоимость</span></button>
       </div>`;
     document.body.append(...box.children);
+    // содержимое окна — в обёртке: на телефоне лист прокручивается внутри неё, а крестик стоит; на ПК обёртка — display: contents
+    $$('.modal-box').forEach(b => { const w = document.createElement('div'); w.className = 'modal-sc'; w.append(...[...b.children].filter(c => !c.matches('.modal-x'))); b.append(w); });
     bindForms();
     let last;
     const open = (id, data = {}) => {
@@ -218,19 +284,67 @@
       last = document.activeElement;
       if (id === 'calc' && data.svc) { const c = $('[data-calc]', m); c.ogSet && c.ogSet(data.svc); }
       if (id === 'form') { const f = $('form', m); f.classList.remove('is-sent'); const q = $('textarea', f); if (q) q.value = data.q || ''; }
+      // окно из меню телефона занимает его запись в истории; одно окно поверх другого — тоже без новой записи
+      const was = $('.modal.is-open');
+      if (was && was !== m) was.classList.remove('is-open');
+      if (MOB.matches) { if (mm.close(true)) layers[layers.length - 1] = shut; else if (!was) layer(shut); }
       m.classList.add('is-open'); document.body.classList.add('is-locked'); window.OG_LENIS && window.OG_LENIS.stop();
-      setTimeout(() => ($('input:not([type=radio]):not([type=checkbox])', m) || $('.modal-x', m)).focus({ preventScroll: true }), 60);
+      // на телефоне поле сразу не фокусируем: клавиатура закрыла бы половину листа, пока его ещё не прочитали
+      setTimeout(() => (MOB.matches ? $('.modal-x', m) : $('input:not([type=radio]):not([type=checkbox])', m) || $('.modal-x', m)).focus({ preventScroll: true }), 60);
     };
-    const close = () => { $$('.modal.is-open').forEach(m => m.classList.remove('is-open')); document.body.classList.remove('is-locked'); window.OG_LENIS && window.OG_LENIS.start(); last && last.focus && last.focus({ preventScroll: true }); };
+    const shut = () => { $$('.modal.is-open').forEach(m => m.classList.remove('is-open')); document.body.classList.remove('is-locked'); window.OG_LENIS && window.OG_LENIS.start(); last && last.focus && last.focus({ preventScroll: true }); };
+    const close = () => { if (!$('.modal.is-open')) return; if (MOB.matches && layers.length) unlayer(); else shut(); };
     document.addEventListener('click', e => {
+      // карточка с кнопкой (data-card) нажимается целиком: клик мимо кнопки отдаём её главной кнопке или ссылке
+      const cd = e.target.closest('[data-card]');
+      if (cd && !e.target.closest('a, button, input, textarea, select, label')) { const b = cd.querySelector('[data-open], a[href]'); if (b) { b.click(); return; } }
       const o = e.target.closest('[data-open]');
       if (o) { e.preventDefault(); open(o.dataset.open, { svc: o.dataset.svc, q: o.dataset.q }); return; }
       if (e.target.closest('[data-close]') || e.target.classList.contains('modal')) close();
     });
     addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
     window.OG_UI.open = open;
+
+    // телефон: лист окна тянется вниз пальцем (когда его содержимое у верха) — дотянули на треть или смахнули, лист закрывается
+    $$('.modal').forEach(m => {
+      const box = $('.modal-box', m), sc = $('.modal-sc', m);
+      let y0 = null, dy = 0, t0 = 0;
+      box.addEventListener('touchstart', e => {
+        if (!MOB.matches || e.touches.length > 1 || sc.scrollTop > 2 || e.target.closest('input, textarea, select')) { y0 = null; return; }
+        y0 = e.touches[0].clientY; dy = 0; t0 = performance.now();
+      }, { passive: true });
+      box.addEventListener('touchmove', e => {
+        if (y0 === null) return;
+        dy = e.touches[0].clientY - y0;
+        if (dy <= 0) { box.style.transition = box.style.transform = ''; if (dy < -8) y0 = null; return; }
+        if (e.cancelable) e.preventDefault();
+        box.style.transition = 'none'; box.style.transform = `translateY(${dy}px)`;
+      }, { passive: false });
+      const end = () => {
+        if (y0 === null) return; y0 = null;
+        const go = dy > box.offsetHeight / 3 || (dy > 50 && dy / (performance.now() - t0) > .5);
+        box.style.transition = '';
+        if (!go) { box.style.transform = ''; return; }
+        box.style.transform = 'translateY(100%)';
+        close(); setTimeout(() => { box.style.transform = ''; }, 550);
+      };
+      box.addEventListener('touchend', end); box.addEventListener('touchcancel', end);
+    });
+
+    // нижняя панель телефона: появляется, когда первый экран ушёл вверх; прячется у подвала (там те же контакты)
+    // и пока печатают в поле — клавиатура подняла бы её на середину экрана. Под меню и окнами её скрывает mobile.css
+    const dock = $('.dock'), ftr = $('#ftr');
+    let past = false, foot = false, typing = false, wait = false;
+    const paint = () => dock.classList.toggle('is-up', MOB.matches && past && !foot && !typing);
+    const onS = () => { wait = false; const p = scrollY > innerHeight * .75; if (p !== past) { past = p; paint(); } };
+    addEventListener('scroll', () => { if (!wait) { wait = true; requestAnimationFrame(onS); } }, { passive: true }); onS();
+    if (ftr) new IntersectionObserver(([e]) => { foot = e.isIntersecting; paint(); }).observe(ftr);
+    const field = t => t.matches && t.matches('input:not([type=checkbox]):not([type=radio]), textarea, select');
+    document.addEventListener('focusin', e => { if (field(e.target)) { typing = true; paint(); } });
+    document.addEventListener('focusout', e => { if (field(e.target)) { typing = false; setTimeout(paint, 250); } });
+    MOB.addEventListener('change', paint);
   }
 
-  window.OG_UI = { $, $$, ICO, AR_UP, formHTML, formRow, bindForms, calc, msgBlock, qr };
+  window.OG_UI = { $, $$, ICO, AR_UP, formHTML, formRow, bindForms, calc, msgBlock, qr, MOB };
   header(); footer(); modals();
 })();

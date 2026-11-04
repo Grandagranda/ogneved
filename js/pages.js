@@ -14,7 +14,7 @@
   const badge = t => `<p class="badge badge--flat"><i></i>${t}</p>`;
   const fb = (t, o = {}) => {
     const cls = `fb${o.cls ? ' ' + o.cls : ''}`, inner = `<span>${t}</span>${AR}`;
-    if (o.href) return `<a class="${cls}" href="${o.href}">${inner}</a>`;
+    if (o.href) return `<a class="${cls}" href="${o.href}"${o.blank ? ' target="_blank" rel="noopener"' : ''}>${inner}</a>`;
     return `<button class="${cls}"${o.open ? ` data-open="${o.open}"` : ''}${o.q ? ` data-q="${o.q}"` : ''}${o.svc ? ` data-svc="${o.svc}"` : ''}>${inner}</button>`;
   };
   // шапка блока, как на главной: плашка, заголовок с серым хвостом, справа — пояснение или кнопка
@@ -44,7 +44,7 @@
   // перерисовка списка по фильтру: старые карточки уходят, новые появляются (motion.js — [data-swap])
   const swap = (box, html) => { box.classList.add('is-swap'); setTimeout(() => { box.innerHTML = html; box.classList.remove('is-swap'); }, box.children.length ? 260 : 0); };
   const onChip = (bar, f) => bar.addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; $$('.chip2', bar).forEach(x => x.classList.toggle('is-on', x === b)); f(b.dataset.f); });
-  const works = list => { const sp = C.wkSpans(list.length); return list.map((w, k) => C.wkc(w, '', `grid-column:span ${sp[k]}`)).join(''); };
+  const works = list => { const sp = C.wkSpans(list.length); return list.map((w, k) => C.wkc(w, '', `grid-column:span ${sp[k]}`, true)).join(''); };
   const R = {};
 
   // ── Услуги ──
@@ -60,7 +60,7 @@
     ['Нужно проверить, хватит ли сил гарнизона для тушения', 'sily'],
   ];
   R.uslugi = () => {
-    after.push(() => { C.eqSc($('#svc')); window.OG_CALC($('#calc')); });
+    after.push(() => { C.eqSc($('#svc')); C.play($('#svc')); window.OG_CALC($('#calc')); });
     return head({ cr: [['Услуги']], h: 'Услуги <span class="g">в&nbsp;области<br>пожаротушения</span>',
         lead: 'Разрабатываем расчёты и&nbsp;проектную документацию, которые подтверждают: пожарные подразделения смогут подъехать к&nbsp;объекту, получить воду и&nbsp;потушить пожар.',
         act: fb('Бесплатная консультация', { cls: 'fb--red', open: 'form', q: 'Подобрать услугу' }) + fb('Рассчитать стоимость', { open: 'calc' }),
@@ -70,7 +70,7 @@
           <div class="pk-l">${badge('Подбор документа')}<h2 class="h2x">Какой документ <span class="g">нужен объекту</span></h2>
             <p class="pk-s">Найдите свою ситуацию — покажем, какой расчёт её&nbsp;закрывает. Не&nbsp;нашли&nbsp;— подскажем бесплатно.</p>
             ${fb('Задать вопрос', { cls: 'fb--dark', open: 'form', q: 'Какой документ нужен моему объекту?' })}</div>
-          <ol class="pk-list">${PICK.map(([t, id], i) => `<li><a class="pk-i" href="usluga.html?id=${id}"><span class="num">${pad(i + 1)}</span><b>${t}</b><span class="pk-to"><span class="pk-im"><img src="img/s-${id}.webp" alt="" loading="lazy"></span>${D.svc(id).cardT}</span>${AR}</a></li>`).join('')}</ol>
+          <ol class="pk-list">${PICK.map(([t, id], i) => `<li><a class="pk-i" href="usluga.html?id=${id}"><span class="num">${pad(i + 1)}</span><b>${t}</b><span class="pk-to"><span class="pk-im"><img src="img/s-${id}.webp" alt="" loading="lazy" decoding="async"></span>${D.svc(id).cardT}</span>${AR}</a></li>`).join('')}</ol>
         </div>`) +
       sec(sh('Стоимость', 'Сколько стоит <span class="g">проект</span>', '<p>Ответьте на&nbsp;шесть вопросов — посчитаем ориентировочную стоимость и&nbsp;срок. Точную цену назовём после просмотра исходных данных.</p>') +
         '<div class="calc-wrap" id="calc"></div>', { id: 'price' }) +
@@ -113,7 +113,7 @@
     const MORE = { sily: ['ptp', 'opp', 'dislokaciya'], ptp: ['opp', 'sily', 'voda'] };
     const others = MORE[s.id] ? MORE[s.id].map(D.svc) : [1, 2, 3].map(k => S[(i + k) % S.length]);
     after.push(() => {
-      setTimeout(() => $('.svh-art').classList.add('is-play'), 900); $('#svc') && C.eqSc($('#svc'));
+      setTimeout(() => $('.svh-art').classList.add('is-play'), 900); $('#svc') && (C.eqSc($('#svc')), C.play($('#svc')));
       // календарный план: когда блок на экране, линия «сегодня» проходит шкалу и отрезки заливаются за ней;
       // наведение на пункт подсвечивает его дни полосой через всю шкалу
       $$('.gnt').forEach(el => {
@@ -190,7 +190,8 @@
     });
     return sec(sh('Графическая часть', 'Рабочие схемы <span class="g">проекта</span>', `<p>${x.note}</p>`, 'sh--line') + `
       <div class="sxw">
-        <div class="sx" id="sx" role="img" aria-label="${x.sheets.map(s => s.t + ': ' + s.s).join('. ').replace(/&nbsp;/g, ' ')}">
+        <p class="sx-hint m-only">Листайте схему<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></p>
+        <div class="sx-scroll"><div class="sx" id="sx" role="img" aria-label="${x.sheets.map(s => s.t + ': ' + s.s).join('. ').replace(/&nbsp;/g, ' ')}">
           <i class="sx-dark"></i>
           <svg class="sx-veil" ${vb} aria-hidden="true">${B.veil(x.veil)}</svg>
           <svg class="sx-art" ${vb} aria-hidden="true"><defs><pattern id="sx-hatch" width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V26M0 0H26" fill="none" stroke="#f5312a" stroke-opacity=".34"/></pattern>${[['hb', '#0032df', .34], ['hr', '#f5312a', .5], ['hw', '#fff', .24]].map(([n, c, o]) => `<pattern id="sx-${n}" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V11" fill="none" stroke="${c}" stroke-opacity="${o}"/></pattern>`).join('')}</defs>${x.art}</svg>
@@ -198,7 +199,7 @@
           ${top(x.sheets[0], 'sxh--l')}${top(x.sheets[1], 'sxh--r')}
           ${x.spec ? `<dl class="sx-spec">${x.spec.map(([t, v]) => `<div><dt>${t}</dt><dd class="num">${v}</dd></div>`).join('')}</dl>` : ''}
           <p class="sx-tag"><i></i>Планировка скрыта, расположение условное</p>
-        </div>
+        </div></div>
         <ul class="sxk-ls" style="--n:${x.keys.length + 1}">${x.keys.map(c => `<li><button class="sxk" data-k="${c.k}"><i class="sxk-ic">${B.ICON[c.i]}</i><b>${c.b}${c.u ? ` <small>${c.u}</small>` : ''}</b><span>${c.t}</span></button></li>`).join('')}
           <li><button class="fl fl--add" data-open="form" data-q="Похожий проект: ${w.obj}"><span class="fl-plus"></span><b>Нужны такие&nbsp;же схемы?</b><small>Разработаем графическую часть для вашего объекта</small></button></li></ul>
       </div>`);
@@ -210,7 +211,7 @@
     const text = [['Задача', tx[0]], ['Что сделали', tx[1]], ['Результат', tx[2]]];
     return head({ cr: [['Наши работы', 'raboty.html'], [w.obj]], badge: w.type, h: w.obj,
         dl: [['Регион', w.city], ['Стоимость', `${w.cost} тыс.&nbsp;₽`], ['Срок', `${w.days} ${C.dn(w.days)}`], ['Тип объекта', D.objects.find(o => o.id === w.o).t]] }) +
-      sec(`<div class="wph"><img src="img/${w.img}.webp" alt="${w.obj}" data-par></div>
+      sec(`<div class="wph">${C.pic(w.img, `alt="${w.obj}" data-par`)}</div>
         <div class="wpb">
           <div class="wpb-main">${text.map(([t, p], k) => `<div class="wpb-i"><p class="wpb-k"><span class="num">${pad(k + 1)}</span>${t}</p><div class="wpb-t"><p>${p}</p>${k === 1 && w.extra ? `<p class="wpb-x"><b>+</b>Дополнительно: ${w.extra.toLowerCase()}</p>` : ''}</div></div>`).join('')}</div>
           <aside class="wpb-side">
@@ -226,7 +227,7 @@
 
   // ── Статьи: первая — крупно, остальные сеткой; фильтр по темам ──
   const feat = a => `<article class="arf">
-      <a class="arf-img" href="statya.html?id=${a.id}" tabindex="-1"><img src="img/${a.img}.webp" alt="" data-par></a>
+      <a class="arf-img" href="statya.html?id=${a.id}" tabindex="-1">${C.pic(a.img, 'alt="" fetchpriority="high" data-par')}</a>
       <div class="arf-b">
         <div class="arf-m">${badge(a.tag)}<time>${a.date}</time></div>
         <h2><a class="cover-link" href="statya.html?id=${a.id}">${a.t}</a></h2>
@@ -236,7 +237,7 @@
     </article>`;
   // ряды по три карточки; если в хвосте осталась одна — два последних ряда становятся парами (7 = 3 + 2 + 2)
   const artGrid = list => { const sp = []; for (let n = list.length; n > 0;) { if (n === 4 || n === 2) { sp.push(...Array(n).fill(3)); n = 0; } else { const k = Math.min(3, n); sp.push(...Array(k).fill(6 / k)); n -= k; } }
-    return `<div class="arg">${list.map((a, k) => C.arc(a, '').replace('<article class="arc"', `<article class="arc" style="grid-column:span ${sp[k]}"`)).join('')}</div>`; };
+    return `<div class="arg">${list.map((a, k) => C.arc(a, '', true).replace('<article class="arc"', `<article class="arc" style="grid-column:span ${sp[k]}"`)).join('')}</div>`; };
   R.blog = () => {
     const tags = [...new Set(D.articles.map(a => a.tag))];
     after.push(() => {
@@ -268,16 +269,16 @@
           <h1 class="h1x">${a.t}</h1>
           <p class="ath-p">${tx.lead}</p>
         </div></div></section>` +
-      sec(`<div class="atc"><img src="img/${a.img}.webp" alt="" data-par></div>
+      sec(`<div class="atc">${C.pic(a.img, 'alt="" data-par')}</div>
         <div class="atb">
           <aside class="toc2"><p class="side-k">Содержание</p><ol>${tx.body.map(([h], k) => `<li><a href="#p${k}" data-off="110"><span class="num">${pad(k + 1)}</span>${h}</a></li>`).join('')}</ol></aside>
           <div class="prose2">${tx.body.map(([h, p], k) => `<h2 id="p${k}">${h}</h2><p>${p}</p>`).join('')}
-            <div class="prose2-cta"><div><b>Нужен расчёт для вашего объекта?</b><p>Бесплатно подскажем, какой документ потребуется, и&nbsp;назовём стоимость.</p></div>${fb('Задать вопрос', { cls: 'fb--dark', open: 'form', q: 'Вопрос по статье: ' + a.t })}</div>
+            <div class="prose2-cta" data-card><div><b>Нужен расчёт для вашего объекта?</b><p>Бесплатно подскажем, какой документ потребуется, и&nbsp;назовём стоимость.</p></div>${fb('Задать вопрос', { cls: 'fb--dark', open: 'form', q: 'Вопрос по статье: ' + a.t })}</div>
           </div>
-          <aside class="ats"><p class="side-k">Услуги</p>${S.slice(0, 4).map((s, k) => `<a class="sv-link sv-link--sm" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/s-${s.id}.webp" alt="" loading="lazy"></span><span class="mx-tx"><i>${pad(k + 1)}</i><b>${s.cardT}</b><small>${D.cost(s)}</small></span>${AR}</a>`).join('')}
+          <aside class="ats"><p class="side-k">Услуги</p>${S.slice(0, 4).map((s, k) => `<a class="sv-link sv-link--sm" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/s-${s.id}.webp" alt="" loading="lazy" decoding="async"></span><span class="mx-tx"><i>${pad(k + 1)}</i><b>${s.cardT}</b><small>${D.cost(s)}</small></span>${AR}</a>`).join('')}
             ${fb('Все услуги', { href: 'uslugi.html', cls: 'fb--sm' })}</aside>
         </div>`, { cls: 'sec--first' }) +
-      sec(sh('Читать дальше', 'Другие <span class="g">статьи</span>', fb('Все статьи', { href: 'blog.html', cls: 'fb--sm' })) + `<div class="arg">${more.map(x => C.arc(x)).join('')}</div>`) +
+      sec(sh('Читать дальше', 'Другие <span class="g">статьи</span>', fb('Все статьи', { href: 'blog.html', cls: 'fb--sm' })) + `<div class="arg">${more.map(x => C.arc(x, '', true)).join('')}</div>`) +
       cta();
   };
 
@@ -286,6 +287,14 @@
     const L = window.OG_LEGAL(D)[id], other = id === 'politika' ? ['Согласие на&nbsp;обработку данных', 'soglasie.html'] : ['Политика конфиденциальности', 'politika.html'];
     document.title = L.crumb + ' — ОГНЕВЕД';
     after.push(() => {
+      // телефон: содержание документа свёрнуто в строку «Содержание · N разделов», раскрывается касанием —
+      // иначе до текста пришлось бы листать полэкрана пунктов
+      if (U.MOB && U.MOB.matches) {
+        const toc = $('.toc2'), k = $('.side-k', toc);
+        k.setAttribute('role', 'button'); k.tabIndex = 0; k.setAttribute('aria-expanded', 'false'); k.dataset.n = L.secs.length;
+        const flip = () => { const on = !toc.classList.contains('is-open'); toc.classList.toggle('is-open', on); k.setAttribute('aria-expanded', on); };
+        k.addEventListener('click', flip); k.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+      }
       const links = $$('.toc2 a'), hs = links.map(l => $(l.getAttribute('href')));
       const spy = () => { let k = 0; hs.forEach((h, i) => { if (h.getBoundingClientRect().top < innerHeight * .4) k = i; }); links.forEach((l, i) => l.classList.toggle('is-on', i === k)); };
       addEventListener('scroll', spy, { passive: true }); spy();
@@ -343,7 +352,7 @@
             <p class="bkh-p">${b.d}</p>
             ${b.news ? `<p class="bkh-new"><i></i>${b.news}</p>` : ''}
             ${svcs.length ? `<div class="bkh-svc"><p class="side-k">Применяем в&nbsp;услугах</p><div class="tag-links">${svcs.map(s => `<a href="usluga.html?id=${s.id}">${s.cardT}${AR}</a>`).join('')}</div></div>` : ''}
-            <div class="pgh-act">${fb('Скачать PDF', { href: '#', cls: 'fb--red' })}${fb('Задать вопрос по документу', { open: 'form', q: 'Вопрос по документу: ' + b.t })}</div>
+            <div class="pgh-act">${fb('Скачать PDF', { href: b.pdf || '#', blank: !!b.pdf, cls: 'fb--red' })}${fb('Задать вопрос по документу', { open: 'form', q: 'Вопрос по документу: ' + b.t })}</div>
             <p class="bkh-note">Документ приведён для ознакомления. Актуальную редакцию сверяйте с&nbsp;официальным источником.</p>
           </div>
         </div></div></section>` +

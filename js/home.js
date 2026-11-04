@@ -5,14 +5,14 @@
   const pad = n => String(n).padStart(2, '0');
   const AR = '<svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg>';
   const plural = n => { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? 'проект' : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'проекта' : 'проектов'; };
-  const pic = (img, label, cls) => img ? `<img class="${cls}" src="img/${img}" alt="" loading="lazy">` : `<div class="phx ${cls}" data-ph="${label}"></div>`;
+  const pic = (img, label, cls) => img ? `<img class="${cls}" src="img/${img}" alt="" loading="lazy" decoding="async">` : `<div class="phx ${cls}" data-ph="${label}"></div>`;
   const tick = f => (window.OG_TICK = window.OG_TICK || []).push(f);
 
   U.bindForms($('.hero-form'));
 
   // ── клиенты ──
   // бегущая лента: два одинаковых ряда, сдвиг на половину — шов не виден; вторая копия скрыта от чтения с экрана
-  const logos = hide => D.clients.map(l => `<div class="cl-i"${hide ? ' aria-hidden="true"' : ''}><img src="img/${l.img}.webp" alt="${hide ? '' : l.t}" style="height:${(l.h * .82).toFixed(2)}rem" loading="lazy"></div>`).join('');
+  const logos = hide => D.clients.map(l => `<div class="cl-i"${hide ? ' aria-hidden="true"' : ''}><img src="img/${l.img}.webp" alt="${hide ? '' : l.t}" style="height:${(l.h * .82).toFixed(2)}rem" loading="lazy" decoding="async"></div>`).join('');
   $('#clients').innerHTML = `<div class="cl-track">${logos(false)}${logos(true)}</div>`;
   // лента идёт сама и не останавливается; зажатой мышью её можно протянуть в обе стороны, после отпускания — по инерции
   {
@@ -53,7 +53,7 @@
   $('#pros').innerHTML = D.about.pros.map(p => {
     const tx = `<h3>${p.t}</h3><p${p.w ? ` style="max-width:${p.w / 16}rem"` : ''}>${p.d}</p>`;
     if (p.k === 'team') return `<li class="prx-t prx-t--team">${pic(D.about.img, 'Фото · инженер-пожарный · PNG', 'prx-ph')}<div class="prx-b">${tx}</div></li>`;
-    if (p.k === 'consult') return `<li class="prx-t prx-t--consult"><svg class="prx-ln" viewBox="0 0 359 314" preserveAspectRatio="none" aria-hidden="true"><path d="M158.4-5.3 315.4 228.7M315.5-6V228M1 228.5H359"/></svg>
+    if (p.k === 'consult') return `<li class="prx-t prx-t--consult" data-card><svg class="prx-ln" viewBox="0 0 359 314" preserveAspectRatio="none" aria-hidden="true"><path d="M158.4-5.3 315.4 228.7M315.5-6V228M1 228.5H359"/></svg>
       <div class="prx-b">${tx}</div><button class="prx-go" data-open="form" data-q="Бесплатная консультация"><span>Оставить заявку</span>${AR}</button></li>`;
     return `<li class="prx-t prx-t--${p.k}"><div class="prx-a">${PA[p.k] || ''}</div><div class="prx-b">${tx}</div></li>`;
   }).join('');
@@ -67,20 +67,29 @@
   $('#svc').innerHTML = S.map((s, i) => C.sc(s, i, S.length)).join('');
   // белые панели карточек — одной высоты: по самой высокой (двухстрочный заголовок), иначе в ряду они «пляшут»
   C.eqSc($('#svc'));
+  // телефон: карточки лентой, сцена — у карточки на экране
+  C.rail($('#svc')); C.play($('#svc'));
+  const MOB = U.MOB;
 
   // ── объекты: лента едет вбок, пока блок закреплён ──
   const OX = window.OG_OBJ;
-  $('#obj').innerHTML = D.objects.map((o, i) => `<article class="obx rv" style="--i:${Math.min(i, 3)}">
-      <div class="obx-m"><img src="img/o-${o.id}.webp" alt="" loading="lazy"><svg class="ox-fx" viewBox="0 0 ${OX.W} ${OX.H}" aria-hidden="true">${OX[o.id] || ''}</svg></div>
+  $('#obj').innerHTML = D.objects.map((o, i) => `<article class="obx rv" data-card style="--i:${Math.min(i, 3)}">
+      <div class="obx-m"><img src="img/o-${o.id}.webp" alt="" loading="lazy" decoding="async"><svg class="ox-fx" viewBox="0 0 ${OX.W} ${OX.H}" aria-hidden="true">${OX[o.id] || ''}</svg></div>
       <div class="obx-b"><span class="obx-n num">${pad(i + 1)}</span><h3>${o.t}</h3>
         <button class="obx-btn" data-open="form" data-q="Объект: ${o.t}"><span>Получить предложение</span>${AR}</button></div>
     </article>`).join('');
   const ox = $('#objects'), track = $('#obj'), ok = $('#obj-k'), op = $('#obj-p'), cards = $$('.obx', track);
   const wrapW = () => $('.objx-pin .wrap2').offsetWidth;
   let dist = 0;
-  const sizeObj = () => { dist = Math.max(0, track.scrollWidth - innerWidth); ox.style.height = `calc(100vh + ${dist}px)`; };
-  addEventListener('resize', sizeObj); addEventListener('load', sizeObj); sizeObj();
+  // на телефоне блок не закрепляется: лента листается пальцем, номер и полосу ведёт C.rail
+  const sizeObj = () => {
+    if (MOB.matches) { dist = 0; ox.style.height = ''; track.style.transform = ''; return; }
+    dist = Math.max(0, track.scrollWidth - innerWidth); ox.style.height = `calc(100vh + ${dist}px)`;
+  };
+  addEventListener('resize', sizeObj); addEventListener('load', sizeObj); MOB.addEventListener('change', sizeObj); sizeObj();
+  C.rail(track, $('.objx-bar', ox)); C.play(track);
   tick(() => {
+    if (MOB.matches) return;
     const r = ox.getBoundingClientRect(), total = ox.offsetHeight - innerHeight;
     const p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
     track.style.transform = `translate3d(${(-p * dist).toFixed(1)}px,0,0)`;
@@ -104,6 +113,7 @@
   };
   wf.addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; $$('.chip2', wf).forEach(x => x.classList.toggle('is-on', x === b)); showWorks(b.dataset.f); });
   showWorks('all');
+  C.rail(wl);
 
   // ── стоимость: калькулятор по шагам (js/calc.js); в окне «Рассчитать стоимость» — он же ──
   window.OG_CALC($('#calc'));
@@ -124,7 +134,9 @@
   const RATE = 1.15, REST = .04, HOLD0 = .2, HOLD1 = .4;
   let MV = 1, SG = 1;
   const ease = t => .6 * t + .4 * t * t * (3 - 2 * t);
+  // на телефоне стопку собирает сам CSS (position: sticky у каждой карточки), скрипт её не трогает
   const draw = () => {
+    if (MOB.matches) return;
     const u = -run.getBoundingClientRect().top - HOLD0 * innerHeight;
     const p = stc.map((c, j) => j ? ease(Math.min(1, Math.max(0, (u - (j - 1) * SG) / MV))) : 1);
     let k = 0;
@@ -134,6 +146,7 @@
     }
   };
   const fit = () => {
+    if (MOB.matches) { run.style.height = ''; stk.style.removeProperty('--d'); stc.forEach(c => { c.style.removeProperty('--p'); c.style.removeProperty('--k'); }); return; }
     // сцена увеличена zoom — путь считаем в её px, прокрутку на путь — в px экрана
     const z = parseFloat(getComputedStyle(stk).zoom) || 1;
     const top = stk.getBoundingClientRect().top - stk.closest('.stk-pin').getBoundingClientRect().top;
@@ -143,7 +156,7 @@
     run.style.height = `${Math.round(innerHeight + (stc.length - 1) * SG - REST * innerHeight + (HOLD0 + HOLD1) * innerHeight)}px`;
     draw();
   };
-  fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit);
+  fit(); addEventListener('resize', fit); MOB.addEventListener('change', fit); document.fonts && document.fonts.ready.then(fit);
   tick(draw);
 
   // ── статьи: лента сдвигается на карточку; последняя встаёт к правому краю колонки ──
@@ -157,18 +170,21 @@
       stops = [...new Set(cards.map(c => Math.min(c.offsetLeft, room)))];
       k = Math.min(k, stops.length - 1);
     };
+    // на телефоне лента — родная прокрутка пальцем (mobile.css), сдвиг и перетаскивание мышью выключены
     const go = (n, drag = 0) => {
       k = Math.max(0, Math.min(stops.length - 1, n));
-      arx.style.transform = `translate3d(${drag - stops[k]}px, 0, 0)`;
+      arx.style.transform = MOB.matches ? '' : `translate3d(${drag - stops[k]}px, 0, 0)`;
       prev.disabled = k === 0; next.disabled = k === stops.length - 1;
     };
     measure(); go(0);
     addEventListener('resize', () => { measure(); go(k); });
+    MOB.addEventListener('change', () => { measure(); go(0); });
     prev.addEventListener('click', () => go(k - 1));
     next.addEventListener('click', () => go(k + 1));
+    C.rail(arx);
     // перетаскивание: лента идёт за курсором (у крайних карточек — туго), на отпускании — к соседней по направлению
     let sx = null, dx = 0, moved = false;
-    arx.addEventListener('pointerdown', e => { if (e.button) return; sx = e.clientX; dx = 0; moved = false; });
+    arx.addEventListener('pointerdown', e => { if (e.button || MOB.matches) return; sx = e.clientX; dx = 0; moved = false; });
     addEventListener('pointermove', e => {
       if (sx === null) return;
       dx = e.clientX - sx;
@@ -185,7 +201,7 @@
     // горизонтальный жест тачпада: один жест — одна карточка
     let acc = 0, lock = 0;
     arx.addEventListener('wheel', e => {
-      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      if (MOB.matches || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
       e.preventDefault();
       if (performance.now() < lock) return;
       acc += e.deltaX;
@@ -217,6 +233,8 @@
     let on = -1, flash = 0, wait = false;
     const paint = () => {
       wait = false;
+      // на телефоне панели нет (mobile.css) — блоки не меряем на каждом кадре прокрутки
+      if (MOB.matches) return;
       const vh = innerHeight, line = vh * .45, tops = secs.map(s => s.getBoundingClientRect().top);
       let i = 0; tops.forEach((y, k) => { if (y <= line) i = k; });
       const next = tops[i + 1] ?? ftr.getBoundingClientRect().top, part = Math.min(1, Math.max(0, (line - tops[i]) / (next - tops[i] || 1)));
@@ -229,11 +247,12 @@
       on = i;
     };
     const ask = () => { if (!wait) { wait = true; requestAnimationFrame(paint); } };
-    addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); addEventListener('load', ask); ask();
+    addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); addEventListener('load', ask); MOB.addEventListener('change', ask); ask();
   }
 
   // ── библиотека ──
   $('#lib').innerHTML = D.bookCats.map(C.bookCat).join('');
+  C.rail($('#lib'));
 
   // ── вопросы ──
   // под заголовком — «Не нашли ответа?» без подложки: строка и одна кнопка «Связаться»
@@ -259,7 +278,7 @@
     + `<li class="gc gc--acc"><b class="gc-t">Вся Россия</b><span class="gc-s">городов в&nbsp;стране — работаем в&nbsp;любом</span><p class="gc-v"><strong>1100+</strong></p></li>`;
   const fact = D.about.facts[0];
   $('#geo-total').innerHTML = `<strong>${fact.n}</strong><span>${fact.t}</span>`;
-  if (D.geoImg) $('#geo-art').innerHTML = `<img src="img/${D.geoImg}" alt="" loading="lazy">`;
+  if (D.geoImg) $('#geo-art').innerHTML = `<img src="img/${D.geoImg}" alt="" loading="lazy" decoding="async">`;
 
   const lit = i => {
     $$('.rt-on', map).forEach(p => p.classList.toggle('is-on', p.dataset.i === i));
@@ -290,7 +309,8 @@
     geo.classList.toggle('is-live', e.isIntersecting);
     clearInterval(flash);
     // живые вспышки: пока блок на экране, случайный город (чаще — где больше проектов) расходится кольцом
-    if (e.isIntersecting && !matchMedia('(prefers-reduced-motion: reduce)').matches) flash = setInterval(() => {
+    // на телефоне карта после волны стоит: каждая вспышка перерисовывала бы весь силуэт страны
+    if (e.isIntersecting && !MOB.matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) flash = setInterval(() => {
       const g = bag[Math.floor(Math.random() * bag.length)]; if (g.classList.contains('is-ping')) return;
       g.classList.add('is-ping'); setTimeout(() => g.classList.remove('is-ping'), 1700);
     }, 1400);

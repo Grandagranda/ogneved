@@ -179,6 +179,13 @@
         go(next < 0 ? (STEPS.every(x => st.a[x.k] != null) ? LAST : i + 1) : next);
         const f = $('.cx-q.is-on .cx-o.is-sel, .cx-q.is-on .cx-o, .cx-q.is-on input', el);
         f && f.focus({ preventScroll: true });
+        // телефон: варианты идут столбиком, до нижних докручивают — если новый вопрос ушёл выше кадра, возвращаем к верху
+        // калькулятора, где стоит итог (под шапку страницы или к верху листа окна)
+        if (U.MOB && U.MOB.matches) {
+          const q = $('.cx-main', el).getBoundingClientRect().top, cx = $('.cx', el).getBoundingClientRect().top, sc = el.closest('.modal-sc');
+          if (sc) { const d = q - sc.getBoundingClientRect().top; if (d < 0) sc.scrollTo({ top: Math.max(0, sc.scrollTop + cx - sc.getBoundingClientRect().top), behavior: 'smooth' }); }
+          else if (q < 64) scrollTo({ top: scrollY + cx - 72, behavior: 'smooth' });
+        }
       }, 380);
     }
     el.addEventListener('click', e => {

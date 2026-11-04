@@ -10,8 +10,12 @@
   const dn = t => { const n = +String(t).match(/\d+(?!.*\d)/)[0], a = n % 10, b = n % 100;
     return 'раб. ' + (a === 1 && b !== 11 ? 'день' : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'дня' : 'дней'); };
 
+  // фото работ и статей: на телефоне — копия 900 px из img/m (_tools/m/assets.cjs), в строках списка (row) — миниатюра 360 px
+  // из img/m/t; планшет и ПК берут исходный файл
+  const pic = (name, attrs, row) => `<picture><source media="(max-width: 600px)" srcset="img/m/${row ? 't/' : ''}${name}.webp"><img src="img/${name}.webp" ${attrs}></picture>`;
+
   const C = {
-    dn, pad, AR,
+    dn, pad, AR, pic,
     // случайный порядок (Фишер — Йейтс): проекты меняются местами при каждом обновлении страницы
     shuffle: list => { const a = [...list]; for (let i = a.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [a[i], a[k]] = [a[k], a[i]]; } return a; },
     // порядок услуг — как в макете главной (по рядам слева направо)
@@ -19,7 +23,7 @@
 
     // услуга: картинка на всю карточку, белая панель снизу, при наведении — сцена услуги (js/svc-fx.js)
     sc: (s, i, n = 6) => { const FX = window.OG_FX || {}, fx = FX[s.id]; return `<article class="sc" data-fx="${s.id}">
-      <div class="sc-art"><img class="sc-im" src="img/s-${s.id}.webp" alt="" loading="lazy">
+      <div class="sc-art"><img class="sc-im" src="img/s-${s.id}.webp" alt="" loading="lazy" decoding="async">
         ${fx ? `<svg class="sc-fx" viewBox="0 0 ${FX.W} ${FX.H}" aria-hidden="true">${fx}</svg>` : ''}</div>
       <span class="sc-n">${pad(i + 1)} / ${pad(n)}</span><span class="sc-d">${s.days} раб. дней</span>
       <div class="sc-b">
@@ -30,8 +34,9 @@
     </article>`; },
 
     // работа: фото с параллаксом, тип и регион, стоимость и срок, дополнительные услуги
-    wkc: (w, cls = '', st = '') => `<article class="wkc${cls ? ' ' + cls : ''}"${st ? ` style="${st}"` : ''}>
-      <a class="wkc-img" href="rabota.html?id=${w.id}" tabindex="-1"><img src="img/${w.img}.webp" alt="${w.obj}" loading="lazy" data-par></a>
+    // row — карточка идёт строкой в списке страницы (на телефоне — с миниатюрой)
+    wkc: (w, cls = '', st = '', row) => `<article class="wkc${cls ? ' ' + cls : ''}"${st ? ` style="${st}"` : ''}>
+      <a class="wkc-img" href="rabota.html?id=${w.id}" tabindex="-1">${pic(w.img, `alt="${w.obj}" loading="lazy" decoding="async" data-par`, row)}</a>
       <div class="wkc-b">
         <p class="wkc-m"><span>${w.type}</span><span>${w.city}</span></p>
         <h3><a class="cover-link" href="rabota.html?id=${w.id}">${w.obj}</a></h3>
@@ -41,8 +46,8 @@
     </article>`,
 
     // статья: фото с меткой темы, белая панель наплывает на фото, дата и «Читать»
-    arc: (a, cls = '') => `<article class="arc${cls ? ' ' + cls : ''}">
-      <a class="arc-img" href="statya.html?id=${a.id}" tabindex="-1" draggable="false"><img src="img/${a.img}.webp" alt="" loading="lazy" draggable="false"></a>
+    arc: (a, cls = '', row) => `<article class="arc${cls ? ' ' + cls : ''}">
+      <a class="arc-img" href="statya.html?id=${a.id}" tabindex="-1" draggable="false">${pic(a.img, 'alt="" loading="lazy" decoding="async" draggable="false"', row)}</a>
       <span class="arc-tag">${a.tag}</span>
       <div class="arc-b">
         <h3><a class="cover-link" href="statya.html?id=${a.id}" draggable="false">${a.t}</a></h3>
@@ -87,6 +92,38 @@
     const bs = [...box.querySelectorAll('.sc-b')];
     const eq = () => { bs.forEach(b => (b.style.minHeight = '')); const h = Math.max(...bs.map(b => b.offsetHeight)); bs.forEach(b => (b.style.minHeight = h + 'px')); };
     eq(); addEventListener('resize', eq); addEventListener('load', eq); document.fonts && document.fonts.ready.then(eq);
+  };
+
+  // ── телефон: лента карточек листается пальцем (mobile.css — scroll-snap), под ней номер карточки у левого края и полоса
+  //    пройденного. Список перерисовали фильтром — лента встаёт в начало. На ПК лента — обычная сетка, номер не трогаем ──
+  const MOB = window.OG_MQ || matchMedia('not all');
+  C.rail = (box, bar) => {
+    if (!box) return;
+    if (!bar) { bar = document.createElement('div'); bar.className = 'rl-bar m-only'; bar.innerHTML = '<span class="num"></span><i><b></b></i>'; box.after(bar); }
+    const k = bar.querySelector('.num'), p = bar.querySelector('b');
+    let wait = false;
+    const paint = () => {
+      wait = false;
+      const cs = [...box.children]; if (!MOB.matches || !cs.length) return;
+      const x = box.scrollLeft, w = box.clientWidth, sw = box.scrollWidth, pl = parseFloat(getComputedStyle(box).paddingLeft) || 0;
+      // текущая — первая карточка, у которой больше половины правее левого поля ленты
+      const i = Math.max(0, cs.findIndex(c => c.offsetLeft + c.offsetWidth / 2 > x + pl));
+      k.textContent = `${pad(Math.min(i + 1, cs.length))} / ${pad(cs.length)}`;
+      p.style.transform = `scaleX(${sw > w ? Math.min(1, (x + w) / sw).toFixed(4) : 1})`;
+      bar.classList.toggle('is-one', sw <= w + 2);
+    };
+    const ask = () => { if (!wait) { wait = true; requestAnimationFrame(paint); } };
+    box.addEventListener('scroll', ask, { passive: true });
+    addEventListener('resize', ask); MOB.addEventListener('change', ask);
+    new MutationObserver(() => { box.scrollLeft = 0; ask(); }).observe(box, { childList: true });
+    ask();
+  };
+  // сцена карточки без наведения: на телефоне проигрывается у карточки, которая видна на экране почти целиком
+  C.play = box => {
+    if (!box || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('is-play', MOB.matches && e.intersectionRatio >= .68)), { threshold: [0, .68, 1] });
+    const watch = () => [...box.children].forEach(c => io.observe(c));
+    watch(); new MutationObserver(() => { io.disconnect(); watch(); }).observe(box, { childList: true });
   };
 
   // сетка работ из 12 колонок: ряды по 2, 2, 3 карточки по кругу (7/5, 5/7, 4/4/4); одиночный хвост не оставляем —

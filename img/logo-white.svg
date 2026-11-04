@@ -2,8 +2,8 @@
   <title>ОГНЕВЕД</title>
   <defs><clipPath id="og-mw"><path d="M104.4 43.6L153.9 60.6V111.5C153.9 148.7 104.4 172.1 104.4 172.1S54.9 150.1 54.9 111.5V60.5Z"/></clipPath></defs>
   <g transform="translate(-36.2 0)">
-    <path d="M104.4 27.7L166.1 48.9V112.4C166.1 158.8 104.4 188 104.4 188S42.7 160.6 42.7 112.4V48.9Z" stroke="#ffffff" stroke-width="13" stroke-miterlimit="17.5"/>
-    <g clip-path="url(#og-mw)"><path fill="#ffffff" d="M65 100.4L143.8 37.4V69.5L65 132.5Z"/><path fill="#f5312a" d="M65 142.7L143.8 79.7V111.8L65 174.8Z"/></g>
+    <path d="M104.4 31.4L162.6 51.4V112.4C162.6 156.4 104.4 184.1 104.4 184.1S46.2 158.1 46.2 112.4V51.4Z" stroke="#ffffff" stroke-width="20" stroke-miterlimit="17.5"/>
+    <g transform="translate(104.4 107.85) scale(.8586) translate(-104.4 -107.85)"><g clip-path="url(#og-mw)"><path fill="#ffffff" d="M65 101.55L143.8 38.55V68.35L65 131.35Z"/><path fill="#f5312a" d="M65 143.85L143.8 80.85V110.65L65 173.65Z"/></g></g>
   </g>
   <g transform="translate(0 57)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="10">
     <g transform="translate(181.8 0)" stroke="#ffffff" color="#ffffff"><rect x="10" y="10" width="110" height="80" rx="30"/></g>

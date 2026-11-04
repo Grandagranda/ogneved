@@ -89,18 +89,19 @@
   art.insertAdjacentHTML('beforeend', `<svg class="art-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
     ${ids.map((id, i) => `<g class="ly" data-s="${i}">${LAYERS[id]}</g>`).join('')}</svg>`);
 
-  // подписи: [услуга, x, y, текст, сторона, задержка]
+  // подписи: [услуга, x, y, текст, сторона, задержка, pc — только на ПК: на телефоне кадр в четыре раза меньше,
+  // и второстепенная подпись наехала бы на соседнюю]
   const mid = (a, b, n = 20) => [(a[0] + b[0]) / 2 + A[0] * n, (a[1] + b[1]) / 2 + A[1] * n];
   const TAGS = [
     ['opp', ...mid(d0, d1), '5,2 м', 'dim', 0], ['opp', ...mid(d1, d2), '4,2 м', 'dim', 1], ['opp', ...AL_TAG, 'Доступ на 4 этаж', 'r', 2],
     ['dislokaciya', ...at(560, TC), 'ПЧ-12 · 2,4 км · 7 мин', 'c', 0], ['dislokaciya', 1668, 908, 'ПЧ-7 · 3,1 км · 9 мин', 'l', 1],
-    ['ptp', FIRE[0], 292, `${sv(FLAME)}Очаг · 4 этаж`, 'c red', 0], ['ptp', 712, 486, 'Ввод сил по лестнице', 'c', 1], ['ptp', ...AL_TAG, 'Ствол с автолестницы', 'r', 2], ['ptp', 988, 1072, 'РТП · штаб', 'c', 3],
-    ['voda', 566, 1086, 'Резервуар · 80 м³', 'l', 0], ['voda', 566, 950, 'Забор воды · 16 л/с', 'l', 1], ['voda', 826, 906, 'Рукав DN 80', 'l', 2],
-    ['sily', 300, 510, 'АЦ-3,2-40', 'c', 0], ['sily', 1604, 620, 'АЛ-30', 'l', 1], ['sily', NOZ_IN[0], 284, 'Ствол РСКУ-50А · 8 л/с', 'c', 2], ['sily', ...AL_TAG, 'Ствол РСКУ-50А · 8 л/с', 'r', 3],
+    ['ptp', FIRE[0], 292, `${sv(FLAME)}Очаг · 4 этаж`, 'c red', 0], ['ptp', 712, 486, 'Ввод сил по лестнице', 'c pc', 1], ['ptp', ...AL_TAG, 'Ствол с автолестницы', 'r', 2], ['ptp', 988, 1072, 'РТП · штаб', 'c', 3],
+    ['voda', 566, 1086, 'Резервуар · 80 м³', 'l', 0], ['voda', 566, 950, 'Забор воды · 16 л/с', 'l pc', 1], ['voda', 826, 906, 'Рукав DN 80', 'l', 2],
+    ['sily', 300, 510, 'АЦ-3,2-40', 'c', 0], ['sily', 1604, 620, 'АЛ-30', 'l', 1], ['sily', NOZ_IN[0], 284, 'Ствол РСКУ-50А · 8 л/с', 'c', 2], ['sily', ...AL_TAG, 'Ствол РСКУ-50А · 8 л/с', 'r pc', 3],
     ['chislennost', 991, 1072, 'Личный состав · 7 чел.', 'c', 2], ['chislennost', 260, 526, 'Техника · 2 ед.', 'c', 3],
   ];
   art.insertAdjacentHTML('beforeend', `<div class="art-tags" aria-hidden="true">${TAGS.map(([id, x, y, t, a, i]) =>
-    `<span class="tg-t ${a.split(' ').map(k => 'tg-t--' + k).join(' ')}" data-s="${ids.indexOf(id)}" style="${pct(x, y)};--i:${i}${a === 'dim' ? `;--r:${DIM.toFixed(2)}deg` : ''}">${t}</span>`).join('')}</div>`);
+    `<span class="tg-t ${a.split(' ').map(k => 'tg-t--' + k).join(' ')}" data-s="${ids.indexOf(id)}" style="${pct(x, y)};--i:${i}${a.startsWith('dim') ? `;--r:${DIM.toFixed(2)}deg` : ''}">${t}</span>`).join('')}</div>`);
 
   const svg = art.querySelector('.art-svg');
   // сигнал продолжается с рукава на рукав: смещение штриха = путь воды от резервуара (+ насос в машине)
@@ -119,6 +120,11 @@
 
   const root = document.querySelector('.hero'), items = [...plate.querySelectorAll('.pl-i')];
   const layers = [...svg.querySelectorAll('.ly')], tags = [...art.querySelectorAll('.art-tags [data-s]')];
+  // телефон: карточка под роликом — лента услуг; выбранная сама подъезжает к левому краю, пока ленту не трогают пальцем
+  const MOB = window.OG_MQ || matchMedia('not all'), list = plate.querySelector('.pl-list');
+  let touched = 0;
+  list.addEventListener('pointerdown', () => { touched = performance.now(); }, { passive: true });
+  list.addEventListener('scroll', () => { touched = Math.max(touched, performance.now() - 2500); }, { passive: true });
   let cur = -1;
   function show(i) {
     if (i === cur) return;
@@ -126,6 +132,17 @@
     items.forEach((b, k) => { b.classList.toggle('is-on', k === i); b.setAttribute('aria-pressed', k === i); });
     layers.forEach((l, k) => l.classList.toggle('is-on', k === i));
     tags.forEach(t => t.classList.toggle('is-on', +t.dataset.s === i));
+    // телефон: кадр во всю ширину экрана — подпись у края сдвигаем внутрь, чтобы не обрезалась
+    const a = art.getBoundingClientRect();
+    tags.forEach(t => {
+      t.style.marginLeft = ''; if (!MOB.matches || +t.dataset.s !== i) return;
+      const r = t.getBoundingClientRect(), over = r.right - (a.right - 8), under = a.left + 8 - r.left;
+      if (over > 0) t.style.marginLeft = -over + 'px'; else if (under > 0) t.style.marginLeft = under + 'px';
+    });
+    if (MOB.matches && performance.now() - touched > 4000 && list.scrollWidth > list.clientWidth) {
+      const li = items[i].parentElement, pl = parseFloat(getComputedStyle(list).paddingLeft) || 0;
+      list.scrollTo({ left: li.offsetLeft - pl, behavior: 'smooth' });
+    }
   }
   // время показа услуги задаёт линия в карточке: закончилась — следующая
   plate.addEventListener('animationend', e => { if (e.target.classList.contains('pl-bar') && !reduce) show((cur + 1) % ids.length); });
@@ -133,14 +150,24 @@
 
   // вне экрана ролик и сцена стоят
   const video = art.querySelector('.art-video');
+  // экономия трафика (Save-Data, медленная сеть) — ролик не грузим, стоит постер
+  const net = navigator.connection || {}, lean = net.saveData || /(^|-)2g$/.test(net.effectiveType || '');
+  if (lean && !reduce) { video.removeAttribute('autoplay'); video.querySelectorAll('source').forEach(s => s.remove()); video.load(); }
   if (reduce) { video.removeAttribute('autoplay'); video.pause(); }
+  // телефон: источники ролика снял встроенный скрипт в index.html — подключаем их, когда страница загрузилась
+  if (video.ogSrc && !lean && !reduce) {
+    const attach = () => { video.ogSrc.forEach(s => video.append(s)); video.ogSrc = null; video.setAttribute('autoplay', ''); video.load(); if (!root.classList.contains('is-off')) video.play().catch(() => {}); };
+    document.readyState === 'complete' ? setTimeout(attach, 300) : addEventListener('load', () => setTimeout(attach, 300), { once: true });
+  }
   new IntersectionObserver(([e]) => {
     root.classList.toggle('is-off', !e.isIntersecting);
-    if (reduce) return;
+    if (reduce || lean) return;
     if (e.isIntersecting) video.play().catch(() => {}); else video.pause();
   }).observe(root);
 
   let started = false;
   const start = () => { if (started) return; started = true; root.classList.add('is-ready'); setTimeout(() => show(0), reduce ? 0 : 900); };
+  // на телефоне кадр уже стоит постером — пометки не ждут ролика
+  if ('ogSrc' in video) setTimeout(start, 600);
   video.readyState >= 2 ? start() : (video.addEventListener('loadeddata', start, { once: true }), video.addEventListener('error', start, { once: true }), setTimeout(start, 2500));
 })();

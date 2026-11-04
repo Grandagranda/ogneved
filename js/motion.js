@@ -5,10 +5,13 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const ticks = window.OG_TICK = window.OG_TICK || [];
+  // телефон и планшет: родная прокрутка без Lenis, блоки стоят сразу — без появлений и заголовков по словам
+  // (на телефоне они подлагивают), параллакса нет
+  const MOB = window.OG_MQ || matchMedia('not all'), mob = MOB.matches;
 
   // ── инерционная прокрутка ──
   let lenis = null;
-  if (window.Lenis && !reduce) {
+  if (window.Lenis && !reduce && !mob) {
     lenis = new Lenis({ lerp: .09, wheelMultiplier: .9, smoothWheel: true });
     window.OG_LENIS = lenis;
     document.addEventListener('click', e => {
@@ -21,10 +24,14 @@
   // эффекты прокрутки считаем только когда страница сдвинулась (или изменился размер/догрузились картинки) —
   // так выбор услуги наведением не перебивается каждым кадром
   let lastY = -1;
-  const force = () => { lastY = -1; };
+  const run = t => { const y = scrollY; if (y !== lastY) { lastY = y; for (const f of ticks) f(t); } };
+  // с Lenis считаем в его кадре; без него — только когда пришла прокрутка: в покое страница не крутит кадры впустую
+  let kick = () => {};
+  if (lenis) { const loop = t => { lenis.raf(t); run(t); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+  else { let q = false; kick = () => { if (q) return; q = true; requestAnimationFrame(t => { q = false; run(t); }); }; addEventListener('scroll', kick, { passive: true }); kick(); }
+  const force = () => { lastY = -1; kick(); };
   addEventListener('resize', force); addEventListener('load', force);
-  const loop = t => { lenis && lenis.raf(t); const y = scrollY; if (y !== lastY) { lastY = y; for (const f of ticks) f(t); } requestAnimationFrame(loop); };
-  requestAnimationFrame(loop);
+  window.OG_KICK = force;
 
   // ── заголовки: слова поднимаются из маски ──
   const split = el => {
@@ -57,7 +64,12 @@
   const GROUPS = '.nums, .prx, .scx, .wkx, .arx, .lbx, .fqx-list, .gcx, .fx-cols, .pgf, .pgd, .rmt, .fls, .pk-list, .io, .arg, .cnt-l, .wpb-main, .ath, .bkh-r, .sxk-ls';
   const ONE = '.sh .badge, .shc .badge, .fqx-l .badge, .stk-l .badge, .stk-s, .sh-r, .chips2, .more2, .cl-head, .fx-btns, .gbar, .st .badge, .cl-grid, ' +
     '.crb, .pgh-h .badge, .pgh-r, .svh-l > :not(h1), .svh-art, .gnt,.pk-l > :not(h2),  .ctx-l .badge, .ctx-r, .ctx-f, .wph, .sx, .wpb-side, .atc, .toc2, .prose2, .ats, .bkh-v, .cnt-f, .arf';
-  if (!reduce && 'IntersectionObserver' in window) {
+  // карта «Географии» прорисовывает сеть и зажигает города, когда входит в экран — и на телефоне, где появлений нет
+  if ('IntersectionObserver' in window && (reduce || mob)) {
+    const lit = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { lit.unobserve(e.target); e.target.classList.add('is-lit'); } }), { threshold: .2 });
+    $$('.gst-map').forEach(el => lit.observe(el));
+  }
+  if (!reduce && !mob && 'IntersectionObserver' in window) {
     document.documentElement.classList.add('js-rv');
     $$(GROUPS).forEach(g => [...g.children].forEach((c, i) => { if (c.matches('h1')) return; c.classList.add('rv'); if (!c.style.getPropertyValue('--i')) c.style.setProperty('--i', Math.min(i, 7)); }));
     $$(ONE).forEach(el => el.classList.add('rv'));
@@ -150,11 +162,14 @@
     if (reduce) words.forEach(w => (w.style.color = 'rgb(15,16,18)')); else ticks.push(fill);
   }
 
-  // ── параллакс фото в карточках работ ──
+  // ── параллакс фото в карточках работ (на телефоне его нет) ──
   if (!reduce) ticks.push(() => {
+    if (MOB.matches) return;
     const vh = innerHeight;
     $$('[data-par]').forEach(img => {
-      const r = img.parentElement.getBoundingClientRect();
+      // у фото в <picture> (display: contents) своей рамки нет — меряем рамку вокруг
+      const box = img.parentElement.tagName === 'PICTURE' ? img.parentElement.parentElement : img.parentElement;
+      const r = box.getBoundingClientRect();
       if (r.bottom < -50 || r.top > vh + 50) return;
       const k = ((r.top + r.height / 2) - vh / 2) / vh;
       img.style.setProperty('--py', (k * -6).toFixed(2) + '%');
