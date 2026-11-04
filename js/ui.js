@@ -347,4 +347,11 @@
 
   window.OG_UI = { $, $$, ICO, AR_UP, formHTML, formRow, bindForms, calc, msgBlock, qr, MOB };
   header(); footer(); modals();
+  // ленивые картинки — за экран до блока, а не у самого края: в лентах (объекты, статьи, ленты телефона) карточки стоят
+  // за правым краем окна, и браузер сам начинает их грузить, только когда карточка почти выехала. Качество то же, меняется только момент
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target); $$('img[loading="lazy"]', e.target).forEach(i => { i.loading = 'eager'; }); }), { rootMargin: '100% 0px' });
+    const watch = () => $$('main section').forEach(s => io.observe(s));
+    document.readyState === 'complete' ? watch() : addEventListener('load', watch, { once: true });
+  }
 })();

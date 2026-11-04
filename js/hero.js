@@ -154,20 +154,23 @@
   const net = navigator.connection || {}, lean = net.saveData || /(^|-)2g$/.test(net.effectiveType || '');
   if (lean && !reduce) { video.removeAttribute('autoplay'); video.querySelectorAll('source').forEach(s => s.remove()); video.load(); }
   if (reduce) { video.removeAttribute('autoplay'); video.pause(); }
-  // телефон: источники ролика снял встроенный скрипт в index.html — подключаем их, когда страница загрузилась
+  // источники ролика снял встроенный скрипт в index.html — подключаем их, когда страница загрузилась
   if (video.ogSrc && !lean && !reduce) {
-    const attach = () => { video.ogSrc.forEach(s => video.append(s)); video.ogSrc = null; video.setAttribute('autoplay', ''); video.load(); if (!root.classList.contains('is-off')) video.play().catch(() => {}); };
+    // если к этому времени первый экран уже ушёл из кадра — ролик ждёт возвращения наверх и не отнимает канал у картинок ниже
+    const attach = () => { if (!video.ogSrc) return; if (root.classList.contains('is-off')) return void (video.ogWait = true); video.ogSrc.forEach(s => video.append(s)); video.ogSrc = null; video.ogWait = false; video.setAttribute('autoplay', ''); video.load(); video.play().catch(() => {}); };
+    video.ogAttach = attach;
     document.readyState === 'complete' ? setTimeout(attach, 300) : addEventListener('load', () => setTimeout(attach, 300), { once: true });
   }
   new IntersectionObserver(([e]) => {
     root.classList.toggle('is-off', !e.isIntersecting);
     if (reduce || lean) return;
+    if (e.isIntersecting && video.ogWait) video.ogAttach();
     if (e.isIntersecting) video.play().catch(() => {}); else video.pause();
   }).observe(root);
 
   let started = false;
   const start = () => { if (started) return; started = true; root.classList.add('is-ready'); setTimeout(() => show(0), reduce ? 0 : 900); };
-  // на телефоне кадр уже стоит постером — пометки не ждут ролика
+  // кадр уже стоит постером — пометки не ждут ролика
   if ('ogSrc' in video) setTimeout(start, 600);
   video.readyState >= 2 ? start() : (video.addEventListener('loadeddata', start, { once: true }), video.addEventListener('error', start, { once: true }), setTimeout(start, 2500));
 })();
