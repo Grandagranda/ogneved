@@ -108,13 +108,15 @@
   const work = (w, i) => C.wkc(w, 'wkc--' + i);
   wf.innerHTML = [['all', 'Все проекты'], ...used.map(s => [s.id, s.short])].map(([v, t], i) => `<button class="chip2${i ? '' : ' is-on'}" data-f="${v}">${t}</button>`).join('');
   const showWorks = v => {
-    const list = WK.filter(w => v === 'all' || w.s === v).slice(0, 4);
+    // на телефоне — все проекты лентой (фильтра там нет), на ПК — 4 в асимметричной сетке
+    const list = WK.filter(w => v === 'all' || w.s === v).slice(0, MOB.matches ? undefined : 4);
     wl.classList.add('is-swap');
     setTimeout(() => { wl.innerHTML = list.map(work).join(''); wl.classList.remove('is-swap'); }, wl.children.length ? 260 : 0);
   };
   wf.addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; $$('.chip2', wf).forEach(x => x.classList.toggle('is-on', x === b)); showWorks(b.dataset.f); });
   showWorks('all');
   C.rail(wl);
+  MOB.addEventListener('change', () => { const b = $('.chip2.is-on', wf); showWorks(MOB.matches ? 'all' : b ? b.dataset.f : 'all'); if (MOB.matches) $$('.chip2', wf).forEach((x, i) => x.classList.toggle('is-on', !i)); });
 
   // ── стоимость: калькулятор по шагам (js/calc.js); в окне «Рассчитать стоимость» — он же ──
   window.OG_CALC($('#calc'));

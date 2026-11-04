@@ -43,8 +43,9 @@ main.frame, .ftr { overflow-x: clip; }
 .objx-pin .sh-r p { white-space: normal; }
 .fb { height: 3.25rem; padding: 0 2.25rem; }
 .fb--sm { height: 2.75rem; padding: 0 2rem; }
-/* крестики на стыках — у линий рамки телефона */
-.sec::after { top: -.34375rem; }
+/* рамка-чертёж на телефоне не нужна (просьба 04.11): ни боковых линий, ни крестиков — линия стыка блоков во всю ширину */
+.frame::before, .frame::after, .sec::after, .ftr--dark::before, .mm::before, .mm::after { display: none; }
+.sec::before, .objx::before { left: 0; right: 0; }
 
 /* лента карточек: выходит за колонку к краям экрана, первая карточка — по линии колонки, следующая выглядывает.
    Ширина карточки — в % от ленты (её внутренняя ширина = колонка). Формула 100vw − 2·var(--rail) во встроенном браузере
@@ -98,8 +99,8 @@ html.is-mm, html.is-mm body { overflow: hidden; }
 .mm.is-open .mm-in > :nth-child(2) { transition-delay: .06s; }
 .mm.is-open .mm-in > :nth-child(3) { transition-delay: .12s; }
 .mm-nav { border-top: 1px solid var(--ln-2); }
-.mm-a { position: relative; display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; align-items: center; min-height: 3.5rem; border-bottom: 1px solid var(--ln-2); }
-.mm-a .num { font-style: normal; font-size: .75rem; color: var(--grey); }
+.mm-a { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; min-height: 3.5rem; border-bottom: 1px solid var(--ln-2); }
+.mm-a .num { display: none; }
 .mm-a b { font-size: 1.375rem; line-height: 1.1; font-weight: 500; letter-spacing: -.025em; }
 .mm-a .fb-ar { position: static; margin-right: .25rem; }
 .mm-a.is-on .num, .mm-a.is-on b { color: var(--red); }
@@ -258,6 +259,8 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .sc-art { position: relative; inset: auto; flex: none; aspect-ratio: 459 / 518; margin-bottom: calc(-218 / 459 * 100%); }
 .sc-b { position: relative; left: auto; right: auto; bottom: auto; flex: 1; min-height: 0; margin: -2.25rem .3125rem .3125rem; padding: 1.25rem 1.125rem 1rem; background: rgba(255, 255, 255, .96); -webkit-backdrop-filter: none; backdrop-filter: none; }
 .sc h3 { font-size: 1.1875rem; }
+/* срок «5–10 раб. дней» на картинке услуги на телефоне не показываем (просьба 04.11) */
+.sc-d { display: none; }
 .sc-b > p { margin: .625rem 0 1rem; font-size: .875rem; }
 .sc-p b { font-size: 1.25rem; }
 .sc-f { padding-top: .875rem; }
@@ -303,6 +306,8 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .objx-bar { width: var(--cw); margin: .375rem auto 0; }
 
 /* ── 05 · наши работы: фильтр строкой, карточки лентой ── */
+/* фильтр работ (главная, «Наши работы») на телефоне не нужен: тип работы и так подписан на карточке. У статей и библиотеки фильтр остаётся */
+#works-f, #wf { display: none; }
 .chips2 { flex-wrap: nowrap; overflow-x: auto; gap: .375rem; margin: 0 calc(var(--rail) * -1) 1.25rem; padding: 0 var(--rail); scrollbar-width: none; }
 .chips2::-webkit-scrollbar { display: none; }
 .chip2 { flex: none; height: 2.5rem; padding: 0 1rem; white-space: nowrap; }
@@ -349,10 +354,14 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .cx-opts[style*="--c:4"] .cx-o { gap: .625rem; min-height: 6rem; padding: .75rem; }
 .cx-opts[style*="--c:4"] .cx-ot b { font-size: .875rem; }
 .cx-o--plan, .cx-o--blk { gap: .75rem; min-height: 5.5rem; padding: .75rem; }
-.cx-opts:not([style*="--c:5"]) .cx-o--blk { grid-template-columns: 3.25rem minmax(0, 1fr); align-items: center; min-height: 3.75rem; }
+.cx-opts:not([style*="--c:5"]) .cx-o--blk { grid-template-columns: 3.875rem minmax(0, 1fr); align-items: center; min-height: 3.75rem; }
+.cx-opts:not([style*="--c:5"]) .cx-bl { gap: .1875rem; height: 1.75rem; }
+.cx-opts:not([style*="--c:5"]) .cx-bl i { width: .625rem; height: 1.125rem; }
+.cx-opts:not([style*="--c:5"]) .cx-bl i:nth-child(2n) { height: 1.75rem; }
+.cx-opts:not([style*="--c:5"]) .cx-bl i:nth-child(3n) { height: .875rem; }
 .cx-o--plan .cx-ot b { font-size: 1.0625rem; }
 .cx-pl { width: 2.25rem; height: 2.25rem; }
-.cx-bl { height: 1.75rem; }
+
 .cx-o--plan .cx-ck, .cx-o--blk .cx-ck, .cx-opts[style*="--c:4"] .cx-ck { top: .75rem; right: .75rem; }
 .cx-opts:not([style*="--c:5"]) .cx-o--blk .cx-ck { top: 50%; margin-top: -.5625rem; }
 .cx-next { grid-template-columns: minmax(0, 1fr); gap: .375rem; margin-top: 1.125rem; }
@@ -534,7 +543,8 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 
 /* страница услуги: картинка карточки крупно над заголовком */
 .svh-art { order: -1; }
-.svh-art.sc { display: block; aspect-ratio: 459 / 290; }
+.svh-art.sc { display: block; aspect-ratio: 459 / 290; box-shadow: none; }
+.svh-l .h1x { font-size: clamp(1.75rem, 7.6vw, 2.75rem); line-height: 1; }
 .svh-art .sc-art { position: absolute; inset: 0 0 auto 0; margin: 0; }
 .svh-doc { margin-top: 1.25rem; font-size: 1.0625rem; }
 .svh-p { margin-top: 1rem; font-size: .9375rem; }
@@ -574,8 +584,8 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .io-nr { padding-top: 1.25rem; margin-top: 1.5rem; }
 .io-chips > * { height: 2.5rem; }
 /* сетки работ и статей на страницах — столбиком */
-.pg .wkx { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; min-height: 0; }
-.pg .wkx > .wkc, .pg .wkc[style] { grid-column: auto !important; }
+.pg .wkx { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; min-height: 0; margin: 0; padding: 0; overflow: visible; scroll-snap-type: none; }
+.pg .wkx > .wkc, .pg .wkc[style] { grid-column: auto !important; width: auto; }
 .pg .wkc[style*="span 4"] .wkc-img, .pg .wkc[style*="span 12"] .wkc-img { height: clamp(12.5rem, 56vw, 19rem); }
 .pg .chips2 { margin-bottom: 1.25rem; }
 
