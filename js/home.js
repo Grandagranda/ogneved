@@ -52,7 +52,8 @@
   const PA = window.OG_PROS || {};
   $('#pros').innerHTML = D.about.pros.map(p => {
     const tx = `<h3>${p.t}</h3><p${p.w ? ` style="max-width:${p.w / 16}rem"` : ''}>${p.d}</p>`;
-    if (p.k === 'team') return `<li class="prx-t prx-t--team">${pic(D.about.img, 'Фото · инженер-пожарный · PNG', 'prx-ph')}<div class="prx-b">${tx}</div></li>`;
+    // на телефоне плитка во всю колонку — фото крупнее ПК-версии (img/m/, _tools/m/about-team-m.cjs), иначе при DPR 3 мылится
+    if (p.k === 'team') return `<li class="prx-t prx-t--team">${D.about.img ? `<picture><source media="(max-width: 600px)" srcset="img/m/${D.about.img}">${pic(D.about.img, '', 'prx-ph')}</picture>` : pic('', 'Фото · инженер-пожарный · PNG', 'prx-ph')}<div class="prx-b">${tx}</div></li>`;
     if (p.k === 'consult') return `<li class="prx-t prx-t--consult" data-card><svg class="prx-ln" viewBox="0 0 359 314" preserveAspectRatio="none" aria-hidden="true"><path d="M158.4-5.3 315.4 228.7M315.5-6V228M1 228.5H359"/></svg>
       <div class="prx-b">${tx}</div><button class="prx-go" data-open="form" data-q="Бесплатная консультация"><span>Оставить заявку</span>${AR}</button></li>`;
     return `<li class="prx-t prx-t--${p.k}"><div class="prx-a">${PA[p.k] || ''}</div><div class="prx-b">${tx}</div></li>`;
@@ -305,9 +306,31 @@
   const geo = $('#geo');
   const cities = $$('.city', map), bag = cities.flatMap((g, i) => Array(1 + Math.round(Math.sqrt(C0[i][3]))).fill(g)).concat($$('.cov', map));
   let flash = 0;
+  // телефон: навести там некому — маршруты «летают» сами: из Москвы к городу пробегает короткий красный штрих, у города
+  // расходится кольцо. По одному раз в 2,4 с, чаще — туда, где больше проектов. Штрихи — отдельным слоем поверх карты
+  // (.map-fly, свой слой композиции в mobile.css): перерисовывается только он, а не весь силуэт страны
+  let fly = null, flyT = 0, flyLast = null;
+  const flyBag = cities.slice(1).flatMap(g => Array(1 + Math.round(Math.sqrt(C0[g.dataset.i][3]))).fill(g.dataset.i));
+  const flyFit = () => { if (fly && fly.clientWidth) fly.style.setProperty('--sw', (2.2 * fly.viewBox.baseVal.width / fly.clientWidth).toFixed(2)); };
+  const flyOne = () => {
+    if (!MOB.matches || document.hidden) return;
+    if (!fly) {
+      fly = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      fly.setAttribute('viewBox', $('.map-svg', map).getAttribute('viewBox')); fly.setAttribute('class', 'map-fly'); fly.setAttribute('aria-hidden', 'true');
+      fly.setAttribute('style', 'position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none');
+      fly.innerHTML = $$('.rt-on', map).map(p => `<path class="fly" data-i="${p.dataset.i}" d="${p.getAttribute('d')}" pathLength="1" fill="none"/>`).join('');
+      map.append(fly); flyFit(); addEventListener('resize', flyFit);
+    }
+    let i; do i = flyBag[Math.floor(Math.random() * flyBag.length)]; while (i === flyLast && new Set(flyBag).size > 1);
+    flyLast = i;
+    const p = $(`.fly[data-i="${i}"]`, fly), g = $(`.city[data-i="${i}"]`, map);
+    p.classList.remove('is-go'); void p.getBoundingClientRect(); p.classList.add('is-go');
+    setTimeout(() => { g.classList.add('is-ping'); setTimeout(() => g.classList.remove('is-ping'), 1700); }, 1250);
+  };
   new IntersectionObserver(([e]) => {
     geo.classList.toggle('is-live', e.isIntersecting);
-    clearInterval(flash);
+    clearInterval(flash); clearInterval(flyT);
+    if (e.isIntersecting && MOB.matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) flyT = setInterval(flyOne, 2400);
     // живые вспышки: пока блок на экране, случайный город (чаще — где больше проектов) расходится кольцом
     // на телефоне карта после волны стоит: каждая вспышка перерисовывала бы весь силуэт страны
     if (e.isIntersecting && !MOB.matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) flash = setInterval(() => {

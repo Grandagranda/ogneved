@@ -46,7 +46,9 @@ main.frame, .ftr { overflow-x: clip; }
 /* крестики на стыках — у линий рамки телефона */
 .sec::after { top: -.34375rem; }
 
-/* лента карточек: выходит за колонку к краям экрана, первая карточка — по линии колонки, следующая выглядывает */
+/* лента карточек: выходит за колонку к краям экрана, первая карточка — по линии колонки, следующая выглядывает.
+   Ширина карточки — в % от ленты (её внутренняя ширина = колонка). Формула 100vw − 2·var(--rail) во встроенном браузере
+   Telegram на Android давала карточкам нулевую ширину: услуги пропадали, объекты, работы и статьи слипались в столбики */
 .rail-x, .scx, .objx-track, .home .wkx, .arx, #lib.lbx {
   display: flex; gap: .625rem; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding-inline: var(--rail);
   padding: .25rem var(--rail) 1rem; margin-inline: calc(var(--rail) * -1); overscroll-behavior-x: contain; scrollbar-width: none;
@@ -211,8 +213,9 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .tg-t--red { padding: .1875rem .375rem; font-size: .5625rem; }
 .tg-t--red svg { width: .625rem; height: .625rem; }
 /* карточка «Наши работы на объекте» — лента услуг под роликом: выбранная тёмная, снизу красная линия-таймер */
-.plate { position: relative; right: auto; top: auto; width: 100vw; margin: .25rem calc(var(--rail) * -1) 0; padding: 0; border-radius: 0; background: none; box-shadow: none; }
-.pl-hd { height: auto; padding: 0 var(--rail) .625rem; border: 0; font-size: .625rem; }
+.plate { position: relative; right: auto; top: auto; display: flex; flex-direction: column; width: 100vw; margin: .25rem calc(var(--rail) * -1) 0; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+/* подпись «Наши работы на объекте» — под лентой (макет пользователя 2136:2) */
+.pl-hd { order: 1; height: auto; padding: .5rem var(--rail) 0; border: 0; font-size: .625rem; }
 .pl-list { display: flex; gap: .375rem; overflow-x: auto; padding: 0 var(--rail) .25rem; scroll-padding-inline: var(--rail); scrollbar-width: none; overscroll-behavior-x: contain; }
 .pl-list::-webkit-scrollbar { display: none; }
 .pl-list li { flex: none; }
@@ -224,6 +227,11 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .pl-n { width: auto; }
 .pl-i.is-on .pl-n { color: var(--red); }
 .pl-bar { bottom: 0; height: 2px; }
+/* телефон: кадр крупнее экрана и чуть обрезан по бокам — 538 × 360 при 390 (x −70), лента услуг вплотную под ним (макет 2136:2) */
+@media (max-width: 599px) and (orientation: portrait) {
+  .hero-art { width: 137.95vw; max-width: none; margin: 1.5rem 0 0 calc(var(--rail) * -1 - 17.95vw); }
+  .plate { margin-top: -.1875rem; }
+}
 /* форма — карточкой, заходит на низ первого экрана */
 .hero-form-w { width: var(--cw); margin: -2rem auto 0; }
 .hero-form { height: auto; padding: 1.5rem 1.25rem 1.25rem; box-shadow: var(--sh-card); }
@@ -239,13 +247,13 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .cl-head { flex-direction: column; align-items: flex-start; gap: .625rem; }
 .cl-note { font-size: .875rem; line-height: 1.4; }
 .cl-grid { margin-top: 1.5rem; }
-.cl-i { width: calc(100cqw / 3); height: 5.5rem; padding: 0 .75rem; }
-.cl-i img, .cl-i:hover img { opacity: .5; transform: scale(.7); }
+.cl-i { width: calc(100cqw / 2.25); height: 7.5rem; padding: 0 1rem; }
+.cl-i img, .cl-i:hover img { opacity: .5; transform: none; }
 
 /* ── 02 · услуги: лента карточек; картинка — верх 459 × 300, белая панель наплывает на неё снизу ── */
 #services { padding-top: var(--sec); }
 #services .sh { margin-bottom: 1.5rem; }
-.scx > .sc { width: min(20rem, 100vw - 2 * var(--rail) - 2.5rem); }
+.scx > .sc { flex: none; width: min(20rem, 100% - 2.5rem); }
 .sc { display: flex; flex-direction: column; aspect-ratio: auto; background: var(--tint-2); }
 .sc-art { position: relative; inset: auto; flex: none; aspect-ratio: 459 / 518; margin-bottom: calc(-218 / 459 * 100%); }
 .sc-b { position: relative; left: auto; right: auto; bottom: auto; flex: 1; min-height: 0; margin: -2.25rem .3125rem .3125rem; padding: 1.25rem 1.125rem 1rem; background: rgba(255, 255, 255, .96); -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -272,6 +280,8 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .prx-t:hover { transform: none; box-shadow: none; }
 .prx-t--team { grid-column: 1 / -1 !important; min-height: clamp(22rem, 110vw, 30rem); padding: .375rem; }
 .prx-t--team .prx-b { padding: 1.125rem 1rem 1.125rem; }
+/* телефон: фото крупнее (img/m/about-team.webp) и обрезано по центру, как заливка в Figma, — шлем целиком над панелью */
+@media (max-width: 599px) { .prx-t--team .prx-ph { object-position: 50% 50%; } }
 .prx-t--team .prx-b p { margin-top: .5rem; }
 .prx-t--consult { grid-column: 1 / -1 !important; min-height: 0; padding: 1.25rem 1rem 1rem; }
 .prx-t--consult h3 { max-width: 14rem; font-size: 1.375rem; }
@@ -285,7 +295,7 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .objx-pin { position: relative; height: auto; display: block; overflow: visible; padding: var(--sec) 0; }
 .objx-pin .sh { margin-bottom: 1.5rem; }
 .objx-track { width: auto; padding-top: .25rem; transform: none !important; will-change: auto; }
-.obx { width: min(17.5rem, 100vw - 2 * var(--rail) - 3.5rem); }
+.obx { flex: none; width: min(17.5rem, 100% - 3.5rem); }
 .obx:hover { transform: none; background: var(--tint); box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .04); }
 .obx-b { padding: 1rem .75rem .625rem; }
 .obx h3 { margin-top: .375rem; font-size: 1.25rem; }
@@ -296,7 +306,7 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .chips2 { flex-wrap: nowrap; overflow-x: auto; gap: .375rem; margin: 0 calc(var(--rail) * -1) 1.25rem; padding: 0 var(--rail); scrollbar-width: none; }
 .chips2::-webkit-scrollbar { display: none; }
 .chip2 { flex: none; height: 2.5rem; padding: 0 1rem; white-space: nowrap; }
-.home .wkx > .wkc { grid-column: auto; width: min(20rem, 100vw - 2 * var(--rail) - 2.5rem); }
+.home .wkx > .wkc { grid-column: auto; flex: none; width: min(20rem, 100% - 2.5rem); }
 .wkc:hover { transform: none; box-shadow: none; }
 .wkc-img { height: clamp(12.5rem, 56vw, 17rem); }
 .wkc-b { padding: 1.125rem .75rem .75rem; }
@@ -324,6 +334,7 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .cx-stage { display: block; }
 .cx-q { display: none; transform: none; transition: none; }
 .cx-q.is-on { display: block; animation: rv-in .45s var(--e-out) both; }
+.cx-k { font-size: .6875rem; font-weight: 600; }
 .cx-t { margin-top: .625rem; font-size: 1.375rem; }
 .cx-h { font-size: .875rem; }
 .cx-opts, .cx-opts[style*="--c:4"], .cx-opts[style*="--c:5"], .cx-opts[style*="--c:3"] { grid-template-columns: minmax(0, 1fr); gap: .375rem; margin-top: 1.125rem; }
@@ -369,6 +380,7 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .stk-c::after { display: none; }
 .stk-b { padding: .875rem .75rem .875rem; }
 .stk-b::before { top: 3.1rem; left: 0; }
+.home .stk-k { font-size: .6875rem; font-weight: 600; }
 .stk-c h3 { margin-top: 1.625rem; font-size: 1.3125rem; line-height: 1.1; }
 .stk-c p { max-width: none; margin-top: .625rem; font-size: .875rem; }
 .stk-m { width: 100%; height: auto; aspect-ratio: 398 / 260; }
@@ -384,13 +396,21 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 /* карта загорается один раз волной; бесконечные «дыхание» и пульс перерисовывали бы весь силуэт страны каждый кадр */
 #geo.is-live .gst-map.is-lit .c-glow, #geo.is-live .c-ping { animation: none; }
 #geo.is-live .c-ping { opacity: 0; }
+/* маршруты летают сами (home.js, flyOne): короткий красный штрих из Москвы к городу; слой поверх карты — свой слой композиции */
+.map-fly { z-index: 1; will-change: transform; }
+.map-fly .fly { stroke: var(--red); stroke-width: var(--sw, 8); stroke-linecap: round; stroke-dasharray: .14 1.3; stroke-dashoffset: .14; opacity: 0; }
+.map-fly .fly.is-go { animation: m-fly 1.6s cubic-bezier(.45, 0, .3, 1) both; }
+@keyframes m-fly { 0% { stroke-dashoffset: .14; opacity: 0; } 14% { opacity: 1; } 80% { opacity: 1; } 100% { stroke-dashoffset: -1; opacity: 0; } }
 .gst-r { position: relative; right: auto; top: auto; width: auto; margin-top: 1.5rem; }
 .gcx { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
 .gc { min-height: 8.25rem; padding: 1rem 1rem .875rem; box-shadow: 0 1rem 2rem -1.25rem rgba(144, 158, 213, .5); }
 .gc:hover, .gc.is-on { transform: none; }
 .gc-t { font-size: .9375rem; }
 .gc-v strong { font-size: 2.25rem; }
-.gbar { flex-wrap: wrap; gap: .75rem 1rem; padding: 1rem 1.125rem; }
+.gbar { flex-wrap: wrap; align-items: flex-start; gap: .75rem .625rem; padding: 1rem 1.125rem; }
+/* галочка — высотой в строку описания и на уровне первой строки, а не посередине абзаца */
+.gbar-i { width: 1.125rem; height: 1.125rem; }
+.gbar-i svg { width: .875rem; height: .875rem; stroke-width: 2.2; }
 .gbar p { flex: 1 1 12rem; font-size: .8125rem; }
 .gbar b { justify-items: start; }
 .map-tip { min-width: 10rem; padding: .75rem .875rem; }
@@ -419,7 +439,7 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .arn { display: none; }
 .arv { overflow: visible; padding: 0; margin: 0; }
 .arx { width: auto; cursor: auto; user-select: auto; transform: none !important; transition: none; }
-.arx > .arc, .arg .arc { width: min(19.5rem, 100vw - 2 * var(--rail) - 2.5rem); height: auto; min-height: 0; }
+.arx > .arc, .arg .arc { flex: none; width: min(19.5rem, 100% - 2.5rem); height: auto; min-height: 0; }
 .arc:hover { transform: none; box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .07); }
 .arc-img { height: clamp(11rem, 48vw, 15rem); }
 .arc-tag { left: 1rem; top: 1rem; }
@@ -702,9 +722,9 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 
 /* ════════ планшет: колонка 46rem, ленты по две карточки ════════ */
 @media (min-width: 600px) {
-  .scx > .sc, .home .wkx > .wkc, .arx > .arc { width: calc((var(--cw) - .625rem) / 2 - 1rem); }
-  .obx { width: calc((var(--cw) - 1.25rem) / 3 + 1rem); }
-  #lib.lbx > .folder { width: calc((var(--cw) - 1.875rem) / 4); }
+  .scx > .sc, .home .wkx > .wkc, .arx > .arc { width: calc((100% - .625rem) / 2 - 1rem); }
+  .obx { width: calc((100% - 1.25rem) / 3 + 1rem); }
+  #lib.lbx > .folder { width: calc((100% - 1.875rem) / 4); }
   /* бенто как на ПК: фото на три строки слева, справа плитки по две, внизу красная */
   .prx { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .prx-t--team { grid-area: 1 / 1 / 4 / 2 !important; min-height: 0; }
