@@ -126,19 +126,25 @@
   list.addEventListener('pointerdown', () => { touched = performance.now(); }, { passive: true });
   list.addEventListener('scroll', () => { touched = Math.max(touched, performance.now() - 2500); }, { passive: true });
   let cur = -1;
+  // телефон: кадр шире экрана и обрезан по бокам — подпись у края сдвигаем внутрь видимой части, чтобы читалась целиком
+  // (сама точка на картинке может уйти за край). Положение — конечное, по раскладке, а не по кадру проявления
+  const keepIn = i => {
+    const a = art.getBoundingClientRect(), vl = Math.max(a.left, 0) + 10, vr = Math.min(a.right, document.documentElement.clientWidth) - 10;
+    tags.forEach(t => {
+      t.style.marginLeft = ''; if (!MOB.matches || +t.dataset.s !== i) return;
+      const w = t.offsetWidth, c = t.classList, dx = c.contains('tg-t--l') ? 6 : c.contains('tg-t--r') ? -w - 6 : -w / 2;
+      const L = t.offsetParent.getBoundingClientRect().left + t.offsetLeft + dx, over = L + w - vr, under = vl - L;
+      if (over > 0) t.style.marginLeft = -over + 'px'; else if (under > 0) t.style.marginLeft = under + 'px';
+    });
+  };
+  addEventListener('resize', () => cur >= 0 && keepIn(cur));
   function show(i) {
     if (i === cur) return;
     cur = i;
     items.forEach((b, k) => { b.classList.toggle('is-on', k === i); b.setAttribute('aria-pressed', k === i); });
     layers.forEach((l, k) => l.classList.toggle('is-on', k === i));
     tags.forEach(t => t.classList.toggle('is-on', +t.dataset.s === i));
-    // телефон: кадр во всю ширину экрана — подпись у края сдвигаем внутрь, чтобы не обрезалась
-    const a = art.getBoundingClientRect();
-    tags.forEach(t => {
-      t.style.marginLeft = ''; if (!MOB.matches || +t.dataset.s !== i) return;
-      const r = t.getBoundingClientRect(), over = r.right - (a.right - 8), under = a.left + 8 - r.left;
-      if (over > 0) t.style.marginLeft = -over + 'px'; else if (under > 0) t.style.marginLeft = under + 'px';
-    });
+    keepIn(i);
     if (MOB.matches && performance.now() - touched > 4000 && list.scrollWidth > list.clientWidth) {
       const li = items[i].parentElement, pl = parseFloat(getComputedStyle(list).paddingLeft) || 0;
       list.scrollTo({ left: li.offsetLeft - pl, behavior: 'smooth' });

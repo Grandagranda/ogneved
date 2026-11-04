@@ -254,10 +254,13 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 /* ── 02 · услуги: лента карточек; картинка — верх 459 × 300, белая панель наплывает на неё снизу ── */
 #services { padding-top: var(--sec); }
 #services .sh { margin-bottom: 1.5rem; }
-.scx > .sc { flex: none; width: min(20rem, 100% - 2.5rem); }
+.scx > .sc { flex: none; width: min(24rem, 100% - 1.75rem); }
 .sc { display: flex; flex-direction: column; aspect-ratio: auto; background: var(--tint-2); }
 .sc-art { position: relative; inset: auto; flex: none; aspect-ratio: 459 / 518; margin-bottom: calc(-218 / 459 * 100%); }
 .sc-b { position: relative; left: auto; right: auto; bottom: auto; flex: 1; min-height: 0; margin: -2.25rem .3125rem .3125rem; padding: 1.25rem 1.125rem 1rem; background: rgba(255, 255, 255, .96); -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* иллюстрация крупнее (просьба 04.11): кадр приближен от верха, сцена услуги (.sc-fx) внутри .sc-art едет вместе с ним */
+.sc:not(.svh-art) .sc-art { transform: scale(1.12); transform-origin: 50% 12%; }
+:is(.sc:hover, .sc.is-play):not(.svh-art) .sc-art { transform: scale(1.15); }
 .sc h3 { font-size: 1.1875rem; }
 /* срок «5–10 раб. дней» на картинке услуги на телефоне не показываем (просьба 04.11) */
 .sc-d { display: none; }
@@ -689,6 +692,10 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 /* контакты */
 .cnt { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
 .cnt-row, .cnt-row--3 { grid-template-columns: minmax(0, 1fr); gap: .75rem; padding: 1.25rem 0; }
+/* без серой линии над «Телефоном» и под «Реквизитами» (просьба 04.11) — линии только между строками */
+.cnt-l { border-top: 0; }
+.cnt-l > .cnt-row:first-child { padding-top: 0; }
+.cnt-l > .cnt-row:last-child { border-bottom: 0; }
 .cnt-row .side-k { padding-top: 0; }
 .cnt-big { font-size: clamp(1.75rem, 8.6vw, 2.75rem); }
 .cnt-mid { font-size: clamp(1.375rem, 6.4vw, 2rem); overflow-wrap: anywhere; }
