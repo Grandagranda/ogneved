@@ -87,7 +87,7 @@
 
   const ids = D.svcOrder;
   art.insertAdjacentHTML('beforeend', `<svg class="art-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
-    ${ids.map((id, i) => `<g class="ly" data-s="${i}">${LAYERS[id]}</g>`).join('')}</svg>`);
+    ${ids.map((id, i) => `<g class="ly" data-s="${i}">${LAYERS[id] || ''}</g>`).join('')}</svg>`);
 
   // подписи: [услуга, x, y, текст, сторона, задержка, pc — только на ПК: на телефоне кадр в четыре раза меньше,
   // и второстепенная подпись наехала бы на соседнюю]
@@ -114,7 +114,7 @@
   addEventListener('resize', fit); fit();
 
   // ── карточка ──
-  plate.innerHTML = `<div class="pl-hd">Наши работы на объекте</div>
+  plate.innerHTML = `<div class="pl-hd">${D.tx.home.plate}</div>
     <ol class="pl-list">${ids.map((id, i) => `<li><button type="button" class="pl-i" data-i="${i}" aria-pressed="false">
       <i class="pl-n">0${i + 1}</i><b>${D.svc(id).cardT}</b><i class="pl-sq"></i><i class="pl-bar"></i></button></li>`).join('')}</ol>`;
 

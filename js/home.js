@@ -1,7 +1,7 @@
 // Главная страница (ПК): наполнение блоков из js/data.js
 // Картинки блоков (PNG) подставляются полем img в data.js; без него — место под картинку с подписью.
 (function () {
-  const D = window.OG, U = window.OG_UI, C = window.OG_C, $ = U.$, $$ = U.$$;
+  const D = window.OG, U = window.OG_UI, C = window.OG_C, $ = U.$, $$ = U.$$, X = D.tx.home, BT = D.btn;
   const pad = n => String(n).padStart(2, '0');
   const AR = '<svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg>';
   const plural = n => { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? 'проект' : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'проекта' : 'проектов'; };
@@ -12,7 +12,7 @@
 
   // ── клиенты ──
   // бегущая лента: два одинаковых ряда, сдвиг на половину — шов не виден; вторая копия скрыта от чтения с экрана
-  const logos = hide => D.clients.map(l => `<div class="cl-i"${hide ? ' aria-hidden="true"' : ''}><img src="img/${l.img}.webp" alt="${hide ? '' : l.t}" style="height:${(l.h * .82).toFixed(2)}rem" loading="lazy" decoding="async"></div>`).join('');
+  const logos = hide => D.clients.map(l => `<div class="cl-i"${hide ? ' aria-hidden="true"' : ''}><img src="img/${l.img}.webp" alt="${hide ? '' : D.esc(l.t)}" style="height:${((+l.h || 2) * .82).toFixed(2)}rem" loading="lazy" decoding="async"></div>`).join('');
   $('#clients').innerHTML = `<div class="cl-track">${logos(false)}${logos(true)}</div>`;
   // лента идёт сама и не останавливается; зажатой мышью её можно протянуть в обе стороны, после отпускания — по инерции
   {
@@ -55,7 +55,7 @@
     // на телефоне плитка во всю колонку — фото крупнее ПК-версии (img/m/, _tools/m/about-team-m.cjs), иначе при DPR 3 мылится
     if (p.k === 'team') return `<li class="prx-t prx-t--team">${D.about.img ? `<picture><source media="(max-width: 600px)" srcset="img/m/${D.about.img}">${pic(D.about.img, '', 'prx-ph')}</picture>` : pic('', 'Фото · инженер-пожарный · PNG', 'prx-ph')}<div class="prx-b">${tx}</div></li>`;
     if (p.k === 'consult') return `<li class="prx-t prx-t--consult" data-card><svg class="prx-ln" viewBox="0 0 359 314" preserveAspectRatio="none" aria-hidden="true"><path d="M158.4-5.3 315.4 228.7M315.5-6V228M1 228.5H359"/></svg>
-      <div class="prx-b">${tx}</div><button class="prx-go" data-open="form" data-q="Бесплатная консультация"><span>Оставить заявку</span>${AR}</button></li>`;
+      <div class="prx-b">${tx}</div>${D.B(BT.consult, 'prx-go')}</li>`;
     return `<li class="prx-t prx-t--${p.k}"><div class="prx-a">${PA[p.k] || ''}</div><div class="prx-b">${tx}</div></li>`;
   }).join('');
   const prx = $('#pros');
@@ -75,9 +75,9 @@
   // ── объекты: лента едет вбок, пока блок закреплён ──
   const OX = window.OG_OBJ;
   $('#obj').innerHTML = D.objects.map((o, i) => `<article class="obx rv" data-card style="--i:${Math.min(i, 3)}">
-      <div class="obx-m"><img src="img/o-${o.id}.webp" alt="" loading="lazy" decoding="async"><svg class="ox-fx" viewBox="0 0 ${OX.W} ${OX.H}" aria-hidden="true">${OX[o.id] || ''}</svg></div>
+      <div class="obx-m"><img src="img/${o.img}.webp" alt="" loading="lazy" decoding="async"><svg class="ox-fx" viewBox="0 0 ${OX.W} ${OX.H}" aria-hidden="true">${(C.ownImg(o, 'o-') && OX[o.id]) || ''}</svg></div>
       <div class="obx-b"><span class="obx-n num">${pad(i + 1)}</span><h3>${o.t}</h3>
-        <button class="obx-btn" data-open="form" data-q="Объект: ${o.t}"><span>Получить предложение</span>${AR}</button></div>
+        ${D.B(BT.objCard, 'obx-btn', o)}</div>
     </article>`).join('');
   const ox = $('#objects'), track = $('#obj'), ok = $('#obj-k'), op = $('#obj-p'), cards = $$('.obx', track);
   const wrapW = () => $('.objx-pin .wrap2').offsetWidth;
@@ -106,7 +106,7 @@
   const used = S.filter(s => D.works.some(w => w.s === s.id));
   const wf = $('#works-f'), wl = $('#works-list');
   const work = (w, i) => C.wkc(w, 'wkc--' + i);
-  wf.innerHTML = [['all', 'Все проекты'], ...used.map(s => [s.id, s.short])].map(([v, t], i) => `<button class="chip2${i ? '' : ' is-on'}" data-f="${v}">${t}</button>`).join('');
+  wf.innerHTML = [['all', X.worksAll], ...used.map(s => [s.id, s.short])].map(([v, t], i) => `<button class="chip2${i ? '' : ' is-on'}" data-f="${v}">${t}</button>`).join('');
   const showWorks = v => {
     // на телефоне — все проекты лентой (фильтра там нет), на ПК — 4 в асимметричной сетке
     const list = WK.filter(w => v === 'all' || w.s === v).slice(0, MOB.matches ? undefined : 4);
@@ -165,7 +165,7 @@
   // ── статьи: лента сдвигается на карточку; последняя встаёт к правому краю колонки ──
   {
     const arx = $('#arts'), prev = $('#ar-prev'), next = $('#ar-next');
-    arx.innerHTML = D.articles.slice(0, 4).map(a => C.arc(a)).join('');
+    arx.innerHTML = D.articles.slice(0, +X.blogN || 4).map(a => C.arc(a)).join('');
     const cards = $$('.arc', arx);
     let k = 0, stops = [0];
     const measure = () => {
@@ -259,10 +259,10 @@
 
   // ── вопросы ──
   // под заголовком — «Не нашли ответа?» без подложки: строка и одна кнопка «Связаться»
-  $('#faq-ask').innerHTML = `<p class="fqx-ask-t">Не нашли ответа?</p><p class="fqx-ask-s">Напишите нам — ответим в&nbsp;течение 15&nbsp;минут в&nbsp;рабочее время.</p>
-    <button class="fb fb--dark fqx-ask-b" data-open="form" data-q="Вопрос"><span>Связаться</span>${AR}</button>`;
+  $('#faq-ask').innerHTML = `<p class="fqx-ask-t">${X.faqAskT}</p><p class="fqx-ask-s">${X.faqAskS}</p>
+    ${D.B(BT.faq, 'fb fb--dark fqx-ask-b')}`;
   const fq = $('#faq-list');
-  fq.innerHTML = D.faq.slice(0, 6).map((f, i) => `<div class="fq-i${i ? '' : ' is-open'}"><button class="fq-q" aria-expanded="${!i}"><span class="num">${pad(i + 1)}</span><b>${f.q}</b><i></i></button><div class="fq-a"><div><p>${f.a}</p></div></div></div>`).join('');
+  fq.innerHTML = D.faq.slice(0, +X.faqN || 6).map((f, i) => `<div class="fq-i${i ? '' : ' is-open'}"><button class="fq-q" aria-expanded="${!i}"><span class="num">${pad(i + 1)}</span><b>${f.q}</b><i></i></button><div class="fq-a"><div><p>${f.a}</p></div></div></div>`).join('');
   fq.addEventListener('click', e => {
     const q = e.target.closest('.fq-q'); if (!q) return;
     const it = q.parentElement, on = !it.classList.contains('is-open');
@@ -278,10 +278,10 @@
 
   const top = C0.map((c, i) => [c, i]).sort((a, b) => b[0][3] - a[0][3]).slice(0, 5);
   $('#geo-cards').innerHTML = top.map(([c, i]) => `<li class="gc" data-i="${i}"><b class="gc-t">${c[0]}</b><span class="gc-s">${c[4]}</span><p class="gc-v"><strong>${c[3]}</strong><span>${plural(c[3])}</span></p></li>`).join('')
-    + `<li class="gc gc--acc"><b class="gc-t">Вся Россия</b><span class="gc-s">городов в&nbsp;стране — работаем в&nbsp;любом</span><p class="gc-v"><strong>1100+</strong></p></li>`;
-  const fact = D.about.facts[0];
+    + `<li class="gc gc--acc"><b class="gc-t">${X.geoAllT}</b><span class="gc-s">${X.geoAllS}</span><p class="gc-v"><strong>${X.geoAllN}</strong></p></li>`;
+  const fact = D.about.facts[0] || { n: '', t: '' };
   $('#geo-total').innerHTML = `<strong>${fact.n}</strong><span>${fact.t}</span>`;
-  if (D.geoImg) $('#geo-art').innerHTML = `<img src="img/${D.geoImg}" alt="" loading="lazy" decoding="async">`;
+  if (D.geoImg) $('#geo-art').innerHTML = `<img src="img/${D.geoImg}.webp" alt="" loading="lazy" decoding="async">`;
 
   const lit = i => {
     $$('.rt-on', map).forEach(p => p.classList.toggle('is-on', p.dataset.i === i));

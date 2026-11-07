@@ -3,14 +3,18 @@
 // Фон блоков чередуется: шапка страницы — цвета первого экрана, дальше белый и тонированный по очереди.
 (function () {
   const D = window.OG, U = window.OG_UI, C = window.OG_C, T = window.OG_TEXT, $ = U.$, $$ = U.$$;
+  // тексты страниц и кнопки — из админки (data/content.json → D.tx.pg, D.btn); {…} — подстановки
+  const X = D.tx.pg, BT = D.btn, F = D.f, NP = D.about.facts[0] ? D.about.facts[0].n : '';
   const main = $('#page'), kind = main.dataset.page, qs = new URLSearchParams(location.search);
   const AR = C.AR, pad = C.pad, S = C.order.map(D.svc);
   const after = [];
 
   // ── общие детали ──
-  const crumbs = list => `<nav class="crb" aria-label="Хлебные крошки"><a href="index.html">Главная</a>${list.map(([t, h]) => h ? `<a href="${h}">${t}</a>` : `<span aria-current="page">${t}</span>`).join('')}</nav>`;
+  const crumbs = list => `<nav class="crb" aria-label="Хлебные крошки"><a href="index.html">${X.crumbHome}</a>${list.map(([t, h]) => h ? `<a href="${h}">${t}</a>` : `<span aria-current="page">${t}</span>`).join('')}</nav>`;
   // услуга без цены в калькуляторе: вместо расчёта — запрос стоимости
-  const costBtn = (s, t = 'Рассчитать стоимость', cls) => s.price ? fb(t, { cls, open: 'calc', svc: s.id }) : fb('Узнать стоимость', { cls, open: 'form', q: 'Стоимость: ' + s.short });
+  const costBtn = (s, t = X.usluga.calc, cls) => s.price ? fb(t, { cls, open: 'calc', svc: s.id }) : fb(X.usluga.ask, { cls, open: 'form', q: F(X.usluga.askQ, s) });
+  // кнопка, у которой «куда ведёт» задано в админке
+  const lb = (l, cls, v) => D.B(l, 'fb' + (cls ? ' ' + cls : ''), v);
   const badge = t => `<p class="badge badge--flat"><i></i>${t}</p>`;
   const fb = (t, o = {}) => {
     const cls = `fb${o.cls ? ' ' + o.cls : ''}`, inner = `<span>${t}</span>${AR}`;
@@ -33,12 +37,12 @@
   let tint = true;
   const sec = (inner, o = {}) => { tint = o.tint ?? !tint; return `<section class="sec${tint ? ' sec--tint' : ''}${o.cls ? ' ' + o.cls : ''}"${o.id ? ` id="${o.id}"` : ''}><div class="wrap2">${inner}</div></section>`; };
   // призыв в конце страницы: заголовок, телефон и форма первого экрана в ряд
-  const cta = (h = 'Нужен расчёт<br><span class="g">для вашего объекта?</span>') => sec(`
+  const cta = (h = X.cta.h) => sec(`
       <div class="ctx">
-        <div class="ctx-l">${badge('Консультация')}<h2 class="h2x">${h}</h2></div>
+        <div class="ctx-l">${badge(X.cta.badge)}<h2 class="h2x">${h}</h2></div>
         <div class="ctx-r"><a class="ctx-tel" href="${D.phoneHref}">${D.phone}</a><small>${D.hours}</small></div>
       </div>
-      <div class="ctx-f"><h3 class="hf-t"><em>Бесплатная консультация</em> за&nbsp;15&nbsp;минут</h3><p class="hf-s">Оставьте заявку и&nbsp;мы&nbsp;подберём подходящее решение под ваш объект</p>${U.formRow()}</div>`, { cls: 'pg-cta' });
+      <div class="ctx-f"><h3 class="hf-t">${X.cta.ft}</h3><p class="hf-s">${X.cta.fs}</p>${U.formRow({ form: 'cta' })}</div>`, { cls: 'pg-cta' });
   const findBook = n => D.books.find(b => n.includes(b.num.replace('№ ', '')) || n.includes(b.t) || b.num.includes(n.replace('СП ', '')));
   const chips = (id, list) => `<div class="chips2" id="${id}">${list.map(([v, t], k) => `<button class="chip2${k ? '' : ' is-on'}" data-f="${v}">${t}</button>`).join('')}</div>`;
   // перерисовка списка по фильтру: старые карточки уходят, новые появляются (motion.js — [data-swap])
@@ -49,30 +53,21 @@
 
   // ── Услуги ──
   // ситуации заказчика → документ, который её закрывает
-  const PICK = [
-    ['Проезды на&nbsp;участке не&nbsp;совпадают с&nbsp;требованиями свода правил', 'opp'],
-    ['Экспертиза запросила обоснование доступа пожарной техники', 'opp'],
-    ['Надзор требует план тушения пожара для объекта', 'ptp'],
-    ['Нужно обосновать меньший объём пожарного резервуара', 'voda'],
-    ['На&nbsp;участке нет централизованного водопровода', 'voda'],
-    ['Пожарные части не&nbsp;успевают к&nbsp;объекту за&nbsp;нормативное время', 'dislokaciya'],
-    ['Предприятие обязано содержать собственную пожарную охрану', 'chislennost'],
-    ['Нужно проверить, хватит ли сил гарнизона для тушения', 'sily'],
-  ];
+  const PICK = X.uslugi.pick.items.map(x => [x.t, x.s]).filter(x => D.svc(x[1]));
   R.uslugi = () => {
     after.push(() => { C.eqSc($('#svc')); C.play($('#svc')); window.OG_CALC($('#calc')); });
-    return head({ cr: [['Услуги']], h: 'Услуги <span class="g">в&nbsp;области<br>пожаротушения</span>',
-        lead: 'Разрабатываем расчёты и&nbsp;проектную документацию, которые подтверждают: пожарные подразделения смогут подъехать к&nbsp;объекту, получить воду и&nbsp;потушить пожар.',
-        act: fb('Бесплатная консультация', { cls: 'fb--red', open: 'form', q: 'Подобрать услугу' }) + fb('Рассчитать стоимость', { open: 'calc' }),
-        facts: [['6', 'направлений — от&nbsp;проездов до&nbsp;численности пожарной охраны'], ['от&nbsp;30&nbsp;000&nbsp;₽', 'стоимость документа, фиксируем в&nbsp;договоре'], ['3–15', 'рабочих дней на&nbsp;разработку'], [D.about.facts[0].n, 'выполненных проектов с&nbsp;2012 года']] }) +
+    const U0 = X.uslugi;
+    return head({ cr: [[U0.crumb]], h: U0.h, lead: U0.lead,
+        act: lb(BT.uslugiA, 'fb--red') + lb(BT.uslugiB),
+        facts: U0.facts.map(x => [F(x.n, { projects: NP }), F(x.t, { projects: NP })]) }) +
       sec(`<div class="scx" id="svc">${S.map((s, i) => C.sc(s, i, S.length)).join('')}</div>`, { cls: 'sec--first' }) +
       sec(`<div class="pk">
-          <div class="pk-l">${badge('Подбор документа')}<h2 class="h2x">Какой документ <span class="g">нужен объекту</span></h2>
-            <p class="pk-s">Найдите свою ситуацию — покажем, какой расчёт её&nbsp;закрывает. Не&nbsp;нашли&nbsp;— подскажем бесплатно.</p>
-            ${fb('Задать вопрос', { cls: 'fb--dark', open: 'form', q: 'Какой документ нужен моему объекту?' })}</div>
-          <ol class="pk-list">${PICK.map(([t, id], i) => `<li><a class="pk-i" href="usluga.html?id=${id}"><span class="num">${pad(i + 1)}</span><b>${t}</b><span class="pk-to"><span class="pk-im"><img src="img/s-${id}.webp" alt="" loading="lazy" decoding="async"></span>${D.svc(id).cardT}</span>${AR}</a></li>`).join('')}</ol>
+          <div class="pk-l">${badge(U0.pick.badge)}<h2 class="h2x">${U0.pick.h}</h2>
+            <p class="pk-s">${U0.pick.s}</p>
+            ${lb(BT.pick, 'fb--dark')}</div>
+          <ol class="pk-list">${PICK.map(([t, id], i) => `<li><a class="pk-i" href="usluga.html?id=${id}"><span class="num">${pad(i + 1)}</span><b>${t}</b><span class="pk-to"><span class="pk-im"><img src="img/${D.svc(id).img}.webp" alt="" loading="lazy" decoding="async"></span>${D.svc(id).cardT}</span>${AR}</a></li>`).join('')}</ol>
         </div>`) +
-      sec(sh('Стоимость', 'Сколько стоит <span class="g">проект</span>', '<p>Ответьте на&nbsp;шесть вопросов — посчитаем ориентировочную стоимость и&nbsp;срок. Точную цену назовём после просмотра исходных данных.</p>') +
+      sec(sh(U0.price.badge, U0.price.h, `<p>${U0.price.p}</p>`) +
         '<div class="calc-wrap" id="calc"></div>', { id: 'price' }) +
       cta();
   };
@@ -80,9 +75,9 @@
   // ── Страница услуги ──
   // «Когда нужен» — чистые карточки на белом, как в блоке «Исходные данные»: у каждой ситуации своя линейная иконка
   // (js/when-ic.js), номер и текст; последняя — пунктирная «Не уверены, нужен ли документ?»
-  const whenCards = s => sh('Когда нужен', 'Когда нужен <span class="g">этот документ</span>') +
+  const whenCards = s => sh(X.usluga.whenBadge, X.usluga.whenH) +
     `<ul class="fls wn-ls" style="--n:${s.when.length + 1}">${s.when.map((t, k) => `<li class="fl wn-c" style="--k:${k}"><span class="wn-ic">${((window.OG_WIC || {})[s.id] || [])[k] || ''}</span><span class="num">${pad(k + 1)}</span><b>${t}</b></li>`).join('')}
-      <li><button class="fl fl--add" data-open="form" data-q="Нужен ли документ «${s.cardT}» для моего объекта?"><span class="fl-plus"></span><b>Не&nbsp;уверены, нужен ли документ?</b><small>Пришлите данные объекта — бесплатно проверим и&nbsp;подскажем</small></button></li></ul>`;
+      <li><button class="fl fl--add" data-open="form" data-q="${D.esc(F(X.usluga.whenQ, s))}"><span class="fl-plus"></span><b>${X.usluga.whenAddT}</b><small>${X.usluga.whenAddS}</small></button></li></ul>`;
   // «Что входит» — типовой календарный план: пункты работ строками, справа — шкала рабочих дней типового срока (s.base).
   // Отрезки — из s.plan (data.js); если пунктов стало больше, чем отрезков, они идут внахлёст сами, шагом в полдня
   const spans = (n, B) => { const st = B / n, h = v => Math.round(v * 2) / 2;
@@ -98,20 +93,20 @@
     const { sp, B } = planOf(s);
     return `<div class="gnt" style="--d:${B}">
         <div class="gnt-tl" aria-hidden="true"><i class="gnt-band"></i><i class="gnt-now"></i></div>
-        <div class="gnt-r gnt-hd"><p class="side-k">Этап работ</p><ol class="gnt-days" aria-hidden="true">${[...Array(B)].map((_, d) => `<li style="--x:${d}">${pad(d + 1)}</li>`).join('')}</ol><p class="gnt-end">Сдача</p></div>
+        <div class="gnt-r gnt-hd"><p class="side-k">${X.usluga.stage}</p><ol class="gnt-days" aria-hidden="true">${[...Array(B)].map((_, d) => `<li style="--x:${d}">${pad(d + 1)}</li>`).join('')}</ol><p class="gnt-end">${X.usluga.end}</p></div>
         <ol class="gnt-ls">${s.includes.map((t, k) => `<li class="gnt-r" style="--a:${sp[k][0]};--b:${sp[k][1]}"><p class="gnt-t"><span class="num">${pad(k + 1)}</span><b>${t}</b></p><span class="gnt-c"><i class="gnt-bar"><em>${dur(sp[k][1] - sp[k][0])}</em></i></span></li>`).join('')}</ol>
-        <div class="gnt-r gnt-ft">${costBtn(s, 'Рассчитать для своего объекта', 'fb--sm')}<p class="gnt-pdf"><i></i>${/бумажн/i.test(s.result) ? 'Бумага и&nbsp;PDF' : 'PDF с&nbsp;подписью'}</p></div>
+        <div class="gnt-r gnt-ft">${costBtn(s, X.usluga.planBtn, 'fb--sm')}<p class="gnt-pdf"><i></i>${/бумажн/i.test(s.result) ? X.usluga.pdfPaper : X.usluga.pdfSign}</p></div>
       </div>`;
   };
   // исходные данные — карточками файлов: чертежи присылают в .dwg/.pdf, сведения — в .pdf/.doc
   const extOf = t => /план|схем|разрез|проект|фасад|застройк/i.test(t) ? ['dwg', 'pdf'] : ['pdf', 'doc'];
   R.usluga = () => {
     const s = D.svc(qs.get('id')) || S[0], i = S.indexOf(s), FX = window.OG_FX || {};
-    document.title = s.cardT + ' — ОГНЕВЕД';
+    document.title = F(X.titleTpl, { t: s.cardT });
     const wk = D.works.filter(w => w.s === s.id);
     // «Другие документы»: у этих услуг порядок задан заказчиком, у остальных — следующие по кругу
-    const MORE = { sily: ['ptp', 'opp', 'dislokaciya'], ptp: ['opp', 'sily', 'voda'] };
-    const others = MORE[s.id] ? MORE[s.id].map(D.svc) : [1, 2, 3].map(k => S[(i + k) % S.length]);
+    const MORE = (s.more || []).map(D.svc).filter(x => x && x !== s);
+    const others = MORE.length ? MORE.slice(0, 3) : [1, 2, 3].map(k => S[(i + k) % S.length]).filter(x => x !== s);
     after.push(() => {
       setTimeout(() => $('.svh-art').classList.add('is-play'), 900); $('#svc') && (C.eqSc($('#svc')), C.play($('#svc')));
       // календарный план: когда блок на экране, линия «сегодня» проходит шкалу и отрезки заливаются за ней;
@@ -125,34 +120,34 @@
       $$('.wn-ls').forEach(el => new IntersectionObserver(([e]) => el.classList.toggle('is-on', e.isIntersecting), { threshold: .25 }).observe(el));
     });
     return `<section class="pgh svh"><div class="wrap2">
-        ${crumbs([['Услуги', 'uslugi.html'], [s.cardT]])}
+        ${crumbs([[X.uslugi.crumb, 'uslugi.html'], [s.cardT]])}
         <div class="svh-g">
           <div class="svh-l">
-            ${badge(`Услуга ${pad(i + 1)} / ${pad(S.length)}`)}
+            ${badge(`${X.usluga.badge} ${pad(i + 1)} / ${pad(S.length)}`)}
             <h1 class="h1x">${s.cardT.replace(/ и (\S+)/g, (m, a) => ` <span style="white-space:nowrap">и ${a}</span>`).replace(/\s*(\([^)]+\))$/, (m, a) => ` <span class="g">${a}</span>`)}</h1>
             <p class="svh-doc">${s.cardD}</p>
             <p class="svh-p">${s.lead}</p>
-            <div class="pgh-act">${fb('Заказать документ', { cls: 'fb--red', open: 'form', q: 'Услуга: ' + s.short })}</div>
+            <div class="pgh-act">${lb(BT.uslugaOrder, 'fb--red', s)}</div>
           </div>
           <div class="svh-art sc" data-fx="${s.id}">
-            <div class="sc-art"><img class="sc-im" src="img/s-${s.id}.webp" alt="${s.cardT}">${FX[s.id] ? `<svg class="sc-fx" viewBox="0 0 ${FX.W} ${FX.H}" aria-hidden="true">${FX[s.id]}</svg>` : ''}</div>
-            <span class="sc-n">${pad(i + 1)} / ${pad(S.length)}</span><span class="sc-d">${s.days} раб. дней</span>
+            <div class="sc-art"><img class="sc-im" src="img/${s.img}.webp" alt="${s.cardT}">${FX[s.id] && C.ownImg(s) ? `<svg class="sc-fx" viewBox="0 0 ${FX.W} ${FX.H}" aria-hidden="true">${FX[s.id]}</svg>` : ''}</div>
+            <span class="sc-n">${pad(i + 1)} / ${pad(S.length)}</span><span class="sc-d">${s.days} ${X.usluga.daysShort}</span>
           </div>
         </div>
-        ${facts([[D.cost(s), s.price ? 'стоимость — фиксируем в&nbsp;договоре до&nbsp;начала работ' : 'стоимость — зависит от&nbsp;параметров защищаемой территории'], [s.days, 'рабочих дней с&nbsp;момента получения исходных данных'], ['PDF', 'с&nbsp;подписью исполнителя — прикладывают к&nbsp;проекту'], [String(s.norms.length), 'нормативных документа в&nbsp;основе расчёта']])}
+        ${facts([[D.cost(s), s.price ? X.usluga.fPrice : X.usluga.fPrice0], [s.days, X.usluga.fDays], [X.usluga.fPdfN, X.usluga.fPdf], [String(s.norms.length), X.usluga.fNorms]])}
       </div></section>` +
       sec(whenCards(s), { cls: 'sec--first' }) +
-      sec(sh('Состав работ', 'Что входит <span class="g">в&nbsp;работу</span>', `<p>${planNote(s)}</p>`, 'sh--line') + plan(s)) +
+      sec(sh(X.usluga.planBadge, X.usluga.planH, `<p>${planNote(s)}</p>`, 'sh--line') + plan(s)) +
       sec(`<div class="io">
-          <div class="io-c io-in"><div class="io-top">${badge('Исходные данные')}<h3 class="io-h">Что нужно от&nbsp;вас</h3>
-            <p class="io-s">Пришлите, что есть, — точный список уточним после первого звонка</p></div>
+          <div class="io-c io-in"><div class="io-top">${badge(X.usluga.inBadge)}<h3 class="io-h">${X.usluga.inH}</h3>
+            <p class="io-s">${X.usluga.inS}</p></div>
             <ul class="fls">${s.input.map((t, k) => `<li class="fl"><span class="num">${pad(k + 1)}</span><span class="fl-x">${extOf(t).map(e => `<i>${e}</i>`).join('')}</span><b>${t}</b></li>`).join('')}
-              <li><button class="fl fl--add" data-open="form" data-q="Не хватает исходных данных: ${s.short}"><span class="fl-plus"></span><b>Не&nbsp;хватает данных?</b><small>Запросим сведения о&nbsp;частях, отрисуем планы и&nbsp;фасады в&nbsp;.dwg</small></button></li></ul></div>
-          <div class="io-c io-c--dark">${badge('Результат')}<h3 class="io-h">Что вы получите</h3><p class="io-p">${s.result}</p>
-            <div class="io-nr"><p class="io-k">Нормативная база</p><div class="io-chips">${s.norms.map(n => { const b = findBook(n); return b ? `<a href="kniga.html?id=${b.id}">${n}${AR}</a>` : `<span>${n}</span>`; }).join('')}</div></div></div>
+              <li><button class="fl fl--add" data-open="form" data-q="${D.esc(F(X.usluga.inQ, s))}"><span class="fl-plus"></span><b>${X.usluga.inAddT}</b><small>${X.usluga.inAddS}</small></button></li></ul></div>
+          <div class="io-c io-c--dark">${badge(X.usluga.outBadge)}<h3 class="io-h">${X.usluga.outH}</h3><p class="io-p">${s.result}</p>
+            <div class="io-nr"><p class="io-k">${X.usluga.norms}</p><div class="io-chips">${s.norms.map(n => { const b = findBook(n); return b ? `<a href="kniga.html?id=${b.id}">${n}${AR}</a>` : `<span>${n}</span>`; }).join('')}</div></div></div>
         </div>`) +
-      (wk.length ? sec(sh('Примеры', 'Выполненные <span class="g">проекты</span>', fb('Все проекты', { href: 'raboty.html', cls: 'fb--sm' })) + `<div class="wkx">${works(wk.slice(0, 2))}</div>`) : '') +
-      sec(sh('Услуги', 'Другие <span class="g">документы</span>', fb('Все услуги', { href: 'uslugi.html', cls: 'fb--sm' })) + `<div class="scx" id="svc">${others.map(x => C.sc(x, S.indexOf(x), S.length)).join('')}</div>`) +
+      (wk.length ? sec(sh(X.usluga.exBadge, X.usluga.exH, fb(X.allWorks, { href: 'raboty.html', cls: 'fb--sm' })) + `<div class="wkx">${works(wk.slice(0, 2))}</div>`) : '') +
+      sec(sh(X.usluga.moreBadge, X.usluga.moreH, fb(X.allSvc, { href: 'uslugi.html', cls: 'fb--sm' })) + `<div class="scx" id="svc">${others.map(x => C.sc(x, S.indexOf(x), S.length)).join('')}</div>`) +
       cta();
   };
 
@@ -164,12 +159,12 @@
       const WK = C.shuffle(D.works), grid = $('#wgrid'), show = v => swap(grid, works(WK.filter(w => v === 'all' || w.s === v)));
       onChip($('#wf'), show); show('all');
     });
-    return head({ cr: [['Наши работы']], h: 'Наши работы<br><span class="g">по&nbsp;всей России</span>',
-        lead: 'Проекты для жилых домов, складов, производств и&nbsp;энергообъектов. Стоимость и&nbsp;сроки указаны как «основная работа + дополнительные услуги».',
-        act: fb('Обсудить проект', { cls: 'fb--red', open: 'form', q: 'Обсудить проект' }),
-        facts: [[D.about.facts[0].n, 'выполненных проектов с&nbsp;2012 года'], [String(D.cities.length), 'городов и&nbsp;регионов на&nbsp;карте работ'], [D.about.facts[1].n, D.about.facts[1].t], [D.about.facts[2].n, D.about.facts[2].t]] }) +
-      sec(chips('wf', [['all', `Все проекты · ${D.works.length}`], ...used.map(s => [s.id, s.short])]) + '<div class="wkx" id="wgrid" data-swap></div>', { cls: 'sec--first' }) +
-      cta('Нужен похожий<br><span class="g">проект?</span>');
+    const R0 = X.raboty, rv = { projects: NP, cities: D.cities.length };
+    return head({ cr: [[R0.crumb]], h: R0.h, lead: R0.lead,
+        act: lb(BT.rabotyA, 'fb--red'),
+        facts: R0.facts.map(x => [F(x.n, rv), F(x.t, rv)]) }) +
+      sec(chips('wf', [['all', F(R0.all, { n: D.works.length })], ...used.map(s => [s.id, s.short])]) + '<div class="wkx" id="wgrid" data-swap></div>', { cls: 'sec--first' }) +
+      cta(X.cta.h2);
   };
 
   // ── Страница проекта ──
@@ -188,9 +183,9 @@
       $$('.sxk', box).forEach(b => { b.addEventListener('mouseenter', () => dim(b.dataset.k)); b.addEventListener('focus', () => dim(b.dataset.k)); b.addEventListener('blur', () => dim()); });
       $('.sxk-ls', box).addEventListener('mouseleave', () => dim());
     });
-    return sec(sh('Графическая часть', 'Рабочие схемы <span class="g">проекта</span>', `<p>${x.note}</p>`, 'sh--line') + `
+    return sec(sh(X.rabota.sxBadge, X.rabota.sxH, `<p>${x.note}</p>`, 'sh--line') + `
       <div class="sxw">
-        <p class="sx-hint m-only">Листайте схему<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></p>
+        <p class="sx-hint m-only">${X.rabota.sxHint}<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></p>
         <div class="sx-scroll"><div class="sx" id="sx" role="img" aria-label="${x.sheets.map(s => s.t + ': ' + s.s).join('. ').replace(/&nbsp;/g, ' ')}">
           <i class="sx-dark"></i>
           <svg class="sx-veil" ${vb} aria-hidden="true">${B.veil(x.veil)}</svg>
@@ -198,31 +193,34 @@
           <svg class="sx-run" ${vb} aria-hidden="true">${x.run}</svg>
           ${top(x.sheets[0], 'sxh--l')}${top(x.sheets[1], 'sxh--r')}
           ${x.spec ? `<dl class="sx-spec">${x.spec.map(([t, v]) => `<div><dt>${t}</dt><dd class="num">${v}</dd></div>`).join('')}</dl>` : ''}
-          <p class="sx-tag"><i></i>Планировка скрыта, расположение условное</p>
+          <p class="sx-tag"><i></i>${X.rabota.sxTag}</p>
         </div></div>
         <ul class="sxk-ls" style="--n:${x.keys.length + 1}">${x.keys.map(c => `<li><button class="sxk" data-k="${c.k}"><i class="sxk-ic">${B.ICON[c.i]}</i><b>${c.b}${c.u ? ` <small>${c.u}</small>` : ''}</b><span>${c.t}</span></button></li>`).join('')}
-          <li><button class="fl fl--add" data-open="form" data-q="Похожий проект: ${w.obj}"><span class="fl-plus"></span><b>Нужны такие&nbsp;же схемы?</b><small>Разработаем графическую часть для вашего объекта</small></button></li></ul>
+          <li><button class="fl fl--add" data-open="form" data-q="${D.esc(F(X.rabota.sxQ, w))}"><span class="fl-plus"></span><b>${X.rabota.sxAddT}</b><small>${X.rabota.sxAddS}</small></button></li></ul>
       </div>`);
   };
   R.rabota = () => {
-    const w = D.works.find(x => x.id === qs.get('id')) || D.works[0], s = D.svc(w.s), tx = T.work[w.s] || T.work.opp;
-    document.title = w.obj + ' — ОГНЕВЕД';
+    const w = D.works.find(x => x.id === qs.get('id')) || D.works[0], s = D.svc(w.s) || S[0], tpl = T.work[w.s] || T.work.opp || [], R1 = X.rabota;
+    // текст проекта: свой у работы или шаблон вида услуги
+    const tx = [w.task || tpl[0] || '', w.did || tpl[1] || '', w.result || tpl[2] || ''];
+    document.title = F(X.titleTpl, { t: w.obj });
     const others = D.works.filter(x => x !== w).sort((a, b) => (b.s === w.s) - (a.s === w.s)).slice(0, 2);
-    const text = [['Задача', tx[0]], ['Что сделали', tx[1]], ['Результат', tx[2]]];
-    return head({ cr: [['Наши работы', 'raboty.html'], [w.obj]], badge: w.type, h: w.obj,
-        dl: [['Регион', w.city], ['Стоимость', `${w.cost} тыс.&nbsp;₽`], ['Срок', `${w.days} ${C.dn(w.days)}`], ['Тип объекта', D.objects.find(o => o.id === w.o).t]] }) +
+    const text = [[R1.task, tx[0]], [R1.did, tx[1]], [R1.result, tx[2]]].filter(x => x[1]);
+    const ob = D.objects.find(o => o.id === w.o);
+    return head({ cr: [[X.raboty.crumb, 'raboty.html'], [w.obj]], badge: w.type, h: w.obj,
+        dl: [[R1.region, w.city], [R1.cost, `${w.cost} ${R1.costU}`], [R1.days, `${w.days} ${C.dn(w.days)}`], ...(ob ? [[R1.objType, ob.t]] : [])] }) +
       sec(`<div class="wph">${C.pic(w.img, `alt="${w.obj}" data-par`)}</div>
         <div class="wpb">
-          <div class="wpb-main">${text.map(([t, p], k) => `<div class="wpb-i"><p class="wpb-k"><span class="num">${pad(k + 1)}</span>${t}</p><div class="wpb-t"><p>${p}</p>${k === 1 && w.extra ? `<p class="wpb-x"><b>+</b>Дополнительно: ${w.extra.toLowerCase()}</p>` : ''}</div></div>`).join('')}</div>
+          <div class="wpb-main">${text.map(([t, p], k) => `<div class="wpb-i"><p class="wpb-k"><span class="num">${pad(k + 1)}</span>${t}</p><div class="wpb-t"><p>${p}</p>${k === 1 && w.extra ? `<p class="wpb-x"><b>+</b>${R1.extra} ${w.extra.toLowerCase()}</p>` : ''}</div></div>`).join('')}</div>
           <aside class="wpb-side">
-            <p class="side-k">Услуга</p>
-            <a class="sv-link" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/s-${s.id}.webp" alt=""></span><span class="mx-tx"><i>${pad(S.indexOf(s) + 1)}</i><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} дней</small></span>${AR}</a>
-            <div class="side-btns">${fb('Заказать похожий проект', { cls: 'fb--red', open: 'form', q: 'Похожий проект: ' + w.obj })}${costBtn(s)}</div>
+            <p class="side-k">${R1.svc}</p>
+            <a class="sv-link" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/${s.img}.webp" alt=""></span><span class="mx-tx"><i>${pad(S.indexOf(s) + 1)}</i><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} ${X.days}</small></span>${AR}</a>
+            <div class="side-btns">${lb(BT.rabotaOrder, 'fb--red', w)}${costBtn(s)}</div>
           </aside>
         </div>`, { cls: 'sec--first' }) +
       schemes(w) +
-      sec(sh('Наши работы', 'Другие <span class="g">проекты</span>', fb('Все проекты', { href: 'raboty.html', cls: 'fb--sm' })) + `<div class="wkx">${works(others)}</div>`) +
-      cta('Нужен похожий<br><span class="g">проект?</span>');
+      sec(sh(R1.moreBadge, R1.moreH, fb(X.allWorks, { href: 'raboty.html', cls: 'fb--sm' })) + `<div class="wkx">${works(others)}</div>`) +
+      cta(X.cta.h2);
   };
 
   // ── Статьи: первая — крупно, остальные сеткой; фильтр по темам ──
@@ -232,7 +230,7 @@
         <div class="arf-m">${badge(a.tag)}<time>${a.date}</time></div>
         <h2><a class="cover-link" href="statya.html?id=${a.id}">${a.t}</a></h2>
         <p class="arf-d">${a.d}</p>
-        <span class="fb arf-btn"><span>Читать статью</span>${AR}</span>
+        <span class="fb arf-btn"><span>${X.blog.read}</span>${AR}</span>
       </div>
     </article>`;
   // ряды по три карточки; если в хвосте осталась одна — два последних ряда становятся парами (7 = 3 + 2 + 2)
@@ -245,16 +243,15 @@
       const show = v => { const list = D.articles.filter(a => v === 'all' || a.tag === v); swap(grid, v === 'all' ? feat(list[0]) + artGrid(list.slice(1)) : list.length < 3 ? list.map(feat).join('') : artGrid(list)); };
       onChip($('#af'), show); show('all');
     });
-    return head({ cr: [['Статьи']], h: 'Статьи<br><span class="g">о&nbsp;пожаротушении</span>',
-        lead: 'Простым языком о&nbsp;проездах, планах тушения, водоснабжении и&nbsp;расчётах сил и&nbsp;средств — для проектировщиков, девелоперов и&nbsp;служб эксплуатации.' }) +
-      sec(chips('af', [['all', `Все статьи · ${D.articles.length}`], ...tags.map(t => [t, t])]) + '<div class="arw" id="agrid" data-swap></div>', { cls: 'sec--first' }) +
+    return head({ cr: [[X.blog.crumb]], h: X.blog.h, lead: X.blog.lead }) +
+      sec(chips('af', [['all', F(X.blog.all, { n: D.articles.length })], ...tags.map(t => [t, t])]) + '<div class="arw" id="agrid" data-swap></div>', { cls: 'sec--first' }) +
       cta();
   };
 
   // ── Статья: содержание слева, текст по центру, услуги справа ──
   R.statya = () => {
-    const a = D.articles.find(x => x.id === qs.get('id')) || D.articles[0], tx = T.articles[a.id];
-    document.title = a.t + ' — ОГНЕВЕД';
+    const a = D.articles.find(x => x.id === qs.get('id')) || D.articles[0], tx = T.articles[a.id], A0 = X.statya;
+    document.title = F(X.titleTpl, { t: a.t });
     const more = D.articles.filter(x => x !== a).slice(0, 3);
     const words = (tx.lead + tx.body.flat().join(' ')).split(/\s+/).length, min = Math.max(2, Math.ceil(words / 160));
     after.push(() => {
@@ -263,29 +260,29 @@
       const spy = () => { let k = 0; hs.forEach((h, i) => { if (h.getBoundingClientRect().top < innerHeight * .4) k = i; }); links.forEach((l, i) => l.classList.toggle('is-on', i === k)); };
       addEventListener('scroll', spy, { passive: true }); spy();
     });
-    return `<section class="pgh"><div class="wrap2">${crumbs([['Статьи', 'blog.html'], [a.tag]])}
+    return `<section class="pgh"><div class="wrap2">${crumbs([[X.blog.crumb, 'blog.html'], [a.tag]])}
         <div class="ath">
-          <div class="ath-m">${badge(a.tag)}<time>${a.date}</time><span>${min} мин чтения</span></div>
+          <div class="ath-m">${badge(a.tag)}<time>${a.date}</time><span>${min} ${A0.min}</span></div>
           <h1 class="h1x">${a.t}</h1>
           <p class="ath-p">${tx.lead}</p>
         </div></div></section>` +
       sec(`<div class="atc">${C.pic(a.img, 'alt="" data-par')}</div>
         <div class="atb">
-          <aside class="toc2"><p class="side-k">Содержание</p><ol>${tx.body.map(([h], k) => `<li><a href="#p${k}" data-off="110"><span class="num">${pad(k + 1)}</span>${h}</a></li>`).join('')}</ol></aside>
-          <div class="prose2">${tx.body.map(([h, p], k) => `<h2 id="p${k}">${h}</h2><p>${p}</p>`).join('')}
-            <div class="prose2-cta" data-card><div><b>Нужен расчёт для вашего объекта?</b><p>Бесплатно подскажем, какой документ потребуется, и&nbsp;назовём стоимость.</p></div>${fb('Задать вопрос', { cls: 'fb--dark', open: 'form', q: 'Вопрос по статье: ' + a.t })}</div>
+          <aside class="toc2"><p class="side-k">${X.toc}</p><ol>${tx.body.map(([h], k) => `<li><a href="#p${k}" data-off="110"><span class="num">${pad(k + 1)}</span>${h}</a></li>`).join('')}</ol></aside>
+          <div class="prose2">${tx.body.map(([h, p], k) => `<h2 id="p${k}">${h}</h2>${String(p).split(/\n\s*\n/).map(x => `<p>${x.replace(/\n/g, '<br>')}</p>`).join('')}`).join('')}
+            <div class="prose2-cta" data-card><div><b>${A0.ctaT}</b><p>${A0.ctaP}</p></div>${lb(BT.statyaAsk, 'fb--dark', a)}</div>
           </div>
-          <aside class="ats"><p class="side-k">Услуги</p>${S.slice(0, 4).map((s, k) => `<a class="sv-link sv-link--sm" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/s-${s.id}.webp" alt="" loading="lazy" decoding="async"></span><span class="mx-tx"><i>${pad(k + 1)}</i><b>${s.cardT}</b><small>${D.cost(s)}</small></span>${AR}</a>`).join('')}
-            ${fb('Все услуги', { href: 'uslugi.html', cls: 'fb--sm' })}</aside>
+          <aside class="ats"><p class="side-k">${A0.svc}</p>${S.slice(0, 4).map((s, k) => `<a class="sv-link sv-link--sm" href="usluga.html?id=${s.id}"><span class="mx-im"><img src="img/${s.img}.webp" alt="" loading="lazy" decoding="async"></span><span class="mx-tx"><i>${pad(k + 1)}</i><b>${s.cardT}</b><small>${D.cost(s)}</small></span>${AR}</a>`).join('')}
+            ${fb(X.allSvc, { href: 'uslugi.html', cls: 'fb--sm' })}</aside>
         </div>`, { cls: 'sec--first' }) +
-      sec(sh('Читать дальше', 'Другие <span class="g">статьи</span>', fb('Все статьи', { href: 'blog.html', cls: 'fb--sm' })) + `<div class="arg">${more.map(x => C.arc(x, '', true)).join('')}</div>`) +
+      sec(sh(A0.moreBadge, A0.moreH, fb(X.allArts, { href: 'blog.html', cls: 'fb--sm' })) + `<div class="arg">${more.map(x => C.arc(x, '', true)).join('')}</div>`) +
       cta();
   };
 
   // ── Политика и согласие: содержание слева (как у статьи), текст, справа — вопросы и второй документ ──
   const legal = id => {
-    const L = window.OG_LEGAL(D)[id], other = id === 'politika' ? ['Согласие на&nbsp;обработку данных', 'soglasie.html'] : ['Политика конфиденциальности', 'politika.html'];
-    document.title = L.crumb + ' — ОГНЕВЕД';
+    const L = window.OG_LEGAL(D)[id], other = id === 'politika' ? [X.legal.soglasie, 'soglasie.html'] : [X.legal.politika, 'politika.html'];
+    document.title = F(X.titleTpl, { t: L.crumb });
     after.push(() => {
       // телефон: содержание документа свёрнуто в строку «Содержание · N разделов», раскрывается касанием —
       // иначе до текста пришлось бы листать полэкрана пунктов
@@ -301,26 +298,26 @@
     });
     return `<section class="pgh"><div class="wrap2">${crumbs([[L.crumb]])}
         <div class="ath">
-          <div class="ath-m">${badge('Документы')}<time>Редакция от&nbsp;${D.legal.date}</time></div>
+          <div class="ath-m">${badge(X.legal.badge)}<time>${X.legal.ed}${D.legal.date}</time></div>
           <h1 class="h1x">${L.h}</h1>
           <p class="ath-p">${L.lead}</p>
         </div></div></section>` +
       sec(`<div class="atb lgb">
-          <aside class="toc2"><p class="side-k">Содержание</p><ol>${L.secs.map(([h], k) => `<li><a href="#p${k}" data-off="110"><span class="num">${pad(k + 1)}</span>${h}</a></li>`).join('')}</ol></aside>
+          <aside class="toc2"><p class="side-k">${X.toc}</p><ol>${L.secs.map(([h], k) => `<li><a href="#p${k}" data-off="110"><span class="num">${pad(k + 1)}</span>${h}</a></li>`).join('')}</ol></aside>
           <div class="prose2 lg">${L.secs.map(([h, b], k) => `<h2 id="p${k}"><span class="num">${pad(k + 1)}</span>${h}</h2>${b}`).join('')}</div>
-          <aside class="ats lg-as"><p class="side-k">Вопросы по&nbsp;данным</p><p class="lg-as-p">Напишите нам — ответим в&nbsp;течение 10&nbsp;рабочих дней</p><a class="lg-as-m" href="mailto:${D.email}">${D.email}</a>
-            <p class="side-k">Второй документ</p>${fb(other[0], { href: other[1], cls: 'fb--sm' })}</aside>
+          <aside class="ats lg-as"><p class="side-k">${X.legal.asK}</p><p class="lg-as-p">${X.legal.asP}</p><a class="lg-as-m" href="mailto:${D.email}">${D.email}</a>
+            <p class="side-k">${X.legal.other}</p>${fb(other[0], { href: other[1], cls: 'fb--sm' })}</aside>
         </div>`, { cls: 'sec--first' });
   };
   R.politika = () => legal('politika');
   R.soglasie = () => legal('soglasie');
 
   // ── Библиотека: папки, как на главной; последняя ячейка — «Не нашли документ?» ──
-  const ask = (t = 'Не&nbsp;нашли документ?', d = 'Спросите — пришлём ссылку на&nbsp;актуальную редакцию') => `<button class="lb-ask" data-open="form" data-q="Ищу документ: "><span class="lb-ask-i"><i></i></span><b>${t}</b><span>${d}</span></button>`;
+  const ask = (t = X.lib.askT, d = X.lib.askD) => `<button class="lb-ask" data-open="form" data-q="${D.esc(X.lib.askQ)}"><span class="lb-ask-i"><i></i></span><b>${t}</b><span>${d}</span></button>`;
   R.biblioteka = () => {
     const part = (c, last) => {
       const list = D.books.filter(b => b.cat === c.id);
-      return `<div class="lb-cat lb-cat--${c.id}"><h2 class="lb-h"><i></i>${c.t}<span class="num">${list.length || ''}</span></h2><div class="lib-grid lbx">${list.map(C.book).join('')}${list.length ? (last ? ask() : '') : ask('Раздел наполняется', 'Спросите — пришлём нужный документ')}</div></div>`;
+      return `<div class="lb-cat lb-cat--${c.id}"><h2 class="lb-h"><i></i>${c.t}<span class="num">${list.length || ''}</span></h2><div class="lib-grid lbx">${list.map(C.book).join('')}${list.length ? (last ? ask() : '') : ask(X.lib.emptyT, X.lib.emptyD)}</div></div>`;
     };
     const start = D.bookCat(qs.get('cat')) ? qs.get('cat') : 'all';
     after.push(() => {
@@ -328,46 +325,40 @@
       onChip($('#bf'), show); show(start);
       $$('#bf .chip2').forEach(x => x.classList.toggle('is-on', x.dataset.f === start));
     });
-    return head({ cr: [['Библиотека']], h: 'Библиотека<br><span class="g">нормативов и&nbsp;книг</span>',
-        lead: 'Законы, своды правил, приказы МЧС и&nbsp;книги, на&nbsp;которые мы&nbsp;опираемся в&nbsp;работе. Следим за&nbsp;изменениями и&nbsp;отмечаем новые редакции.' }) +
-      sec(chips('bf', [['all', `Все документы · ${D.books.length}`], ...D.bookCats.map(c => [c.id, c.short])]) + '<div class="lbw" id="bgrid" data-swap></div>', { cls: 'sec--first' }) +
+    return head({ cr: [[X.lib.crumb]], h: X.lib.h, lead: X.lib.lead }) +
+      sec(chips('bf', [['all', F(X.lib.all, { n: D.books.length })], ...D.bookCats.map(c => [c.id, c.short])]) + '<div class="lbw" id="bgrid" data-swap></div>', { cls: 'sec--first' }) +
       cta();
   };
 
   // ── Документ ──
   R.kniga = () => {
     const b = D.books.find(x => x.id === qs.get('id')) || D.books[0];
-    document.title = b.t + ' — ОГНЕВЕД';
+    document.title = F(X.titleTpl, { t: b.t });
     const svcs = S.filter(s => s.norms.some(n => findBook(n) === b));
-    const book = /Учебник|Справочник/.test(b.kind), status = book ? 'Учебное издание' : 'Действует';
+    const K0 = X.kniga, book = /Учебник|Справочник/.test(b.kind), status = b.status || (book ? K0.stBook : K0.stOk);
     // обложка крупно: у нарисованной — внизу дата и вид документа
     const cover = C.cover(b, 8);
-    return `<section class="pgh bkh"><div class="wrap2">${crumbs([['Библиотека', 'biblioteka.html'], [b.num]])}
+    return `<section class="pgh bkh"><div class="wrap2">${crumbs([[X.lib.crumb, 'biblioteka.html'], [b.num]])}
         <div class="bkh-g">
           <div class="bkh-v${book ? ' bkh-v--book' : ''}"><div class="bkh-doc">${book ? '<i class="bk-e"></i>' : '<i class="bk-s"></i><i class="bk-s"></i>'}<div class="bk-p">${cover}</div></div></div>
           <div class="bkh-r">
             ${badge(b.kind)}
             <h1 class="h1x h1x--md">${b.t}</h1>
-            ${dl([['Номер', b.num], ['Дата', b.date], ['Статус', `<span class="st-ok">${status}</span>`]])}
+            ${dl([[K0.num, b.num], [K0.date, b.date], [K0.status, `<span class="st-ok">${status}</span>`]])}
             <p class="bkh-p">${b.d}</p>
             ${b.news ? `<p class="bkh-new"><i></i>${b.news}</p>` : ''}
-            ${svcs.length ? `<div class="bkh-svc"><p class="side-k">Применяем в&nbsp;услугах</p><div class="tag-links">${svcs.map(s => `<a href="usluga.html?id=${s.id}">${s.cardT}${AR}</a>`).join('')}</div></div>` : ''}
-            <div class="pgh-act">${fb('Скачать PDF', { href: b.pdf || '#', blank: !!b.pdf, cls: 'fb--red' })}${fb('Задать вопрос по документу', { open: 'form', q: 'Вопрос по документу: ' + b.t })}</div>
-            <p class="bkh-note">Документ приведён для ознакомления. Актуальную редакцию сверяйте с&nbsp;официальным источником.</p>
+            ${svcs.length ? `<div class="bkh-svc"><p class="side-k">${K0.svc}</p><div class="tag-links">${svcs.map(s => `<a href="usluga.html?id=${s.id}">${s.cardT}${AR}</a>`).join('')}</div></div>` : ''}
+            <div class="pgh-act">${fb(K0.pdf, { href: b.pdf || '#', blank: !!b.pdf, cls: 'fb--red' })}${lb(BT.knigaAsk, '', b)}</div>
+            <p class="bkh-note">${K0.note}</p>
           </div>
         </div></div></section>` +
-      sec(sh('Библиотека', 'Другие <span class="g">документы</span>', fb('Вся библиотека', { href: 'biblioteka.html', cls: 'fb--sm' })) + `<div class="lib-grid lbx">${D.books.filter(x => x !== b).slice(0, 5).map(C.book).join('')}</div>`, { cls: 'sec--first' }) +
+      sec(sh(K0.moreBadge, K0.moreH, fb(K0.all, { href: 'biblioteka.html', cls: 'fb--sm' })) + `<div class="lib-grid lbx">${D.books.filter(x => x !== b).slice(0, 5).map(C.book).join('')}</div>`, { cls: 'sec--first' }) +
       cta();
   };
 
   // ── Контакты: строки контактов слева, форма справа; ниже — как работаем с регионами: карта и тёмная карточка этапов ──
   // у этапа — куда идёт обмен: от заказчика в Москву (in), туда и обратно (both), из Москвы заказчику (out); n — сколько отметок
-  const REMOTE = [
-    ['Заявка', 'Звоните, пишете в&nbsp;мессенджер или оставляете заявку на&nbsp;сайте — перезваниваем за&nbsp;15&nbsp;минут', 'in', 1],
-    ['Исходные данные', 'Присылаете чертежи и&nbsp;документы онлайн. Список нужного пришлём сами', 'in', 3],
-    ['Договор', 'Фиксируем стоимость и&nbsp;срок, подписываем по&nbsp;ЭДО или обмениваемся сканами', 'both', 1],
-    ['Документ', 'Передаём PDF с&nbsp;подписью, оригиналы — курьером в&nbsp;любой город', 'out', 1],
-  ];
+  const REMOTE = X.kontakty.remote.map(x => [x.t, x.p, x.dir, +x.n || 1]);
   // этапы сменяются раз в STEP мс (наведение держит этап); на карте этап — обмен с одним из дальних городов:
   // по его дуге летят отметки, на прилёте город или Москва вспыхивают кольцом. Город меняется с каждым кругом.
   // Всё идёт, только пока блок на экране
@@ -407,35 +398,32 @@
       new IntersectionObserver(([e]) => g.classList.toggle('is-live', e.isIntersecting)).observe(g);
       remote(g);
     });
-    return head({ cr: [['Контакты']], h: 'Контакты<br><span class="g">ответим за&nbsp;15&nbsp;минут</span>',
-        lead: 'Работаем дистанционно по&nbsp;всей России. Позвоните, напишите в&nbsp;мессенджер или оставьте заявку&nbsp;— специалист перезвонит и&nbsp;подскажет, какой документ нужен.' }) +
+    const K1 = X.kontakty;
+    return head({ cr: [[K1.crumb]], h: K1.h, lead: K1.lead }) +
       sec(`<div class="cnt">
           <div class="cnt-l">
-            <div class="cnt-row"><p class="side-k">Телефон</p><div class="cnt-tel"><div><a class="cnt-big" href="${D.phoneHref}">${D.phone}</a><p class="cnt-s">${D.hours}</p></div>${U.qr(D.phoneHref)}</div></div>
-            <div class="cnt-row"><p class="side-k">Почта</p><div><a class="cnt-mid" href="mailto:${D.email}">${D.email}</a><p class="cnt-s">Ответим в&nbsp;течение рабочего дня</p></div></div>
-            <div class="cnt-row"><p class="side-k">Мессенджеры</p><div>${U.msgBlock(['max', 'tg'])}</div></div>
+            <div class="cnt-row"><p class="side-k">${K1.telK}</p><div class="cnt-tel"><div><a class="cnt-big" href="${D.phoneHref}">${D.phone}</a><p class="cnt-s">${D.hours}</p></div>${U.qr(D.phoneHref)}</div></div>
+            <div class="cnt-row"><p class="side-k">${K1.mailK}</p><div><a class="cnt-mid" href="mailto:${D.email}">${D.email}</a><p class="cnt-s">${K1.mailS}</p></div></div>
+            <div class="cnt-row"><p class="side-k">${K1.msgK}</p><div>${U.msgBlock(['max', 'tg'])}</div></div>
             <div class="cnt-row cnt-row--3">
-              <div><p class="side-k">География</p><p class="cnt-v">Москва</p><p class="cnt-s">работаем по&nbsp;всей России</p></div>
-              <div><p class="side-k">Руководитель</p><p class="cnt-v">Пигусова Екатерина Михайловна</p><p class="cnt-s">исполнительный директор</p></div>
-              <div><p class="side-k">Реквизиты</p><p class="cnt-v">Отправим с&nbsp;договором</p><p class="cnt-s">работаем с&nbsp;юрлицами и&nbsp;ИП</p></div>
+              ${K1.cells.map(x => `<div><p class="side-k">${x.k}</p><p class="cnt-v">${x.v}</p><p class="cnt-s">${x.s}</p></div>`).join('\n              ')}
             </div>
           </div>
-          <div class="cnt-f"><p class="mdl-t">Напишите нам</p><p class="mdl-s">Опишите объект и&nbsp;задачу — подготовим предложение и&nbsp;назовём стоимость</p>${U.formHTML({ ql: 'Объект и задача' })}</div>
+          <div class="cnt-f"><p class="mdl-t">${K1.formT}</p><p class="mdl-s">${K1.formS}</p>${U.formHTML({ ql: K1.formQl, form: 'contacts' })}</div>
         </div>`, { cls: 'sec--first' }) +
-      sec(sh('Работаем дистанционно', 'Из&nbsp;любого региона<br><span class="g">без поездок в&nbsp;Москву</span>', '<p>Все этапы проходят онлайн: исходные данные, договор и&nbsp;готовые документы.</p>') +
+      sec(sh(K1.rmBadge, K1.rmH, `<p>${K1.rmP}</p>`) +
         `<div class="rmt">
           <div class="rmt-map">
-            <p class="rmt-lg"><span><i class="lg-dot"></i>${D.cities.length} городов с&nbsp;нашими проектами</span><span><i class="lg-ring"></i>и&nbsp;любой другой регион</span></p>
+            <p class="rmt-lg"><span><i class="lg-dot"></i>${F(K1.lgA, { n: D.cities.length })}</span><span><i class="lg-ring"></i>${K1.lgB}</span></p>
             <div class="map gst-map rv">${window.OG_MAP && C.mapSVG ? C.mapSVG() : ''}</div>
             <p class="rmt-sum"><strong>${D.about.facts[0].n}</strong><span>${D.about.facts[0].t}</span></p>
           </div>
-          <div class="rmt-st"><p class="side-k">Как проходит работа</p>
+          <div class="rmt-st"><p class="side-k">${K1.stK}</p>
             <ol>${REMOTE.map(([t, p], k) => `<li><span class="num">${pad(k + 1)}</span><div><h3>${t}</h3><p>${p}</p></div><i class="rmt-bar"></i></li>`).join('')}</ol></div>
         </div>`, { id: 'geo' });
   };
 
-  const notFound = () => head({ cr: [['Страница не найдена']], h: 'Такой страницы <span class="g">нет</span>',
-    lead: 'Возможно, ссылка устарела. Вернитесь на&nbsp;главную или выберите раздел в&nbsp;меню.', act: fb('На главную', { href: 'index.html', cls: 'fb--red' }) });
+  const notFound = () => head({ cr: [[X.nf.crumb]], h: X.nf.h, lead: X.nf.lead, act: fb(X.nf.btn, { href: 'index.html', cls: 'fb--red' }) });
 
   main.innerHTML = (R[kind] || notFound)();
   after.forEach(f => f());

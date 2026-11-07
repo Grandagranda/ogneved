@@ -2,9 +2,14 @@
 // Язык — как у главной (Figma «home»): Inter Tight, чёрный #0f1012, красный #f5312a, линии рамки, стрелка-уголок в кнопках.
 (function () {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const D = window.OG;
-  // внешняя ссылка; пустая (мессенджеры, пока нет адресов) — ссылка без href, никуда не ведёт
-  const ext = h => h ? ` href="${h}" target="_blank" rel="noopener"` : '';
+  const D = window.OG, X = D.tx, BT = D.btn;
+  // MAX: ссылка профиля открывает чат прямо в приложении. Пока её нет, на Android кнопка зовёт приложение MAX (пакет ru.oneme.app)
+  // по адресу max.ru, а без приложения браузер уходит в веб-версию (S.browser_fallback_url); на iPhone и ПК — веб-версия
+  if (D.maxProfile) { D.max = D.maxProfile; D.maxQr = D.maxProfile; }
+  else if (/Android/i.test(navigator.userAgent)) D.max = `intent://max.ru/#Intent;scheme=https;package=ru.oneme.app;S.browser_fallback_url=${encodeURIComponent(D.max)};end`;
+  // внешняя ссылка; пустая (мессенджеры, пока нет адресов) — ссылка без href, никуда не ведёт.
+  // intent: — в той же вкладке: из новой вкладки встроенные браузеры (Telegram) приложение не открывают
+  const ext = h => !h ? '' : /^intent:/.test(h) ? ` href="${h}"` : ` href="${h}" target="_blank" rel="noopener"`;
   const sv = (p, vb = 24) => `<svg viewBox="0 0 ${vb} ${vb}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 
   // знаки связи — заливкой: MAX — официальный знак (maxicons.ru), Telegram, телефон и почта — им в пару
@@ -44,8 +49,8 @@
   //    У «Наших работ» и «Статей» панели нет: пункт просто ведёт в раздел ──
   const PANELS = {
     'uslugi.html': () => `<ul class="mx-sv">${D.svcOrder.map(D.svc).map((s, i) => `<li class="mx-a" style="--i:${Math.floor(i / 3)}"><a href="usluga.html?id=${s.id}">
-          <span class="mx-im"><img data-src="img/s-${s.id}.webp" alt=""></span>
-          <span class="mx-tx"><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} дней</small></span></a></li>`).join('')}</ul>`,
+          <span class="mx-im"><img data-src="img/${s.img}.webp" alt=""></span>
+          <span class="mx-tx"><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} ${X.pg.days}</small></span></a></li>`).join('')}</ul>`,
   };
 
   // ── меню телефона: лист под шапкой — разделы строками на линиях (у «Услуг» раскрывается список с миниатюрами),
@@ -57,19 +62,19 @@
       const on = sect === n.href ? ' is-on' : '', num = `<i class="num">${String(i + 1).padStart(2, '0')}</i>`;
       if (!n.sub) return `<a class="mm-a${on}" href="${n.href}">${num}<b>${n.t}</b>${AR_UP}</a>`;
       return `<div class="mm-r"><a class="mm-a${on}" href="${n.href}">${num}<b>${n.t}</b></a><button class="mm-tg" type="button" aria-expanded="false" aria-controls="mm-sv" aria-label="Показать услуги"><i></i></button></div>
-        <div class="mm-sv" id="mm-sv"><ul>${D.svcOrder.map(D.svc).map(s => `<li><a href="usluga.html?id=${s.id}"><span class="mm-im"><img data-src="img/m/t-${s.id}.webp" alt="" width="96" height="60"></span><span class="mm-tx"><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} дней</small></span></a></li>`).join('')}</ul></div>`;
+        <div class="mm-sv" id="mm-sv"><ul>${D.svcOrder.map(D.svc).map(s => `<li><a href="usluga.html?id=${s.id}"><span class="mm-im"><img data-src="img/m/t/${s.img}.webp" alt="" width="96" height="60"></span><span class="mm-tx"><b>${s.cardT}</b><small>${D.cost(s)} · ${s.days} ${X.pg.days}</small></span></a></li>`).join('')}</ul></div>`;
     }).join('');
     const box = document.createElement('div');
     box.className = 'mm'; box.id = 'mm'; box.inert = true;
     box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', 'Меню');
     box.innerHTML = `<div class="mm-in">
         <nav class="mm-nav" aria-label="Разделы сайта">${nav}</nav>
-        ${MAIN ? `<div class="mm-pg"><p class="mm-k">На главной</p><div class="mm-chips">${BLOCKS.map(([id, t]) => `<a href="#${id}">${t}</a>`).join('')}</div></div>` : ''}
+        ${MAIN ? `<div class="mm-pg"><p class="mm-k">${X.mm.pg}</p><div class="mm-chips">${BLOCKS.map(([id, t]) => `<a href="#${id}">${t}</a>`).join('')}</div></div>` : ''}
         <div class="mm-ct">
-          <p class="mm-k">Позвоните или напишите</p>
+          <p class="mm-k">${X.mm.ct}</p>
           <a class="mm-tel" href="${D.phoneHref}">${D.phone}</a><p class="mm-s">${D.hours}</p>
           <div class="mm-msg"><a${ext(D.max)}>${ICO.max}<span>MAX</span></a><a${ext(D.tg)}>${ICO.tg}<span>Telegram</span></a><a href="mailto:${D.email}">${ICO.mail}<span>Почта</span></a></div>
-          <button class="btn btn--red mm-cta" type="button" data-open="form"><span>Оставить заявку</span></button>
+          ${D.B(BT.mm, 'btn btn--red mm-cta', {}, { arrow: false })}
         </div>
       </div>`;
     document.body.append(box);
@@ -106,10 +111,10 @@
     }).join('');
     el.classList.add('hx');
     el.innerHTML = `<div class="hx-in">
-      <a class="hx-logo" href="index.html" aria-label="ОГНЕВЕД — на главную"><img src="img/logo.svg" width="940" height="214" alt="ОГНЕВЕД"><small>эксперты в тушении пожаров</small></a>
+      <a class="hx-logo" href="index.html" aria-label="ОГНЕВЕД — на главную"><img src="img/logo.svg" width="940" height="214" alt="ОГНЕВЕД"><small>${X.hdr.tag}</small></a>
       <nav class="hx-nav" aria-label="Разделы сайта">${links}</nav>
       <a class="hx-tel" href="${D.phoneHref}">${D.phone}</a>
-      <button class="hx-btn" data-open="form"><span>Оставить заявку</span>${AR_UP}</button>
+      ${D.B(BT.hdr, 'hx-btn')}
       <a class="hx-call m-only" href="${D.phoneHref}" aria-label="Позвонить: ${D.phone}">${ICO.tel}</a>
       <button class="hx-bur m-only" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mm"><i></i><i></i></button></div>
       <div class="mx">${Object.entries(PANELS).map(([k, f]) => `<div class="mx-p" data-mx="${k}" inert><div class="mx-in">${f()}</div></div>`).join('')}</div>`;
@@ -177,42 +182,45 @@
     const S = D.svcOrder.map(D.svc);
     el.innerHTML = `<div class="wrap2 fd">
       <div class="fd-top">
-        <div class="fd-brand-w"><a class="fd-brand" href="${MAIN ? '#top' : 'index.html'}" aria-label="ОГНЕВЕД — ${MAIN ? 'наверх' : 'на главную'}"><img src="img/logo-white.svg" width="940" height="214" alt="ОГНЕВЕД"><small>эксперты в&nbsp;тушении пожаров</small></a>
-          <p class="fd-claim">Расчёты и&nbsp;проектная документация в&nbsp;области пожаротушения для зданий и&nbsp;сооружений по&nbsp;всей России</p></div>
-        <div class="fd-col"><p class="fd-l">Телефон</p><a class="fd-v" href="${D.phoneHref}">${D.phone}</a><p class="fd-s">${D.hours}</p></div>
-        <div class="fd-col"><p class="fd-l">Почта</p><a class="fd-v" href="mailto:${D.email}">${D.email}</a><p class="fd-s">Ответим в&nbsp;течение рабочего дня</p></div>
-        <div class="fd-col"><p class="fd-l">Мессенджеры</p><div class="fd-socs"><a${ext(D.max)} aria-label="MAX">${ICO.max}</a><a${ext(D.tg)} aria-label="Telegram">${ICO.tg}</a><a href="mailto:${D.email}" aria-label="Почта">${ICO.mail}</a></div></div>
+        <div class="fd-brand-w"><a class="fd-brand" href="${MAIN ? '#top' : 'index.html'}" aria-label="ОГНЕВЕД — ${MAIN ? 'наверх' : 'на главную'}"><img src="img/logo-white.svg" width="940" height="214" alt="ОГНЕВЕД"><small>${X.ftr.tag}</small></a>
+          <p class="fd-claim">${X.ftr.claim}</p></div>
+        <div class="fd-col"><p class="fd-l">${X.ftr.telL}</p><a class="fd-v" href="${D.phoneHref}">${D.phone}</a><p class="fd-s">${D.hours}</p></div>
+        <div class="fd-col"><p class="fd-l">${X.ftr.mailL}</p><a class="fd-v" href="mailto:${D.email}">${D.email}</a><p class="fd-s">${X.ftr.mailS}</p></div>
+        <div class="fd-col"><p class="fd-l">${X.ftr.msgL}</p><div class="fd-socs"><a${ext(D.max)} aria-label="MAX">${ICO.max}</a><a${ext(D.tg)} aria-label="Telegram">${ICO.tg}</a><a href="mailto:${D.email}" aria-label="Почта">${ICO.mail}</a></div></div>
       </div>
       <div class="fd-mid">
-        <div class="fd-cta"><p class="fd-h">Расскажите об&nbsp;объекте — <span>подскажем, какой документ нужен</span></p>
-          <button class="fd-btn" data-open="form"><span>Оставить заявку</span>${AR_UP}</button></div>
-        <div><p class="fd-l">Разделы</p><ul class="fd-ul">${D.nav.map(n => `<li><a href="${n.href}">${n.t}</a></li>`).join('')}</ul></div>
-        <div><p class="fd-l">Услуги</p><ul class="fd-ul">${S.map(s => `<li><a href="usluga.html?id=${s.id}">${s.short}</a></li>`).join('')}</ul></div>
-        <div><p class="fd-l">География</p><p class="fd-t">${D.city.split(',')[0]}</p><p class="fd-s">${D.city.split(',').slice(1).join(',').trim()}</p>
-          <p class="fd-l fd-l--gap">Режим работы</p><p class="fd-t">${D.hours.replace(/,.*/, '')}</p><p class="fd-s">${(D.hours.split(',')[1] || '').trim()}</p></div>
+        <div class="fd-cta"><p class="fd-h">${X.ftr.cta}</p>
+          ${D.B(BT.ftr, 'fd-btn')}</div>
+        <div><p class="fd-l">${X.ftr.navL}</p><ul class="fd-ul">${D.nav.map(n => `<li><a href="${n.href}">${n.t}</a></li>`).join('')}</ul></div>
+        <div><p class="fd-l">${X.ftr.svcL}</p><ul class="fd-ul">${S.map(s => `<li><a href="usluga.html?id=${s.id}">${s.short}</a></li>`).join('')}</ul></div>
+        <div><p class="fd-l">${X.ftr.geoL}</p><p class="fd-t">${D.city.split(',')[0]}</p><p class="fd-s">${D.city.split(',').slice(1).join(',').trim()}</p>
+          <p class="fd-l fd-l--gap">${X.ftr.hoursL}</p><p class="fd-t">${D.hours.replace(/,.*/, '')}</p><p class="fd-s">${(D.hours.split(',')[1] || '').trim()}</p></div>
       </div>
-      <div class="fd-bot"><span>© 2012–2026 ОГНЕВЕД</span><a href="politika.html">Политика конфиденциальности</a><a href="soglasie.html">Согласие на&nbsp;обработку персональных данных</a><a href="#top">Наверх ↑</a></div>
+      <div class="fd-bot"><span>${X.ftr.copy}</span><a href="politika.html">${X.ftr.privacy}</a><a href="soglasie.html">${X.ftr.consent}</a><a href="#top">${X.ftr.up}</a></div>
     </div>`;
   }
 
   // ── формы: поля как в форме первого экрана (Figma «home» 2038:34) — #f3f3f4 с обводкой, подпись внутри поля ──
   const telField = () => `<label class="fld fld--tel">${FLAG}<input name="phone" type="tel" placeholder="+7 (000) 000 00 00" autocomplete="tel" required><span class="pfx">+7</span></label>`;
-  const formHTML = (o = {}) => `<form class="form ff${o.cls ? ' ' + o.cls : ''}" novalidate>
-    <label class="fld"><input name="name" placeholder=" " autocomplete="name"><span>Ваше имя</span></label>
+  // o.form — какая это форма (в админке видно, откуда пришла заявка, и по нему выбирают, куда её отправить)
+  const FX = X.form, okOf = k => (D.forms[k] && D.forms[k].ok) || FX.ok;
+  const agree = () => `<label class="consent agr"><input type="checkbox" name="agree" required><i></i><span>${FX.agree}</span></label>`;
+  const formHTML = (o = {}) => `<form class="form ff${o.cls ? ' ' + o.cls : ''}" data-form="${o.form || 'modal'}" novalidate>
+    <label class="fld"><input name="name" placeholder=" " autocomplete="name"><span>${FX.name}</span></label>
     ${telField()}
-    ${o.q === false ? '' : `<label class="fld fld--ta"><textarea name="q" placeholder=" " rows="3"></textarea><span>${o.ql || 'Объект или вопрос'}</span></label>`}
-    <button class="btn btn--red" type="submit">${o.btn || 'Оставить заявку'}</button>
-    <label class="consent agr"><input type="checkbox" name="agree" required><i></i><span>Даю <a href="soglasie.html" target="_blank">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="politika.html" target="_blank">политику конфиденциальности</a></span></label>
-    <div class="form-ok">${ICO.ok}<div><b>Заявка отправлена</b><p class="muted">Специалист перезвонит в течение 15 минут в рабочее время.</p></div></div>
+    ${o.q === false ? '' : `<label class="fld fld--ta"><textarea name="q" placeholder=" " rows="3"></textarea><span>${o.ql || FX.q}</span></label>`}
+    <button class="btn btn--red" type="submit">${o.btn || FX.btn}</button>
+    ${agree()}
+    <div class="form-ok">${ICO.ok}<div><b>${FX.okT}</b><p class="muted">${okOf(o.form || 'modal')}</p></div></div>
   </form>`;
   // строка формы как на первом экране: имя, телефон, объект и красная кнопка в один ряд
-  const formRow = (o = {}) => `<form class="form hf" novalidate>
-    <label class="fld"><input name="name" placeholder=" " autocomplete="name"><span>Ваше имя</span></label>
+  const formRow = (o = {}) => `<form class="form hf" data-form="${o.form || 'cta'}" novalidate>
+    <label class="fld"><input name="name" placeholder=" " autocomplete="name"><span>${FX.name}</span></label>
     ${telField()}
-    <label class="fld"><input name="obj" placeholder=" "><span>${o.ql || 'Ваш объект'}</span></label>
-    <button class="btn btn--red" type="submit">${o.btn || 'Получить консультацию'}</button>
-    <label class="consent agr"><input type="checkbox" name="agree" required><i></i><span>Даю <a href="soglasie.html" target="_blank">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="politika.html" target="_blank">политику конфиденциальности</a></span></label>
-    <div class="form-ok">${ICO.ok}<div><b>Заявка отправлена</b><p class="muted">Специалист перезвонит в течение 15 минут в рабочее время.</p></div></div>
+    <label class="fld"><input name="obj" placeholder=" "><span>${o.ql || FX.obj}</span></label>
+    <button class="btn btn--red" type="submit">${o.btn || FX.btnRow}</button>
+    ${agree()}
+    <div class="form-ok">${ICO.ok}<div><b>${FX.okT}</b><p class="muted">${okOf(o.form || 'cta')}</p></div></div>
   </form>`;
   function bindForms(root = document) {
     $$('form.form', root).forEach(f => {
@@ -231,25 +239,40 @@
         if (tel.value.replace(/\D/g, '').length < 11) { tel.closest('.fld').classList.add('err'); tel.focus(); return; }
         const agr = f.elements.agree;
         if (agr && !agr.checked) { agr.closest('.agr').classList.add('err'); agr.focus(); return; }
-        f.classList.add('is-sent');
+        sendLead(f);
       });
     });
   }
 
+  // ── заявка уходит на сервер (send.php): сохраняется в админке → «Заявки» и рассылается туда, куда указано в админке.
+  //    t — сколько мс страница открыта: робот отправляет форму сразу. В предпросмотре админки заявки не отправляются ──
+  const leadCtx = { topic: '', btn: '' };
+  const utm = (() => { try { const q = new URLSearchParams(location.search), o = {}; ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(k => { if (q.get(k)) o[k] = q.get(k); }); if (Object.keys(o).length) sessionStorage.setItem('og-utm', JSON.stringify(o)); return JSON.parse(sessionStorage.getItem('og-utm') || '{}'); } catch (e) { return {}; } })();
+  function sendLead(f) {
+    const kind = f.dataset.form || 'modal', el = f.elements, v = n => (el[n] && el[n].value || '').trim();
+    const lead = { form: kind, name: v('name'), phone: v('phone'), text: v('q') || v('obj'), page: location.pathname.split('/').pop() + location.search,
+      title: document.title, ref: document.referrer, utm, t: Math.round(performance.now()) };
+    if (kind === 'modal') { lead.topic = leadCtx.topic; lead.btn = leadCtx.btn; }
+    if (f.ogExtra) Object.assign(lead, f.ogExtra());
+    const btn = $('button[type=submit]', f), done = () => { f.classList.add('is-sent'); f.classList.remove('is-busy'); btn.disabled = false; };
+    if (D.preview) return done();
+    f.classList.add('is-busy'); btn.disabled = true;
+    fetch(D.forms.endpoint || 'send.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+      .then(r => r.json()).then(j => { if (!j.ok) throw new Error(j.error); done(); f.reset(); })
+      .catch(() => { f.classList.remove('is-busy'); btn.disabled = false; alert(D.f(FX.err, { phone: D.phone })); });
+  }
+
   // ── связаться: звонок и мессенджеры кнопками — значок в квадрате, подпись капсом и действие, стрелка-уголок.
   //    msgBlock(['max', 'tg']) — только мессенджеры ──
-  const MSG = [['tel', 'Позвонить', D.phone, D.phoneHref], ['max', `Мессенджер · по&nbsp;номеру ${D.phone}`, 'Написать в&nbsp;MAX', D.max], ['tg', 'Мессенджер', 'Написать в&nbsp;Telegram', D.tg]];
+  const MSG = [['tel', X.msg.telK, D.phone, D.phoneHref], ['max', D.f(X.msg.maxK, { phone: D.phone }), X.msg.maxV, D.max], ['tg', X.msg.tgK, X.msg.tgV, D.tg]];
   // qr: код для телефона; строится из той же ссылки, что и кнопка (у звонка — tel:, камера предложит набрать номер)
   const qr = h => { qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8']; const q = qrcode(0, 'M'); q.addData(h, 'Byte'); q.make(); const n = q.getModuleCount(); let d = ''; for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`; return `<svg class="msg-q" viewBox="-2 -2 ${n + 4} ${n + 4}" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}"/></svg>`; };
   const msgBlock = (only, withQr) => `<div class="msg${withQr ? ' msg--qr' : ''}">${MSG.filter(m => !only || only.includes(m[0])).map(([k, t, v, h]) =>
     `<a class="msg-b"${k === 'tel' ? ` href="${h}"` : ext(h)}><span class="msg-i">${ICO[k]}</span><span class="msg-t"><small>${t}</small><b>${v}</b></span>${withQr ? qr(k === 'max' ? D.maxQr : h) : ''}${AR_UP}</a>`).join('')}</div>`;
 
   // ── коэффициенты калькулятора стоимости (js/calc.js) ──
-  const calc = { data: {
-    AREA: [['до 1 000 м²', 1], ['1–5 тыс. м²', 1.2], ['5–20 тыс. м²', 1.5], ['20–50 тыс. м²', 1.9], ['более 50 тыс. м²', 2.4]],
-    BLD: [['Одно', 1], ['2–3', 1.35], ['4 и более', 1.7]],
-    KOBJ: { logistic: 1.1, production: 1.25, admin: 1, living: .9, trade: 1.05, oil: 1.4, social: 1, other: 1.2 },
-  } };
+  const K = D.calc;
+  const calc = { data: { AREA: K.area.map(a => [a.t + ' м²', +a.k]), BLD: K.bld.map(b => [b.t, +b.k]), KOBJ: Object.fromEntries(D.objects.map(o => [o.id, +o.k || 1])) } };
 
   // ── окна и «блуждающие» кнопки ──
   // заявка: слева — тонированная панель с обещаниями и телефоном (рамка с крестиками, как блоки главной), справа — форма
@@ -258,21 +281,21 @@
     box.innerHTML = `
       <div class="modal mdl" id="m-form" role="dialog" aria-modal="true" aria-label="Заявка на консультацию"><div class="modal-box mdl-box"><button class="modal-x" data-close aria-label="Закрыть">${ICO.x}</button>
         <aside class="mdl-l">
-          <p class="badge badge--flat"><i></i>Бесплатная консультация</p>
-          <h3 class="mdl-h">Расскажите об&nbsp;объекте&nbsp;— <span class="g">подскажем, какой документ нужен</span></h3>
-          <ul class="mdl-ul"><li>Перезвоним в&nbsp;течение 15&nbsp;минут в&nbsp;рабочее время</li><li>Подскажем, какие расчёты нужны вашему объекту</li><li>Назовём стоимость и&nbsp;срок ещё до&nbsp;договора</li></ul>
-          <div class="mdl-c"><div class="mdl-ct"><p class="mdl-k">Или позвоните</p><a href="${D.phoneHref}">${D.phone}</a><small>${D.hours}</small></div>${qr(D.phoneHref)}</div>
+          <p class="badge badge--flat"><i></i>${X.mForm.badge}</p>
+          <h3 class="mdl-h">${X.mForm.h}</h3>
+          <ul class="mdl-ul">${X.mForm.ul.map(t => `<li>${t}</li>`).join('')}</ul>
+          <div class="mdl-c"><div class="mdl-ct"><p class="mdl-k">${X.mForm.callK}</p><a href="${D.phoneHref}">${D.phone}</a><small>${D.hours}</small></div>${qr(D.phoneHref)}</div>
         </aside>
-        <div class="mdl-r"><p class="mdl-t">Заявка на&nbsp;консультацию</p><p class="mdl-s">Оставьте контакты — специалист перезвонит и&nbsp;уточнит задачу</p>${formHTML()}</div></div></div>
+        <div class="mdl-r"><p class="mdl-t">${X.mForm.t}</p><p class="mdl-s">${X.mForm.s}</p>${formHTML({ form: 'modal' })}</div></div></div>
       <div class="modal modal--wide" id="m-calc" role="dialog" aria-modal="true" aria-label="Калькулятор стоимости"><div class="modal-box"><button class="modal-x" data-close aria-label="Закрыть">${ICO.x}</button><div data-calc></div></div></div>
       <div class="modal mdl mdl--cnt" id="m-cnt" role="dialog" aria-modal="true" aria-label="Контакты"><div class="modal-box"><button class="modal-x" data-close aria-label="Закрыть">${ICO.x}</button>
-        <p class="badge badge--flat"><i></i>Контакты</p>
-        <h3 class="mdl-h">Свяжитесь с&nbsp;нами <span class="g">удобным способом</span></h3><p class="mdl-s">Позвоните или напишите в&nbsp;мессенджер — ответим в&nbsp;течение 15&nbsp;минут в&nbsp;рабочее время.</p>${msgBlock(null, true)}
-        <dl class="mdl-dl"><div><dt>Почта</dt><dd><a href="mailto:${D.email}">${D.email}</a></dd></div><div><dt>Режим работы</dt><dd>${D.hours}</dd></div></dl></div></div>
+        <p class="badge badge--flat"><i></i>${X.mCnt.badge}</p>
+        <h3 class="mdl-h">${X.mCnt.h}</h3><p class="mdl-s">${X.mCnt.s}</p>${msgBlock(null, true)}
+        <dl class="mdl-dl"><div><dt>${X.mCnt.mailL}</dt><dd><a href="mailto:${D.email}">${D.email}</a></dd></div><div><dt>${X.mCnt.hoursL}</dt><dd>${D.hours}</dd></div></dl></div></div>
       <div class="dock" aria-label="Быстрые действия">
-        <button data-open="cnt" aria-label="Позвонить, написать или открыть QR-код">${ICO.qr.replace('<svg', '<svg class="pc-only"')}${ICO.tel.replace('<svg', '<svg class="m-only"')}<span class="d-tip">Позвонить, написать, QR-код</span></button>
-        <button data-open="form" aria-label="Задать вопрос">${ICO.chat}<span class="d-tip">Задать вопрос</span></button>
-        <button class="d-main" data-open="calc" aria-label="Рассчитать стоимость">${ICO.calc}<span>Рассчитать стоимость</span></button>
+        <button data-open="cnt" aria-label="Позвонить, написать или открыть QR-код">${ICO.qr.replace('<svg', '<svg class="pc-only"')}${ICO.tel.replace('<svg', '<svg class="m-only"')}<span class="d-tip">${X.dock.cnt}</span></button>
+        <button data-open="form" aria-label="${X.dock.ask}">${ICO.chat}<span class="d-tip">${X.dock.ask}</span></button>
+        <button class="d-main" data-open="calc" aria-label="${X.dock.calc}">${ICO.calc}<span>${X.dock.calc}</span></button>
       </div>`;
     document.body.append(...box.children);
     // содержимое окна — в обёртке: на телефоне лист прокручивается внутри неё, а крестик стоит; на ПК обёртка — display: contents
@@ -283,7 +306,7 @@
       const m = $('#m-' + id); if (!m) return;
       last = document.activeElement;
       if (id === 'calc' && data.svc) { const c = $('[data-calc]', m); c.ogSet && c.ogSet(data.svc); }
-      if (id === 'form') { const f = $('form', m); f.classList.remove('is-sent'); const q = $('textarea', f); if (q) q.value = data.q || ''; }
+      if (id === 'form') { const f = $('form', m); f.classList.remove('is-sent'); const q = $('textarea', f); if (q) q.value = data.q || ''; leadCtx.topic = data.q || ''; leadCtx.btn = data.btn || ''; }
       // окно из меню телефона занимает его запись в истории; одно окно поверх другого — тоже без новой записи
       const was = $('.modal.is-open');
       if (was && was !== m) was.classList.remove('is-open');
@@ -299,7 +322,7 @@
       const cd = e.target.closest('[data-card]');
       if (cd && !e.target.closest('a, button, input, textarea, select, label')) { const b = cd.querySelector('[data-open], a[href]'); if (b) { b.click(); return; } }
       const o = e.target.closest('[data-open]');
-      if (o) { e.preventDefault(); open(o.dataset.open, { svc: o.dataset.svc, q: o.dataset.q }); return; }
+      if (o) { e.preventDefault(); open(o.dataset.open, { svc: o.dataset.svc, q: o.dataset.q, btn: (o.getAttribute('aria-label') || o.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80) }); return; }
       if (e.target.closest('[data-close]') || e.target.classList.contains('modal')) close();
     });
     addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
@@ -345,7 +368,7 @@
     MOB.addEventListener('change', paint);
   }
 
-  window.OG_UI = { $, $$, ICO, AR_UP, formHTML, formRow, bindForms, calc, msgBlock, qr, MOB };
+  window.OG_UI = { $, $$, ICO, AR_UP, formHTML, formRow, bindForms, calc, msgBlock, qr, MOB, sendLead };
   header(); footer(); modals();
   // ленивые картинки — за экран до блока, а не у самого края: в лентах (объекты, статьи, ленты телефона) карточки стоят
   // за правым краем окна, и браузер сам начинает их грузить, только когда карточка почти выехала. Качество то же, меняется только момент

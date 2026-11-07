@@ -27,10 +27,10 @@
     <div class="hero-stage">
       <i class="fl fl--h" style="--y:40.25rem"></i>
       <div class="hero-in">
-        <p class="badge hero-badge"><svg class="flag" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.975.5C4.725.5 1.95 2.6.925 5.5h14.15C14.025 2.6 11.25.5 7.975.5Z" fill="#EEE"/><path d="M7.975 15.5c3.275 0 6.05-2.1 7.075-5H.925c1.025 2.925 3.8 5 7.05 5Z" fill="#FE2630"/><path d="M.925 5.5A7.5 7.5 0 0 0 .5 8c0 .875.15 1.725.425 2.5h14.15c.275-.775.425-1.625.425-2.5s-.15-1.725-.425-2.5H.925Z" fill="#3C73E9"/></svg>Работаем по всей России с 2012 года</p>
-        <h1 class="hero-h"><span class="ln"><span>Экспертные решения</span></span> <span class="ln"><span>при проектировании</span></span> <span class="ln"><span>в области</span></span> <span class="ln"><span><mark class="hl"><b>пожаротушения</b></mark></span></span></h1>
-        <p class="hero-sub">Разрабатываем расчётные обоснования и&nbsp;документацию для зданий и&nbsp;сооружений. Профессионально, обоснованно, в&nbsp;срок.</p>
-        <button class="fb hero-cta" data-open="form"><span>Заказать проект</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></button>
+        <p class="badge hero-badge" data-c="tx.home.heroBadge" data-k="1"><svg class="flag" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.975.5C4.725.5 1.95 2.6.925 5.5h14.15C14.025 2.6 11.25.5 7.975.5Z" fill="#EEE"/><path d="M7.975 15.5c3.275 0 6.05-2.1 7.075-5H.925c1.025 2.925 3.8 5 7.05 5Z" fill="#FE2630"/><path d="M.925 5.5A7.5 7.5 0 0 0 .5 8c0 .875.15 1.725.425 2.5h14.15c.275-.775.425-1.625.425-2.5s-.15-1.725-.425-2.5H.925Z" fill="#3C73E9"/></svg>Работаем по всей России с 2012 года</p>
+        <h1 class="hero-h" data-c="tx.home.heroH"><span class="ln"><span>Экспертные решения</span></span> <span class="ln"><span>при проектировании</span></span> <span class="ln"><span>в области</span></span> <span class="ln"><span><mark class="hl"><b>пожаротушения</b></mark></span></span></h1>
+        <p class="hero-sub" data-c="tx.home.heroSub">Разрабатываем расчётные обоснования и&nbsp;документацию для зданий и&nbsp;сооружений. Профессионально, обоснованно, в&nbsp;срок.</p>
+        <button class="fb hero-cta" data-b="heroCta" data-open="form"><span>Заказать проект</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></button>
 
         <!-- петля img/hero.mp4 (_tools/hero-video.cjs); поверх — пометки услуг (js/hero.js) -->
         <div class="hero-art" id="art">
@@ -50,15 +50,15 @@
 
     <div class="hero-form-w">
       <div class="hero-form">
-        <h2 class="hf-t"><em>Бесплатная консультация</em> за&nbsp;15&nbsp;минут</h2>
-        <p class="hf-s">Оставьте заявку и&nbsp;мы подберем подходящее решение под ваш объект</p>
-        <form class="form hf" novalidate>
-          <label class="fld"><input name="name" placeholder=" " autocomplete="name"><span>Ваше имя</span></label>
+        <h2 class="hf-t" data-c="tx.home.hfT"><em>Бесплатная консультация</em> за&nbsp;15&nbsp;минут</h2>
+        <p class="hf-s" data-c="tx.home.hfS">Оставьте заявку и&nbsp;мы подберем подходящее решение под ваш объект</p>
+        <form class="form hf" data-form="hero" novalidate>
+          <label class="fld"><input name="name" placeholder=" " autocomplete="name"><span data-c="tx.form.name">Ваше имя</span></label>
           <label class="fld fld--tel"><svg class="flag" viewBox="0 0 14 11" aria-hidden="true"><path d="M14 9.036c0 .417-.164.816-.456 1.111a1.55 1.55 0 0 1-1.1.46H1.556a1.55 1.55 0 0 1-1.1-.46A1.58 1.58 0 0 1 0 9.036V7.464h14v1.572Z" fill="#CE2028"/><path d="M0 3.536h14v3.928H0z" fill="#22408C"/><path d="M12.444.393H1.556c-.413 0-.809.165-1.1.46A1.58 1.58 0 0 0 0 1.964v1.572h14V1.964c0-.417-.164-.816-.456-1.111a1.55 1.55 0 0 0-1.1-.46Z" fill="#fff"/></svg><input name="phone" type="tel" placeholder="+7 (000) 000 00 00" autocomplete="tel" required><span class="pfx">+7</span></label>
-          <label class="fld"><input name="obj" placeholder=" "><span>Ваш объект</span></label>
-          <button class="btn btn--red" type="submit">Получить консультацию</button>
-          <label class="consent agr"><input type="checkbox" name="agree" required><i></i><span>Даю <a href="soglasie.html" target="_blank">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="politika.html" target="_blank">политику конфиденциальности</a></span></label>
-          <div class="form-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><b>Заявка отправлена</b><p class="muted">Специалист перезвонит в течение 15 минут в рабочее время.</p></div>
+          <label class="fld"><input name="obj" placeholder=" "><span data-c="tx.form.obj">Ваш объект</span></label>
+          <button class="btn btn--red" type="submit" data-c="tx.form.btnRow">Получить консультацию</button>
+          <label class="consent agr"><input type="checkbox" name="agree" required><i></i><span data-c="tx.form.agree">Даю <a href="soglasie.html" target="_blank">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="politika.html" target="_blank">политику конфиденциальности</a></span></label>
+          <div class="form-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><b data-c="tx.form.okT">Заявка отправлена</b><p class="muted" data-c="forms.hero.ok">Специалист перезвонит в течение 15 минут в рабочее время.</p></div>
         </form>
       </div>
     </div>
@@ -66,7 +66,7 @@
 
   <!-- клиенты: сетка логотипов на линиях рамки -->
   <section class="clients" aria-label="Нам доверяют">
-    <div class="wrap2 cl-head"><p class="badge badge--flat"><i></i>Нам доверяют</p><p class="cl-note">Проектные институты, девелоперы и&nbsp;промышленные предприятия</p></div>
+    <div class="wrap2 cl-head"><p class="badge badge--flat" data-c="tx.home.clBadge" data-k="1"><i></i>Нам доверяют</p><p class="cl-note" data-c="tx.home.clNote">Проектные институты, девелоперы и&nbsp;промышленные предприятия</p></div>
     <div class="cl-grid" id="clients"></div>
   </section>
 
@@ -74,9 +74,9 @@
   <section class="sec sec--tint" id="services">
     <div class="wrap2">
       <div class="sh">
-        <p class="badge badge--flat"><i></i>Услуги</p>
-        <h2 class="h2x">Расчёты и&nbsp;документы <span class="g">для пожаротушения</span></h2>
-        <div class="sh-r"><p>Документы готовят пожарные с&nbsp;профильным образованием — поэтому решения учитывают реальную тактику тушения.</p></div>
+        <p class="badge badge--flat" data-c="tx.home.svcBadge" data-k="1"><i></i>Услуги</p>
+        <h2 class="h2x" data-c="tx.home.svcH">Расчёты и&nbsp;документы <span class="g">для пожаротушения</span></h2>
+        <div class="sh-r"><p data-c="tx.home.svcP">Документы готовят пожарные с&nbsp;профильным образованием — поэтому решения учитывают реальную тактику тушения пожаров.</p></div>
       </div>
       <div class="scx" id="svc"></div>
     </div>
@@ -86,11 +86,9 @@
   <section class="sec" id="about">
     <div class="wrap2">
       <div class="st">
-        <p class="badge badge--flat rv"><i></i>О нас</p>
-        <div class="st-text" id="statement">
-          <p>С&nbsp;2012 года узко специализируемся на&nbsp;проектировании и&nbsp;расчётных обоснованиях соответствия объектов защиты требованиям пожарной безопасности в&nbsp;области пожаротушения:</p>
-          <ul><li>разрабатываем обоснования проектных решений для строящихся объектов;</li><li>подтверждаем соответствие требованиям норм эксплуатируемых объектов.</li></ul>
-        </div>
+        <p class="badge badge--flat rv" data-c="tx.home.abBadge" data-k="1"><i></i>О нас</p>
+        <div class="st-text" id="statement" data-c="tx.home.statement"><p>С&nbsp;2012 года узко специализируемся на&nbsp;проектировании и&nbsp;расчётных обоснованиях соответствия объектов защиты требованиям пожарной безопасности в&nbsp;области пожаротушения:</p>
+          <ul><li>разрабатываем обоснования проектных решений для строящихся объектов;</li><li>подтверждаем соответствие требованиям норм эксплуатируемых объектов.</li></ul></div>
       </div>
       <ul class="nums" id="nums"></ul>
       <ul class="prx" id="pros"></ul>
@@ -101,9 +99,9 @@
   <section class="objx" id="objects">
     <div class="objx-pin">
       <div class="wrap2 sh">
-        <p class="badge badge--flat"><i></i>Объекты</p>
-        <h2 class="h2x">Для каких объектов<br><span class="g">мы&nbsp;проектируем</span></h2>
-        <div class="sh-r"><p>От жилого дома до&nbsp;гидроэлектростанции. Выберите тип объекта&nbsp;—<br>подготовим предложение под ваши условия.</p></div>
+        <p class="badge badge--flat" data-c="tx.home.objBadge" data-k="1"><i></i>Объекты</p>
+        <h2 class="h2x" data-c="tx.home.objH">Для каких объектов<br><span class="g">мы&nbsp;проектируем</span></h2>
+        <div class="sh-r"><p data-c="tx.home.objP">От жилого дома до&nbsp;гидроэлектростанции. Выберите тип объекта&nbsp;—<br>подготовим предложение под ваши условия.</p></div>
       </div>
       <div class="objx-track" id="obj"></div>
       <div class="wrap2 objx-bar"><span class="num" id="obj-k">01 / 08</span><i><b id="obj-p"></b></i></div>
@@ -114,13 +112,13 @@
   <section class="sec sec--tint" id="works">
     <div class="wrap2">
       <div class="sh">
-        <p class="badge badge--flat"><i></i>Наши работы</p>
-        <h2 class="h2x">Выполненные <span class="g">проекты</span></h2>
-        <div class="sh-r"><p>Стоимость и&nbsp;сроки указаны как «основная работа + дополнительные услуги».</p></div>
+        <p class="badge badge--flat" data-c="tx.home.wkBadge" data-k="1"><i></i>Наши работы</p>
+        <h2 class="h2x" data-c="tx.home.wkH">Выполненные <span class="g">проекты</span></h2>
+        <div class="sh-r"><p data-c="tx.home.wkP">Стоимость и&nbsp;сроки указаны как «основная работа + дополнительные услуги».</p></div>
       </div>
       <div class="chips2" id="works-f"></div>
       <div class="wkx" id="works-list"></div>
-      <div class="more2"><a class="fb" href="raboty.html" id="works-more"><span>Все проекты</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a></div>
+      <div class="more2"><a class="fb" data-b="worksMore" id="works-more" href="raboty.html"><span>Все проекты</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a></div>
     </div>
   </section>
 
@@ -128,8 +126,8 @@
   <section class="sec" id="price">
     <div class="wrap2">
       <div class="sh">
-        <p class="badge badge--flat"><i></i>Стоимость</p>
-        <h2 class="h2x">Сколько стоит <span class="g">проект</span></h2>
+        <p class="badge badge--flat" data-c="tx.home.prBadge" data-k="1"><i></i>Стоимость</p>
+        <h2 class="h2x" data-c="tx.home.prH">Сколько стоит <span class="g">проект</span></h2>
       </div>
       <div class="calc-wrap rv" id="calc"></div>
     </div>
@@ -141,10 +139,10 @@
     <div class="stk-run" id="stk-run"><div class="stk-pin">
     <div class="wrap2 stk">
       <div class="stk-l">
-        <p class="badge badge--flat"><i></i>Как мы работаем</p>
-        <h2 class="h2x">От&nbsp;заявки<br class="pc-only"> до&nbsp;проекта<br><span class="g">в&nbsp;пять шагов</span></h2>
-        <p class="stk-s">Срок выполнения зависит от&nbsp;объёма работ — точную дату сдачи фиксируем в&nbsp;договоре.</p>
-        <button class="fb" data-open="form" data-q="Обсудить проект"><span>Обсудить проект</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></button>
+        <p class="badge badge--flat" data-c="tx.home.stBadge" data-k="1"><i></i>Как мы работаем</p>
+        <h2 class="h2x" data-c="tx.home.stH">От&nbsp;заявки<br class="pc-only"> до&nbsp;проекта<br><span class="g">в&nbsp;пять шагов</span></h2>
+        <p class="stk-s" data-c="tx.home.stP">Срок выполнения зависит от&nbsp;объёма работ — точную дату сдачи фиксируем в&nbsp;договоре.</p>
+        <button class="fb" data-b="steps" data-open="form" data-q="Обсудить проект"><span>Обсудить проект</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></button>
       </div>
       <ol class="stk-list" id="stk"></ol>
     </div>
@@ -156,18 +154,18 @@
   <section class="sec" id="geo">
     <div class="wrap2">
       <div class="geh">
-        <p class="badge badge--flat"><i></i>География</p>
-        <h2 class="h2x">Неважно, где вы&nbsp;находитесь, —<br><span class="g">работаем по&nbsp;всей России</span></h2>
+        <p class="badge badge--flat" data-c="tx.home.geoBadge" data-k="1"><i></i>География</p>
+        <h2 class="h2x" data-c="tx.home.geoH">Неважно, где вы&nbsp;находитесь, —<br><span class="g">работаем по&nbsp;всей России</span></h2>
       </div>
       <div class="gst">
         <div class="map gst-map rv" id="map"><div class="map-tip" id="map-tip"></div></div>
-        <div class="gst-lg" aria-hidden="true"><span><i class="lg-dot"></i>Выполненные проекты</span><span><i class="lg-ring"></i>Работаем удалённо</span></div>
+        <div class="gst-lg" aria-hidden="true"><span data-c="tx.home.geoLg1" data-k="1"><i class="lg-dot"></i>Выполненные проекты</span><span data-c="tx.home.geoLg2" data-k="1"><i class="lg-ring"></i>Работаем удалённо</span></div>
         <div class="gst-art" id="geo-art"></div>
         <div class="gst-r">
           <ul class="gcx" id="geo-cards"></ul>
           <div class="gbar">
             <span class="gbar-i"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 10.4 2.6 2.6L14 7.4"/></svg></span>
-            <p>Работаем дистанционно: исходные данные получаем онлайн, документы передаём в&nbsp;электронном виде и&nbsp;курьером</p>
+            <p data-c="tx.home.geoBar">Работаем дистанционно: исходные данные получаем онлайн, документы передаём в&nbsp;электронном виде и&nbsp;курьером</p>
             <b id="geo-total"></b>
           </div>
         </div>
@@ -179,8 +177,8 @@
   <section class="sec sec--tint" id="faq">
     <div class="wrap2 fqx">
       <div class="fqx-l">
-        <p class="badge badge--flat"><i></i>Вопросы</p>
-        <h2 class="h2x">Ответы на&nbsp;<span class="g">частые вопросы</span></h2>
+        <p class="badge badge--flat" data-c="tx.home.faqBadge" data-k="1"><i></i>Вопросы</p>
+        <h2 class="h2x" data-c="tx.home.faqH">Ответы на&nbsp;<span class="g">частые вопросы</span></h2>
         <div class="fqx-ask" id="faq-ask"></div>
       </div>
       <div class="fqx-list" id="faq-list"></div>
@@ -191,11 +189,11 @@
   <section class="sec" id="blog">
     <div class="wrap2 arh">
       <div class="arh-l">
-        <p class="badge badge--flat"><i></i>Статьи</p>
-        <h2 class="h2x">О&nbsp;пожаротушении<br><span class="g">простым языком</span></h2>
+        <p class="badge badge--flat" data-c="tx.home.blogBadge" data-k="1"><i></i>Статьи</p>
+        <h2 class="h2x" data-c="tx.home.blogH">О&nbsp;пожаротушении<br><span class="g">простым языком</span></h2>
       </div>
       <div class="arh-r">
-        <a class="fb fb--red" href="blog.html"><span>Все статьи</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a>
+        <a class="fb fb--red" data-b="blogAll" href="blog.html"><span>Все статьи</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a>
         <div class="arn">
           <button class="arn-b" id="ar-prev" aria-label="Предыдущая статья"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12 4.5 6.5 10l5.5 5.5"/></svg></button>
           <button class="arn-b" id="ar-next" aria-label="Следующая статья"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m8 4.5 5.5 5.5L8 15.5"/></svg></button>
@@ -211,9 +209,9 @@
   <section class="sec sec--tint" id="library">
     <div class="wrap2">
       <div class="sh">
-        <p class="badge badge--flat"><i></i>Библиотека</p>
-        <h2 class="h2x">Нормативы и&nbsp;книги,<br><span class="g">с&nbsp;которыми работаем</span></h2>
-        <div class="sh-r"><a class="fb fb--sm" href="biblioteka.html"><span>Открыть библиотеку</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a></div>
+        <p class="badge badge--flat" data-c="tx.home.libBadge" data-k="1"><i></i>Библиотека</p>
+        <h2 class="h2x" data-c="tx.home.libH">Нормативы и&nbsp;книги,<br><span class="g">с&nbsp;которыми работаем</span></h2>
+        <div class="sh-r"><a class="fb fb--sm" data-b="libOpen" href="biblioteka.html"><span>Открыть библиотеку</span><svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg></a></div>
       </div>
       <div class="lib-grid lbx" id="lib"></div>
     </div>
@@ -224,6 +222,7 @@
 
 <script src="js/vendor/lenis.min.js"></script>
 <script src="js/vendor/qrcode.js"></script>
+<script src="js/content.js"></script>
 <script src="js/data.js"></script>
 <script src="js/map-dots.js"></script>
 <script src="js/map-outline.js"></script>

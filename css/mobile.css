@@ -251,22 +251,26 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .cl-i { width: calc(100cqw / 2.25); height: 7.5rem; padding: 0 1rem; }
 .cl-i img, .cl-i:hover img { opacity: .5; transform: none; }
 
-/* ── 02 · услуги: лента карточек; картинка — верх 459 × 300, белая панель наплывает на неё снизу ── */
+/* ── 02 · услуги: лента карточек; картинка — верх 459 × 372 (вся сцена: у ПТП и численности она доходит до 72 % высоты),
+   белая панель наплывает на неё снизу ── */
 #services { padding-top: var(--sec); }
 #services .sh { margin-bottom: 1.5rem; }
 .scx > .sc { flex: none; width: min(24rem, 100% - 1.75rem); }
 .sc { display: flex; flex-direction: column; aspect-ratio: auto; background: var(--tint-2); }
-.sc-art { position: relative; inset: auto; flex: none; aspect-ratio: 459 / 518; margin-bottom: calc(-218 / 459 * 100%); }
-.sc-b { position: relative; left: auto; right: auto; bottom: auto; flex: 1; min-height: 0; margin: -2.25rem .3125rem .3125rem; padding: 1.25rem 1.125rem 1rem; background: rgba(255, 255, 255, .96); -webkit-backdrop-filter: none; backdrop-filter: none; }
-/* иллюстрация крупнее (просьба 04.11): кадр приближен от верха, сцена услуги (.sc-fx) внутри .sc-art едет вместе с ним */
-.sc:not(.svh-art) .sc-art { transform: scale(1.12); transform-origin: 50% 12%; }
-:is(.sc:hover, .sc.is-play):not(.svh-art) .sc-art { transform: scale(1.15); }
+.sc-art { position: relative; inset: auto; flex: none; aspect-ratio: 459 / 518; margin-bottom: calc(-146 / 459 * 100%); }
+.sc-b { position: relative; left: auto; right: auto; bottom: auto; flex: 1; min-height: 0; margin: -1.5rem .3125rem .3125rem; padding: 1.125rem 1.125rem .875rem; background: rgba(255, 255, 255, .96); -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* 05.11: иллюстрация целиком, без приближения — с приближением (04.11) края сцены срезались («выглядят обрезанными») */
+.sc:not(.svh-art) .sc-art, :is(.sc:hover, .sc.is-play):not(.svh-art) .sc-art { transform: none; }
 .sc h3 { font-size: 1.1875rem; }
 /* срок «5–10 раб. дней» на картинке услуги на телефоне не показываем (просьба 04.11) */
 .sc-d { display: none; }
-.sc-b > p { margin: .625rem 0 1rem; font-size: .875rem; }
+.sc-b > p { margin: .5rem 0 .875rem; font-size: .875rem; line-height: 1.45; }
+/* описание — две строки, обрыв «… подробнее» (класс .is-cut ставит C.eqSc, когда текст не влез). Весь текст остаётся
+   в разметке, обрезка только видимая — для поиска описание целиком; карточка и так ведёт на страницу услуги */
+.scx > .sc .sc-b > p { position: relative; max-height: 2.9em; overflow: hidden; }
+.scx > .sc .sc-b > p.is-cut::after { content: '…\00a0подробнее'; position: absolute; right: 0; bottom: 0; padding-left: 2.5rem; color: var(--red); background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 2.25rem); pointer-events: none; }
 .sc-p b { font-size: 1.25rem; }
-.sc-f { padding-top: .875rem; }
+.sc-f { padding-top: .75rem; }
 
 /* ── 03 · о нас: заявление, цифры 2 × 2, плитки преимуществ ── */
 .st { grid-template-columns: minmax(0, 1fr); row-gap: 1.25rem; }
@@ -379,6 +383,14 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .cs-spec .is-cur::before { display: none; }
 .cs-inc { order: 2; padding-top: 1rem; }
 .cs-pdf { order: 3; margin: 0; padding: .875rem 1.25rem 1rem; border-top: 1px solid var(--ln-2); background: var(--tint); }
+.cx-in { right: .75rem; bottom: .75rem; }
+.cx-hgi { width: 1.125rem; height: 2.25rem; }
+.cx-tip { right: .125rem; top: calc(100% - .25rem); width: 13.5rem; }
+.cx-go { flex-direction: column; align-items: stretch; gap: .625rem; margin-top: 1rem; }
+.cx-gon { text-align: center; }
+.cx-ask { margin-top: 1.25rem; padding-top: 1rem; }
+.cx-ask-r { grid-template-columns: minmax(0, 1fr); gap: .375rem; }
+.home .cx-ask .btn { white-space: normal; text-align: center; }
 
 /* ── 07 · как мы работаем: карточки шагов ложатся стопкой сами (sticky), без скрипта ── */
 .stk-run { height: auto !important; }
@@ -657,6 +669,19 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .f-d { gap: .5rem; }
 .f-d em { line-height: 1.15; }
 .lb-ask { aspect-ratio: 1 / 1.24; padding: 1rem .875rem; }
+/* документы на странице библиотеки и в «Других документах»: название до четырёх строк (05.11: «поинформативнее»,
+   в две строки «Боевой устав подразделений…» не говорило, о чём документ) — папка выше, лицевая сторона больше */
+.lib-grid > .folder, .lib-grid > .lb-ask { aspect-ratio: 1 / 1.4; }
+.lib-grid .f-doc { height: 56%; }
+.lib-grid .f-front { height: 63%; padding: .75rem .75rem .6875rem; }
+.lib-grid .f-t { margin-top: .3125rem; font-size: .875rem; line-height: 1.2; -webkit-line-clamp: 4; }
+.lib-grid .f-d { align-items: flex-end; padding-top: .375rem; }
+/* узкие телефоны (320–359): в строке ~15 знаков — папка ещё выше, иначе «Новая редакция» наезжает на третью строку */
+@media (max-width: 374px) {
+  .lib-grid > .folder, .lib-grid > .lb-ask { aspect-ratio: 1 / 1.62; }
+  .lib-grid .f-doc { height: 50%; }
+  .lib-grid .f-front { height: 68%; }
+}
 .lb-ask-i { left: .875rem; top: 1rem; }
 
 /* телефон: статьи и работы на страницах — строками: миниатюра слева, текст справа, карточка нажимается целиком;

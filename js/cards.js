@@ -1,6 +1,6 @@
 // Карточки, общие для главной и внутренних страниц — в языке макета главной (Figma «home»)
 (function () {
-  const D = window.OG;
+  const D = window.OG, X = D.tx.cards;
   const pad = n => String(n).padStart(2, '0');
   // стрелка-уголок кнопок (Figma: arrow-up-right) и стрелка круглой кнопки карточки услуги
   const AR = '<svg class="fb-ar" viewBox="0 0 17 17" aria-hidden="true"><path d="M4.958 12.042 12.042 4.958M4.958 4.958h7.084v7.084"/></svg>';
@@ -16,21 +16,23 @@
 
   const C = {
     dn, pad, AR, pic,
+    // картинка своя (загружена в админке) — сцена поверх неё не совпадёт с рисунком, её не показываем
+    ownImg: (s, pre = 's-') => s.img === pre + s.id,
     // случайный порядок (Фишер — Йейтс): проекты меняются местами при каждом обновлении страницы
     shuffle: list => { const a = [...list]; for (let i = a.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [a[i], a[k]] = [a[k], a[i]]; } return a; },
     // порядок услуг — как в макете главной (по рядам слева направо)
     order: D.svcOrder,
 
     // услуга: картинка на всю карточку, белая панель снизу, при наведении — сцена услуги (js/svc-fx.js)
-    sc: (s, i, n = 6) => { const FX = window.OG_FX || {}, fx = FX[s.id]; return `<article class="sc" data-fx="${s.id}">
+    sc: (s, i, n = 6) => { const FX = window.OG_FX || {}, fx = C.ownImg(s) && FX[s.id]; return `<article class="sc" data-fx="${s.id}">
       <a class="card-hit" href="usluga.html?id=${s.id}" tabindex="-1" aria-hidden="true"></a>
-      <div class="sc-art"><img class="sc-im" src="img/s-${s.id}.webp" alt="" loading="lazy" decoding="async">
+      <div class="sc-art"><img class="sc-im" src="img/${s.img}.webp" alt="" loading="lazy" decoding="async">
         ${fx ? `<svg class="sc-fx" viewBox="0 0 ${FX.W} ${FX.H}" aria-hidden="true">${fx}</svg>` : ''}</div>
-      <span class="sc-n">${pad(i + 1)} / ${pad(n)}</span><span class="sc-d">${s.days} раб. дней</span>
+      <span class="sc-n">${pad(i + 1)} / ${pad(n)}</span><span class="sc-d">${s.days} ${X.days}</span>
       <div class="sc-b">
         <h3><a class="cover-link" href="usluga.html?id=${s.id}">${s.cardT}</a></h3>
         <p>${s.cardD}</p>
-        <div class="sc-f"><p class="sc-p"><small>Стоимость</small><b>${D.cost(s)}</b></p><span class="sc-go">${GO}</span></div>
+        <div class="sc-f"><p class="sc-p"><small>${X.price}</small><b>${D.cost(s)}</b></p><span class="sc-go">${GO}</span></div>
       </div>
     </article>`; },
 
@@ -41,7 +43,7 @@
       <div class="wkc-b">
         <p class="wkc-m"><span>${w.type}</span><span>${w.city}</span></p>
         <h3><a class="cover-link" href="rabota.html?id=${w.id}">${w.obj}</a></h3>
-        <dl class="wkc-dl"><div><dt>Стоимость</dt><dd>${w.cost} тыс. ₽</dd></div><div><dt>Срок</dt><dd>${w.days} ${dn(w.days)}</dd></div></dl>
+        <dl class="wkc-dl"><div><dt>${X.price}</dt><dd>${w.cost} ${X.k}</dd></div><div><dt>${X.term}</dt><dd>${w.days} ${dn(w.days)}</dd></div></dl>
         ${w.extra ? `<p class="wkc-x"><b>+</b>${w.extra}</p>` : ''}
       </div>
     </article>`,
@@ -54,7 +56,7 @@
       <div class="arc-b">
         <h3><a class="cover-link" href="statya.html?id=${a.id}" draggable="false">${a.t}</a></h3>
         <p class="arc-d">${a.d}</p>
-        <div class="arc-f"><p><span>Дата публикации</span><time>${a.date}</time></p><span class="fb fb--sm arc-btn"><span>Читать</span>${AR}</span></div>
+        <div class="arc-f"><p><span>${X.date}</span><time>${a.date}</time></p><span class="fb fb--sm arc-btn"><span>${X.read}</span>${AR}</span></div>
       </div>
     </article>`,
 
@@ -81,7 +83,7 @@
       <span class="f-front">
         <span class="f-k">${String(i + 1).padStart(2, '0')} / ${String(D.bookCats.length).padStart(2, '0')}</span>
         <span class="f-t">${c.t}</span>
-        <span class="f-d">${n ? `${n} ${C.docs(n)}` : 'Наполняется'}</span>
+        <span class="f-d">${n ? `${n} ${C.docs(n)}` : X.empty}</span>
       </span>
     </a>`;
     },
@@ -92,7 +94,9 @@
   // белые панели карточек услуг — одной высоты, по самой высокой: иначе в ряду они «пляшут»
   C.eqSc = box => {
     const bs = [...box.querySelectorAll('.sc-b')];
-    const eq = () => { bs.forEach(b => (b.style.minHeight = '')); const h = Math.max(...bs.map(b => b.offsetHeight)); bs.forEach(b => (b.style.minHeight = h + 'px')); };
+    // .is-cut — описание не влезло в видимые строки (телефон, mobile.css): в конце строки «… подробнее»
+    const eq = () => { bs.forEach(b => (b.style.minHeight = '')); const h = Math.max(...bs.map(b => b.offsetHeight)); bs.forEach(b => (b.style.minHeight = h + 'px'));
+      bs.forEach(b => { const p = b.querySelector(':scope > p'); p && p.classList.toggle('is-cut', p.scrollHeight > p.clientHeight + 1); }); };
     eq(); addEventListener('resize', eq); addEventListener('load', eq); document.fonts && document.fonts.ready.then(eq);
   };
 

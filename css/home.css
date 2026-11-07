@@ -854,6 +854,41 @@ img.stk-im { transition: transform 1.4s var(--e-out); }
 .cs-pdf:hover .cs-pdf-i { background: var(--red); color: #fff; }
 .cs-st { color: var(--grey); }
 .cs-st.is-done { color: var(--red); }
+/* шаги по услуге: строки листа расчёта не своего порядка и высоты не своего типа объекта скрыты */
+.cs-spec > div[hidden], .cx-o[hidden], .cs-cur[hidden] { display: none; }
+/* высота здания: узкая рамка, заполнение снизу — как площадь, но вертикально */
+.cx-hgi { position: relative; width: 1.5rem; height: 3.25rem; }
+.cx-hgi::before { content: ''; position: absolute; inset: 0; border: 1px dashed rgba(15, 16, 18, .18); border-radius: .125rem; }
+.cx-hgi i { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--s) * 100%); border-radius: .125rem; background: rgba(15, 16, 18, .12); transition: background .35s; }
+.cx-o.is-sel .cx-hgi i { background: var(--red); }
+/* подсказка «i» у варианта (Зрелищные учреждения): тёмная выноска под значком, не закрывает название — по наведению на значок, на телефоне по нажатию */
+.cx-in { position: absolute; right: 1.125rem; bottom: 1.125rem; display: grid; place-items: center; width: 1.375rem; height: 1.375rem; border-radius: 50%; box-shadow: inset 0 0 0 1.25px currentColor; color: var(--grey); font: 600 .75rem/1 var(--f-num); cursor: help; transition: color .3s; }
+.cx-o:hover .cx-in, .cx-o.is-tip .cx-in { color: var(--ink); }
+.cx-tip { position: absolute; right: .625rem; top: calc(100% - .375rem); z-index: 5; width: 15rem; max-width: calc(100vw - 2.5rem); padding: .75rem .875rem; border-radius: .375rem; background: var(--ink); color: #fff; font-size: .8125rem; line-height: 1.4; text-align: left; pointer-events: none; opacity: 0; visibility: hidden; transform: translateY(-.375rem); transition: opacity .25s, transform .35s var(--e-out), visibility 0s .35s; }
+.cx-tip::after { content: ''; position: absolute; right: .875rem; bottom: 100%; border: .375rem solid transparent; border-bottom-color: var(--ink); }
+.cx-in:hover + .cx-tip, .cx-o.is-tip .cx-tip { opacity: 1; visibility: visible; transform: none; transition: opacity .25s, transform .35s var(--e-out), visibility 0s; }
+/* галочки «Чего нет»: пустой квадрат виден всегда, при отметке — красный с галкой */
+.cx-o--multi .cx-ck { border-radius: .25rem; background: #fff; box-shadow: inset 0 0 0 1.5px rgba(15, 16, 18, .2); transform: none; transition: background-color .25s, box-shadow .25s; }
+.cx-o--multi .cx-ck::after { opacity: 0; transform: scale(.5); transition: opacity .2s, transform .4s cubic-bezier(.34, 1.56, .64, 1); }
+.cx-o--multi.is-sel .cx-ck { background: var(--red); box-shadow: none; }
+.cx-o--multi.is-sel .cx-ck::after { opacity: 1; transform: none; }
+.cx-go { display: flex; align-items: center; gap: 1.25rem; margin-top: 1.25rem; }
+.home .cx-gob { height: 3.25rem; margin: 0; padding: 0 1.375rem 0 1.5rem; }
+.cx-gon { font-size: .8125rem; line-height: 1.4; color: var(--grey); }
+/* «Не нашли услугу / объект»: подпись и одна строка — телефон, что нужно, кнопка */
+.cx-ask { display: grid; gap: .625rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--ln-2); }
+.cx-ask-t { font-size: .875rem; line-height: 1.4; font-weight: 500; letter-spacing: -.01em; }
+.cx-ask-r { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.35fr) auto; gap: .5rem; }
+.home .cx-ask .fld input { height: 3.25rem; padding-top: 1.25rem; border-radius: .3125rem; background: var(--field); box-shadow: inset 0 0 0 1px var(--field); font-size: .875rem; }
+.home .cx-ask .fld input:focus { background: #fff; box-shadow: inset 0 0 0 1px var(--ink); }
+.home .cx-ask .fld.err input { box-shadow: inset 0 0 0 1.5px var(--red); }
+.home .cx-ask .fld span { top: .9375rem; overflow: hidden; max-width: calc(100% - 2.25rem); font-size: .875rem; white-space: nowrap; text-overflow: ellipsis; }
+.home .cx-ask .btn { height: 3.25rem; margin: 0; padding: 0 1.25rem; background: var(--ink); color: #fff; font-size: .875rem; }
+.home .cx-ask .consent { font-size: .6875rem; color: rgba(0, 0, 0, .3); }
+.home .cx-ask .form-ok { display: none; padding: 0; }
+.home .cx-ask.is-sent .form-ok { display: flex; align-items: center; gap: 1rem; text-align: left; }
+.home .cx-ask .form-ok svg { margin: 0; width: 2.25rem; height: 2.25rem; color: var(--red); }
+.home .cx-ask .form-ok b { font-size: 1rem; }
 /* калькулятор в окне на главной — светлый */
 .home .modal--wide .modal-box { width: min(100%, 76rem); background: #fff; border-radius: .75rem; }
 .home .modal--wide .modal-x { background: var(--tint-2); color: var(--ink); }

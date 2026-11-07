@@ -3,7 +3,8 @@
 // Эффекты, привязанные к прокрутке, регистрируются в window.OG_TICK и считаются в одном кадре.
 (function () {
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // в предпросмотре админки — без появлений и инерции: правка видна сразу, а не после анимации
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches || !!(window.OG && window.OG.preview);
   const ticks = window.OG_TICK = window.OG_TICK || [];
   // телефон и планшет: родная прокрутка без Lenis, блоки стоят сразу — без появлений и заголовков по словам
   // (на телефоне они подлагивают), параллакса нет
