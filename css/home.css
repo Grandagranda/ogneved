@@ -801,6 +801,10 @@ img.stk-im { transition: transform 1.4s var(--e-out); }
 .cx-o.is-sel .cx-bl i { background: var(--red); }
 /* у карточек с картинкой отметка — в правом верхнем углу, на одной линии с картинкой */
 .cx-o--plan .cx-ck, .cx-o--blk .cx-ck, .cx-opts[style*="--c:4"] .cx-ck { top: 1.125rem; right: 1.125rem; margin-top: 0; }
+/* диапазон «от 800 до 2 000 м²»: части не рвутся, перенос только перед «до»; площадь в четыре колонки — как остальные «планы» */
+.cx-nw { white-space: nowrap; }
+.cx-opts[style*="--c:4"] .cx-o--plan { align-content: space-between; gap: 1.5rem; min-height: 9.5rem; }
+.cx-opts[style*="--c:4"] .cx-o--plan .cx-ot b { font-size: 1.375rem; }
 /* экран результата */
 .cx-next { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin-top: 1.75rem; }
 .cx-next li { display: grid; gap: .5rem; padding: .875rem 1rem; border-radius: .5rem; background: var(--tint); font-size: .9375rem; line-height: 1.35; }

@@ -370,6 +370,8 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .cx-pl { width: 2.25rem; height: 2.25rem; }
 
 .cx-o--plan .cx-ck, .cx-o--blk .cx-ck, .cx-opts[style*="--c:4"] .cx-ck { top: .75rem; right: .75rem; }
+.cx-opts[style*="--c:4"] .cx-o--plan { gap: .75rem; min-height: 5.5rem; }
+.cx-opts[style*="--c:4"] .cx-o--plan .cx-ot b { font-size: 1.0625rem; }
 .cx-opts:not([style*="--c:5"]) .cx-o--blk .cx-ck { top: 50%; margin-top: -.5625rem; }
 .cx-next { grid-template-columns: minmax(0, 1fr); gap: .375rem; margin-top: 1.125rem; }
 .cx-next li { grid-template-columns: 1.75rem minmax(0, 1fr); align-items: baseline; padding: .75rem .875rem; font-size: .875rem; }

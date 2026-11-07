@@ -49,11 +49,23 @@
     .concat(K.spec ? [{ id: 'spec', t: K.spec.t, n: K.spec.n, k: +K.spec.k || 1 }] : []);
   const kObj = id => (OBJS.find(o => o.id === id) || {}).k || KOBJ.admin || 1;
   const needOf = sid => NEED.opts.filter(o => !o.only || [].concat(o.only).includes(sid));
-  // высота: варианты по типу объекта (K.height.by); один вариант — шаг пропускается, ответ подставляется сам
-  const HG = K.height || { opts: [], by: {} }, HG_S = [.2, .4, .6, .8, 1];
-  const hOf = obj => { const l = obj && HG.by && HG.by[obj]; return l && l.length ? l : HG.opts.map((_, i) => i); };
-  // цена по таблице (K.table — «Анализ проездов»): строка = площадь × здания, столбец = высота; «-» или пусто — индивидуально
+  // текст пункта «Чего нет»: у «Анализа проездов» свой (tOpp — «в .dwg» вместо «в векторе»)
+  const needT = (o, sid) => (sid === 'opp' && o.tOpp) || o.t;
+  // подпись варианта с единицей: «от 800 до 2 000 м²» переносится только перед «до», числа не рвутся
+  const lab = (t, u) => String(t).split(/\s(?=до\s)/).map((p, i, a) => `<span class="cx-nw">${p}${i === a.length - 1 && u ? ' ' + u : ''}</span>`).join(' ');
+  // высота: набор вариантов по услуге и типу объекта; c — столбец таблицы цен. Один вариант — шаг пропускается, ответ подставляется сам
+  const HG = K.height || { opts: [] }, HG_S = [.2, .4, .6, .8, 1];
+  const has = (l, v) => [].concat(l || []).includes(v);
+  const hList = (doc, obj) => {
+    const l = has(HG.oneObj, obj) ? (HG.two || HG.opts).slice(0, 1) : doc === 'ptp' && has(HG.ptpObj, obj) && HG.ptp ? HG.ptp
+      : has(HG.twoObj, obj) && HG.two ? HG.two : HG.opts;
+    return l.map((o, i) => ({ t: o.t, c: o.c ?? i, k: +o.k || 1 }));
+  };
+  // цена по таблице (K.table — «Анализ проездов» и «ПТП»): строка = площадь × здания, столбец = высота; «-» или пусто — индивидуально
   const TB = K.table || {};
+  // нефтегазовые объекты у табличных услуг: вместо площади застройки, высоты, зданий и «Чего нет» — площадь территории (цена диапазоном)
+  const TERR = K.terr || null;
+  const isTerr = (doc, obj) => !!TERR && has(TERR.obj, obj) && has(TB.svc, doc);
   const cell = (a, b, h) => { const row = (TB.rows || [])[a * 3 + b], m = row && String(row['h' + h] || '').match(/(\d+)\D+(\d+)/); return m ? [+m[1] * 1000, +m[2] * 1000] : null; };
   // цена «от» услуги: у трёхшаговых — нижняя граница самого малого объёма
   const from = s => VOL[s.id] ? Math.min(...VOL[s.id].opts.map(o => +o.lo)) : s.price;
@@ -65,10 +77,12 @@
       opts: () => D.services.filter(s => s.price).map(s => ({ v: s.id, t: s.short, m: `от ${D.rub(from(s))} · ${s.days} ${D.tx.pg.days}` })) },
     { id: 'obj', ...q(1), c: 4, ask: 'obj',
       opts: () => OBJS.map(o => ({ v: o.id, t: o.t, n: o.n, i: OBJ_I[o.id] || OBJ_I.other })) },
-    { id: 'area', ...q(2), c: 5,
-      opts: () => AREA_T.map((t, i) => ({ v: i, t, m: 'м²', plan: AREA_S[i] })) },
+    { id: 'area', ...q(2), c: 4,
+      opts: () => AREA_T.map((t, i) => ({ v: i, t: lab(t, 'м²'), plan: AREA_S[i] })) },
+    ...(TERR ? [{ id: 'terr', t: TERR.t, q: TERR.q, h: TERR.h, c: TERR.opts.length,
+      opts: () => TERR.opts.map((o, i) => ({ v: i, t: lab(o.t, 'м²'), plan: [.4, .7, 1][i] || 1 })) }] : []),
     { id: 'height', t: HG.t, q: HG.q, h: HG.h, c: 5,
-      opts: () => HG.opts.map((o, i) => ({ v: i, t: o.t, m: 'м', hg: HG_S[i] || 1 })) },
+      opts: () => hList().map((o, i) => ({ v: i, t: lab(o.t, 'м'), hg: HG_S[o.c] || 1 })) },
     { id: 'bld', ...q(3), c: 3,
       opts: () => BLD_T.map((t, i) => ({ v: i, t, blocks: BLD_N[i] })) },
     { id: 'term', ...q(5), c: 2,
@@ -79,7 +93,7 @@
     // «Чего нет из исходных данных» — галочки, у каждой услуги свой набор (K.need.opts[].only)
     ...D.services.filter(s => s.price).map(s => s.id).map(sid =>
       ({ id: 'need-' + sid, k: 'need', sid, t: NEED.t, q: NEED.q, h: NEED.h, c: 2, multi: 1,
-        opts: () => needOf(sid).map(o => ({ v: o.v, t: o.t, m: `${o.m} · +${num(+o.add || 0)}&nbsp;₽`, i: NI[o.v] || DI.none })) })),
+        opts: () => needOf(sid).map(o => ({ v: o.v, t: needT(o, sid), m: `${o.m} · +${num(+o.add || 0)}&nbsp;₽`, i: NI[o.v] || DI.none })) })),
   ].map(p => ({ k: p.id, ...p }));
   const PI = Object.fromEntries(PANELS.map(p => [p.id, p]));
 
@@ -109,8 +123,11 @@
     const st = { step: 0, a: {} };
     // порядок шагов по выбранной услуге
     // порядок шагов: у «Проездов» и «ПТП» высота пропускается, если для типа объекта она одна (логистика)
+    // нефтегаз у «Проездов» и «ПТП»: услуга → объект → территория → срок
     const flow = () => { const d = st.a.doc || 'opp';
-      return VOL[d] ? ['doc', 'vol-' + d, 'need-' + d] : ['doc', 'obj', 'area', ...(hOf(st.a.obj).length > 1 ? ['height'] : []), 'bld', 'need-' + d, 'term']; };
+      if (VOL[d]) return ['doc', 'vol-' + d, 'need-' + d];
+      if (isTerr(d, st.a.obj)) return ['doc', 'obj', 'terr', 'term'];
+      return ['doc', 'obj', 'area', ...(hList(d, st.a.obj).length > 1 ? ['height'] : []), 'bld', 'need-' + d, 'term']; };
     // в истории браузера — шаги калькулятора на странице: «назад» браузера и телефона возвращает на шаг, а не уводит со страницы.
     // В окне не пишем — там «назад» закрывает окно (слои js/ui.js)
     const inline = !el.closest('.modal'), hid = 'cx' + Math.random().toString(36).slice(2, 7);
@@ -171,20 +188,27 @@
         const [d0, d1] = (String(s.days).match(/\d+/g) || [s.base, s.base + 2]).map(Number);
         return { s, lo: +o.lo + add, hi: +o.hi + add, d0: d0 + xd, d1: (d1 || d0 + 2) + xd };
       }
-      // «Проезды» — по таблице K.table, «ПТП» — от базовой цены коэффициентами. Сверху — отмеченные пункты «Чего нет» и «Срочно»
-      const ai = Math.min(a.area ?? 0, AREA.length - 1), bi = Math.min(a.bld ?? 0, BLD.length - 1), hl = hOf(a.obj), h = hl.includes(a.height) ? a.height : hl[0];
-      const ns = needOf(s.id).filter(n => (a.need || []).includes(n.v)), add = ns.reduce((x, n) => x + (+n.add || 0), 0), xd = Math.max(0, ...ns.map(n => +n.days || 0));
       const fast = a.term === (TERM[1] || [])[0], kf = fast ? +K.fast.price || 1 : 1;
+      if (isTerr(s.id, a.obj)) {
+        // нефтегаз: цена диапазоном по площади территории, сверху «Срочно»; срок — из карточки услуги
+        const o = TERR.opts[a.terr ?? 0] || TERR.opts[0];
+        let [d0, d1] = (String(s.days).match(/\d+/g) || [s.base, s.base + 2]).map(Number); d1 = d1 || d0 + 2;
+        if (fast) { d0 = Math.max(2, Math.ceil(d0 * (+K.fast.time || 1))); d1 = Math.max(d0 + 1, Math.ceil(d1 * (+K.fast.time || 1))); }
+        return { s, lo: r1(+o.lo * kf), hi: r1(+o.hi * kf), d0, d1 };
+      }
+      // «Проезды» и «ПТП» — по таблице K.table (иначе — от базовой цены коэффициентами). Сверху — отмеченные пункты «Чего нет» и «Срочно»
+      const ai = Math.min(a.area ?? 0, AREA.length - 1), bi = Math.min(a.bld ?? 0, BLD.length - 1), hl = hList(s.id, a.obj), hv = hl[a.height] || hl[0];
+      const ns = needOf(s.id).filter(n => (a.need || []).includes(n.v)), add = ns.reduce((x, n) => x + (+n.add || 0), 0), xd = Math.max(0, ...ns.map(n => +n.days || 0));
       const ar = AREA[ai][1], bl = BLD[bi][1], B = s.base * Math.sqrt(ar * bl);
       let d0 = Math.max(2, Math.ceil(B)) + xd;
       if (fast) d0 = Math.max(2, Math.ceil(d0 * (+K.fast.time || 1)));
       const days = { d0, d1: d0 + 2 };
       if ([].concat(TB.svc || []).includes(s.id)) {
-        const c = !(TB.skip || []).includes(a.obj) && cell(ai, bi, h);
+        const c = !has(TB.skip, a.obj) && cell(ai, bi, hv.c);
         if (!c) return { s, ind: 1, ...days };
         return { s, lo: r1((c[0] + add) * kf), hi: r1((c[1] + add) * kf), ...days };
       }
-      const p = (s.price * kObj(a.obj || 'admin') * ar * bl * (+(HG.opts[h] || {}).k || 1) + add) * kf;
+      const p = (s.price * kObj(a.obj || 'admin') * ar * bl * hv.k + add) * kf;
       return { s, lo: Math.max(s.price, r5(p)), hi: r5(p * 1.2), ...days };
     }
     // число докручивается до нового значения; новый вызов отменяет предыдущий
@@ -204,10 +228,11 @@
         case 'obj': return (OBJS.find(o => o.id === v) || {}).t;
         case 'area': return AREA_T[v] + ' м²';
         case 'bld': return BLD_T[v];
-        case 'height': return HG.opts[v] ? HG.opts[v].t + ' м' : '';
+        case 'height': { const o = hList(a.doc, a.obj)[v]; return o ? o.t + ' м' : ''; }
+        case 'terr': return TERR.opts[v] ? TERR.opts[v].t + ' м²' : '';
         case 'term': return (TERM.find(t => t[0] === v) || [])[1];
         case 'vol': return (VOL[p.sid].opts[v] || {}).t;
-        case 'need': return v.length ? needOf(p.sid).filter(n => v.includes(n.v)).map(n => n.t).join('; ') : X.allOk;
+        case 'need': return v.length ? needOf(p.sid).filter(n => v.includes(n.v)).map(n => needT(n, p.sid)).join('; ') : X.allOk;
       }
       return '';
     }
@@ -303,7 +328,7 @@
       $$('.cx-o', x).forEach(o => o.classList.toggle('is-sel', o === btn));
       if (p.k === 'doc' && st.a.doc !== v) newDoc(v);
       st.a[p.k] = v;
-      if (p.k === 'obj') syncHeight();
+      if (p.k === 'obj' || p.k === 'doc') syncHeight();
       paint();
       busy = setTimeout(() => { busy = 0; advance(i); }, 380);
     }
@@ -312,16 +337,21 @@
       delete st.a.need; clear(PANELS.filter(z => z.sid).map(z => z.id));
       if (VOL[st.a.doc] || VOL[v]) delete st.a.vol;
     }
-    // высоты под тип объекта: лишние варианты скрыты, сетка по их числу; единственный вариант отвечается сам
+    // высоты под услугу и тип объекта: варианты перестраиваются, сетка по их числу; другой набор — ответ сбрасывается;
+    // единственный вариант отвечается сам
     function syncHeight() {
       const x = QE.height; if (!x) return;
-      const l = hOf(st.a.obj), os = $$('.cx-o', x);
-      os.forEach((o, i) => { o.hidden = !l.includes(i); });
-      $('.cx-opts', x).setAttribute('style', '--c:' + Math.max(2, l.length));
+      const l = hList(st.a.doc, st.a.obj), key = l.map(o => o.t + '/' + o.c).join('|'), box = $('.cx-opts', x);
+      if (box.dataset.key !== key) {
+        box.dataset.key = key;
+        box.innerHTML = l.map((o, i) => optHTML({ v: i, t: lab(o.t, 'м'), hg: HG_S[o.c] || 1 })).join('');
+        box.setAttribute('style', '--c:' + Math.max(2, l.length));
+        delete st.a.height; st.hAuto = 0;
+      }
       // подставленная сама высота (логистика) — не ответ клиента: у другого типа объекта шаг спросит заново
-      if (l.length === 1) { st.a.height = l[0]; st.hAuto = 1; }
-      else if (st.hAuto || (st.a.height != null && !l.includes(st.a.height))) { delete st.a.height; st.hAuto = 0; }
-      os.forEach((o, i) => o.classList.toggle('is-sel', st.a.height === i && l.length > 1));
+      if (l.length === 1) { st.a.height = 0; st.hAuto = 1; }
+      else if (st.hAuto) { delete st.a.height; st.hAuto = 0; }
+      $$('.cx-o', x).forEach((o, i) => o.classList.toggle('is-sel', st.a.height === i && l.length > 1));
     }
     // назад: если шаг записан в истории — через историю (её «назад» и вернёт шаг), иначе сразу
     // кнопка «Назад» — всегда на шаг раньше по порядку. Если предыдущая запись истории и есть этот шаг — уходим по истории,
@@ -381,7 +411,7 @@
     el.ogSet = id => {
       if (!D.svc(id)) return;
       if (st.a.doc !== id) newDoc(id);
-      st.a.doc = id;
+      st.a.doc = id; syncHeight();
       $$('.cx-q[data-id="doc"] .cx-o', el).forEach(o => o.classList.toggle('is-sel', o.dataset.v === id));
       go(1);
     };
