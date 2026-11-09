@@ -464,7 +464,7 @@ html.is-mm .dock, body.is-locked .dock { transform: translateY(calc(100% + 1rem 
 .arh-r { padding: 0; }
 .arn { display: none; }
 .arv { overflow: visible; padding: 0; margin: 0; }
-.arx { width: auto; cursor: auto; user-select: auto; transform: none !important; transition: none; }
+.arx { width: auto; cursor: auto; user-select: auto; touch-action: auto; transform: none !important; transition: none; }
 .arx > .arc, .arg .arc { flex: none; width: min(19.5rem, 100% - 2.5rem); height: auto; min-height: 0; }
 .arc:hover { transform: none; box-shadow: inset 0 0 0 1px rgba(15, 16, 18, .07); }
 .arc-img { height: clamp(11rem, 48vw, 15rem); }
